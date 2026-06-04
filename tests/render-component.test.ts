@@ -1,6 +1,6 @@
 import { test, describe } from "node:test";
 import assert from "node:assert";
-import { renderComponent } from "../src/render/render.ts";
+import { renderComponent } from "../src/render/render-component.ts";
 import { tagConfig } from "../src/config/tag-config.ts";
 import { sharedAttributeConfig } from "../src/config/shared-attribute-config.ts";
 import { createComponent } from "../src/create-component.ts";
