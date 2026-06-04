@@ -1,5 +1,5 @@
-import { SharedAttributeConfig } from "./config/shared-attribute-config";
-import { BaseTagConfig } from "./config/tag-config";
+import { type SharedAttributeConfig } from "./config/shared-attribute-config";
+import { type BaseTagConfig } from "./config/tag-config";
 
 export type ComponentDictionary<
   TTagConfig extends BaseTagConfig,
@@ -31,29 +31,25 @@ export type ComponentNode<
     ? TTagConfig[T] extends { innerHTML: infer I }
       ? I extends readonly []
         ? never
-        : string | ComponentDictionary<TTagConfig, TGlobalConfig>[]
+        : string | readonly ComponentDictionary<TTagConfig, TGlobalConfig>[]
       : never
     : never;
 } & {
-  [K in keyof MergedSchema<
-    T,
-    TTagConfig,
-    TGlobalConfig
-  > as K extends "innerHTML"
+  [K in keyof MergedSchema<T, TTagConfig, TGlobalConfig> as string extends K
     ? never
-    : undefined extends MergedSchema<T, TTagConfig, TGlobalConfig>[K]
+    : K extends "innerHTML"
       ? never
-      : K]: MergedSchema<T, TTagConfig, TGlobalConfig>[K];
+      : undefined extends MergedSchema<T, TTagConfig, TGlobalConfig>[K]
+        ? never
+        : K]: MergedSchema<T, TTagConfig, TGlobalConfig>[K];
 } & {
-  [K in keyof MergedSchema<
-    T,
-    TTagConfig,
-    TGlobalConfig
-  > as K extends "innerHTML"
+  [K in keyof MergedSchema<T, TTagConfig, TGlobalConfig> as string extends K
     ? never
-    : undefined extends MergedSchema<T, TTagConfig, TGlobalConfig>[K]
-      ? K
-      : never]?: Exclude<
+    : K extends "innerHTML"
+      ? never
+      : undefined extends MergedSchema<T, TTagConfig, TGlobalConfig>[K]
+        ? K
+        : never]?: Exclude<
     MergedSchema<T, TTagConfig, TGlobalConfig>[K],
     undefined
   >;
@@ -67,31 +63,33 @@ export function validateComponent<
   globalAttributes: TGlobalConfig,
   node: unknown,
 ): asserts node is AnyComponentNode<TTagConfig, TGlobalConfig> {
+  // 1. Structural Baseline Check
   if (!node || typeof node !== "object") {
     throw new Error(
       "Validation Error: Provided node is not a valid component object.",
     );
   }
 
-  const nodeRecord = node as Record<string, unknown>;
-
-  if (typeof nodeRecord.tag !== "string") {
+  if (!("tag" in node) || typeof node.tag !== "string") {
     throw new Error(
       "Validation Error: Component node is missing a valid string 'tag' property.",
     );
   }
 
-  const tag = nodeRecord.tag;
-  const schemaForTag = htmlTagAttributes[tag as keyof TTagConfig];
+  const tag = node.tag;
+  const schemaForTag = htmlTagAttributes[tag];
 
-  if (!schemaForTag) return;
+  if (!schemaForTag) {
+    throw new Error(
+      `Structural Error: '<${tag}>' is not a recognized configuration tag in your registry.`,
+    );
+  }
 
-  const tagRecord = schemaForTag as Record<string, unknown>;
-
-  for (const [attrKey, attrValue] of Object.entries(nodeRecord)) {
+  for (const [attrKey, attrValue] of Object.entries(node)) {
     if (attrKey === "tag" || attrKey === "innerHTML") continue;
 
-    const tagAttrExpectation = tagRecord[attrKey];
+    const tagAttrExpectation =
+      schemaForTag[attrKey as keyof typeof schemaForTag];
     const globalAttrExpectation = globalAttributes[attrKey];
 
     if (
@@ -129,8 +127,8 @@ export function validateComponent<
     }
   }
 
-  const innerHTMLRule = tagRecord.innerHTML;
-  const innerHTMLValue = nodeRecord.innerHTML;
+  const innerHTMLRule = schemaForTag.innerHTML;
+  const innerHTMLValue = "innerHTML" in node ? node.innerHTML : undefined;
 
   if (Array.isArray(innerHTMLRule) && innerHTMLRule.length === 0) {
     if (innerHTMLValue !== undefined) {
@@ -170,25 +168,23 @@ export function validateComponent<
     } else if (Array.isArray(innerHTMLRule)) {
       for (const childDict of childDictionaries) {
         for (const childNode of Object.values(childDict)) {
-          if (
-            childNode &&
-            typeof childNode === "object" &&
-            "tag" in childNode &&
-            typeof childNode.tag === "string"
-          ) {
-            const childTag = childNode.tag;
+          if (childNode && typeof childNode === "object") {
+            if (typeof childNode.tag === "string") {
+              const childTag = childNode.tag;
 
-            if (!(innerHTMLRule as readonly string[]).includes(childTag)) {
-              throw new Error(
-                `Structural Error: '<${tag}>' cannot contain a '<${childTag}>' element. Allowed elements: [${(innerHTMLRule as readonly string[]).join(", ")}]`,
-              );
+              if (!(innerHTMLRule as readonly string[]).includes(childTag)) {
+                throw new Error(
+                  `Structural Error: '<${tag}>' cannot contain a '<${childTag}>' element. Allowed elements: [${(innerHTMLRule as readonly string[]).join(", ")}]`,
+                );
+              }
+              validateComponent(htmlTagAttributes, globalAttributes, childNode);
+              continue;
             }
-            validateComponent(htmlTagAttributes, globalAttributes, childNode);
-          } else {
-            throw new Error(
-              `Structural Error: Invalid child node detected inside '<${tag}>'.`,
-            );
           }
+
+          throw new Error(
+            `Structural Error: Invalid child node detected inside '<${tag}>'.`,
+          );
         }
       }
     }
