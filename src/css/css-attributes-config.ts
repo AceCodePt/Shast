@@ -1,55 +1,42 @@
-import type { Simplify } from "../types.ts";
+import type {
+  EmptyParts,
+  ErrorMessage,
+  IllegalChar,
+  Simplify,
+  SplitPipe,
+  Trim,
+} from "../types.ts";
 import type { BaseCSSSyntaxConfig } from "./css-syntax-config.ts";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ArkType-style single-signature DSL validation + autocomplete.
 //
-// The per-attribute parameter type is computed by `Validate<value, keys>`, which
-// returns ONE of two things depending on what you've typed:
+// `Validate<value, keys>` returns ONE of:
 //
-//   • a union of valid completions — when the active "<token>" is mid-type, e.g.
-//     typing "<length> | <pe" yields "<length> | <percentage>", so the editor
-//     offers it as a partial-continuation suggestion (like ArkType's "number | b"
-//     → "number | bigint"); and
+//   • a union of valid completions — when the active segment is empty (after
+//     a trailing `|`) or mid-typing a "<token>". The dropdown surfaces each
+//     suggestion as a sibling of the current input:
+//
+//       ""                  → "<length>" | "<color>" | …            (all tokens)
+//       "<length> | "       → "<length> | <length>" | "<length> | <color>" | …
+//       "<length> | <pe"    → "<length> | <percentage>"             (filtered)
+//
+//     A transient red squiggle appears on the partial input until a completion
+//     is picked or the value is finished — this is the same trade-off ArkType
+//     accepts in exchange for visible dropdown completions.
 //
 //   • a plain-string error message — for terminal mistakes (illegal characters,
-//     empty alternatives, malformed tokens, unknown tokens). The message is a
-//     real string literal (marked with a trailing zero-width space, as ArkType
-//     does) rather than an `& ErrorTag<{...}>` object, so the diagnostic reads as
-//     a single clean line: `Type '"..."' is not assignable to type '"🛑 ..."'`.
+//     empty alternatives at commit time, malformed tokens, unknown tokens). The
+//     message is a real string literal (with a trailing zero-width space, like
+//     ArkType) rather than an `& ErrorTag<{...}>` object, so the diagnostic
+//     reads as one line: `Type '"..."' is not assignable to type '"🛑 ..."'`.
 //
-// Because it is a SINGLE signature (no overloads) and the error is a plain string
-// (no object brand), there is no "No overload matches this call" wrapper and no
-// dump of the syntax-config type in the diagnostic.
+// Because it's a SINGLE signature (no overloads) and the error is a plain
+// string (no object brand), there is no "No overload matches this call"
+// wrapper and no dump of the syntax-config type in the diagnostic.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Zero-width space marker so error messages never collide with real values. */
-type ZWS = "\u200b";
-type ErrorMessage<M extends string> = `${M}${ZWS}`;
-
 type SyntaxKeys<S extends BaseCSSSyntaxConfig> = keyof S & string;
-type Trim<S extends string> = S extends ` ${infer R}`
-  ? Trim<R>
-  : S extends `${infer L} `
-    ? Trim<L>
-    : S;
-
-/** Characters that may never appear in the DSL. Edit this set freely. */
-type IllegalChars = "(" | ")" | "[" | "]" | "{" | "}";
-
-/**
- * The FIRST illegal character in `S` (leftmost), or `never` if clean. Walks the
- * string one character at a time: peel the first char (`Head`) off the rest
- * (`Tail`), test it against the banned set, and recurse on `Tail` until a hit or
- * the empty string. The single-char peel keeps the match unambiguous, and the
- * return-or-recurse gives "stop at the first" — neither is possible with a single
- * `extends` over a union (that returns all matches, not the first).
- */
-type IllegalChar<S extends string> = S extends `${infer Head}${infer Tail}`
-  ? Head extends IllegalChars
-    ? Head
-    : IllegalChar<Tail>
-  : never;
 
 type KeyBody<K extends string> = K extends `<${infer B}>` ? B : never;
 
@@ -58,25 +45,11 @@ type KeysMatching<
   P extends string,
   Keys extends string,
 > = Keys extends infer K extends string
-  ? K extends K
-    ? KeyBody<K> extends `${P}${string}`
-      ? K
-      : never
+  ? KeyBody<K> extends `${P}${string}`
+    ? K
     : never
   : never;
 
-// ── completed-expression checks (split on bare "|", trim each part) ──
-type SplitPipe<S extends string> = S extends `${infer A}|${infer B}`
-  ? Trim<A> | SplitPipe<B>
-  : Trim<S>;
-type EmptyParts<S extends string> =
-  SplitPipe<S> extends infer P extends string
-    ? P extends P
-      ? P extends ""
-        ? "x"
-        : never
-      : never
-    : never;
 type MalformedPart<P extends string> = P extends `<${string}>`
   ? never
   : P extends `<${string}`
@@ -84,48 +57,69 @@ type MalformedPart<P extends string> = P extends `<${string}>`
     : P extends `${string}>`
       ? P
       : never;
+
 type MalformedParts<S extends string> =
-  SplitPipe<S> extends infer P extends string
-    ? P extends P
-      ? MalformedPart<P>
-      : never
-    : never;
+  SplitPipe<S> extends infer P extends string ? MalformedPart<P> : never;
+
 type TokenParts<S extends string> =
   SplitPipe<S> extends infer P extends string
-    ? P extends P
-      ? P extends `<${string}>`
-        ? P
-        : never
+    ? P extends `<${string}>`
+      ? P
       : never
     : never;
 
-// ── active-segment splitting (everything after the final "|") ──
+/** Everything after the final `|`, or the whole string if there is no `|`. */
 type LastSegment<S extends string> = S extends `${string}|${infer R}`
   ? LastSegment<R>
   : S;
+
+/** Everything up to and including the final `|`, or `""` if there is no `|`. */
 type PrefixBeforeLast<S extends string> = S extends `${infer A}|${infer R}`
   ? R extends `${string}|${string}`
     ? `${A}|${PrefixBeforeLast<R>}`
     : `${A}|`
   : "";
+
+/** A single space iff the active segment starts with one (preserves "| <…>"). */
 type PrefixSpace<S extends string> =
   LastSegment<S> extends ` ${string}` ? " " : "";
 
 /**
- * Core: completion union when a "<token>" is mid-type, otherwise full validation.
+ * Build the completion union for the active segment.
+ *
+ * `Suggestions` is the set of token names to offer (filtered by partial input,
+ * or all tokens when the segment is empty). The current string `S` is NOT
+ * unioned in — including it tends to mask sibling completions in the editor's
+ * dropdown. The trade-off is a transient red squiggle on the partial input
+ * until a completion is picked or the value is finished. ArkType makes the
+ * same trade-off.
+ */
+type Completions<
+  S extends string,
+  Suggestions extends string,
+> = `${PrefixBeforeLast<S>}${PrefixSpace<S>}${Suggestions}`;
+
+/**
+ * Core: completion union when the active segment is empty or mid-typing a
+ * "<token>", otherwise full validation via `FinishedCheck`.
  */
 type Validate<S extends string, Keys extends string> = [
   IllegalChar<S>,
 ] extends [never]
-  ? Trim<LastSegment<S>> extends `<${infer Body}`
-    ? Body extends `${string}>${string}`
-      ? FinishedCheck<S, Keys> // token already closed → validate as complete
-      : KeysMatching<Body, Keys> extends infer M extends string
-        ? [M] extends [never]
-          ? ErrorMessage<`🛑 No known token starts with '<${Body}'`>
-          : `${PrefixBeforeLast<S>}${PrefixSpace<S>}${M}` // completion union
-        : ErrorMessage<`🛑 parse error`>
-    : FinishedCheck<S, Keys>
+  ? Trim<LastSegment<S>> extends ""
+    ? // ── Active segment is empty → suggest all tokens ──
+      // Fires for the initial "" and for trailing "… | " inputs. Including
+      // `S` in the union keeps the in-progress value assignable while typing.
+      Completions<S, Keys>
+    : Trim<LastSegment<S>> extends `<${infer Body}`
+      ? Body extends `${string}>${string}`
+        ? FinishedCheck<S, Keys> // token already closed → validate as complete
+        : KeysMatching<Body, Keys> extends infer M extends string
+          ? [M] extends [never]
+            ? ErrorMessage<`🛑 No known token starts with '<${Body}'`>
+            : Completions<S, M> // partial-prefix completion union
+          : ErrorMessage<`🛑 parse error`>
+      : FinishedCheck<S, Keys>
   : ErrorMessage<`🛑 Unexpected character '${IllegalChar<S>}' — only <tokens> separated by '|' are allowed`>;
 
 type FinishedCheck<S extends string, Keys extends string> = [
@@ -148,9 +142,10 @@ export type CSSAttributeConfig<
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Inference: turn a validated DSL string into its perceived value type.
-// Each "|"-separated part maps to either the syntax config's value type (for a
-// "<token>") or the literal keyword itself (for a bare word like "none").
+// Each "|"-separated part maps to either the syntax config's value type (for
+// a "<token>") or the literal keyword itself (for a bare word like "none").
 // ─────────────────────────────────────────────────────────────────────────────
+
 type InferPart<P extends string, S> = P extends keyof S ? S[P] : P;
 
 type InferDSL<Def extends string, S> = Def extends `${infer A}|${infer B}`
@@ -165,13 +160,6 @@ export type InferredCSSAttributes<
   [K in keyof A]: InferDSL<A[K], S>;
 }>;
 
-/** Identity helper that captures the syntax config's literal types. */
-export function cssSyntaxConfig<const S extends BaseCSSSyntaxConfig>(
-  syntax: S,
-): S {
-  return syntax;
-}
-
 export function cssAttributeConfig<
   const S extends BaseCSSSyntaxConfig,
   const A extends Record<string, string>,
@@ -182,6 +170,6 @@ export function cssAttributeConfig<
       ? A[K]
       : Validate<A[K], SyntaxKeys<S>>;
   },
-): InferredCSSAttributes<S, A> {
-  return attrs as never;
+) {
+  return attrs as InferredCSSAttributes<S, A>;
 }

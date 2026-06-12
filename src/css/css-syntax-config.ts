@@ -1,3 +1,5 @@
+import type { Simplify } from "../types.ts";
+
 declare const _error: unique symbol;
 type ErrorTag<Msg extends string> = { [_error]: Msg };
 
@@ -11,7 +13,9 @@ export type ValidatedCSSSyntaxConfig<
   [K in keyof T]: K extends string
     ? K extends `<${string}${string}>`
       ? T[K] extends string
-        ? T[K]
+        ? T[K] extends keyof T
+          ? T[T[K] & keyof T]
+          : T[K]
         : T[K] &
             ErrorTag<`🛑 ERROR: The value of '${K}' must be any type of string`>
       : T[K] &
@@ -20,7 +24,7 @@ export type ValidatedCSSSyntaxConfig<
 };
 
 export function cssSyntaxConfig<const T extends BaseCSSSyntaxConfig>(
-  config: ValidatedCSSSyntaxConfig<T>,
-): T {
-  return config;
+  config: T,
+) {
+  return config as Simplify<ValidatedCSSSyntaxConfig<T>>;
 }

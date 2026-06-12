@@ -23,6 +23,33 @@ type UndefinedKeys<T> = {
   [K in keyof T]-?: undefined extends T[K] ? K : never;
 }[keyof T];
 
+export type ErrorMessage<M extends string> = `${M}`;
+
+export type IllegalChars = "(" | ")" | "[" | "]" | "{" | "}";
+
+export type IllegalChar<S extends string> = S extends `${infer Head}${infer Tail}`
+  ? Head extends IllegalChars
+    ? Head
+    : IllegalChar<Tail>
+  : never;
+
+export type SplitPipe<S extends string> = S extends `${infer A}|${infer B}`
+  ? Trim<A> | SplitPipe<B>
+  : Trim<S>;
+
+export type EmptyParts<S extends string> =
+  SplitPipe<S> extends infer P extends string
+    ? P extends ""
+      ? "x"
+      : never
+    : never;
+
+export type Trim<S extends string> = S extends ` ${infer R}`
+  ? Trim<R>
+  : S extends `${infer L} `
+    ? Trim<L>
+    : S;
+
 export type Simplify<T> = { readonly [K in keyof T]: T[K] } & {};
 
 export type MakeUndefinedOptional<T> = Simplify<
