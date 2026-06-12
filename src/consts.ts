@@ -227,14 +227,153 @@ export const HTML_TAG_DEFINITIONS = htmlTagConfig({
 });
 
 export const CSS_SYNTAX = cssSyntaxConfig({
-  "<angle>": "" as `${number}${"dag" | "rad" | "turn"}`,
+  // ── MDN numeric / dimension types ─────────────────────────────────────────
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/integer
   "<integer>": "" as `${bigint}`,
-  "<length>":
-    "" as `${number}${"px" | "rem" | "em" | "vw" | "vh" | "vmin" | "vmax" | "ch" | "lh" | "in" | "pt" | "%"}`,
+
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/number
   "<number>": "" as `${number}`,
-  "<percentage>": "" as `${bigint}%`,
+
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/percentage
+  "<percentage>": "" as `${number}%`,
+
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/length
+  "<length>":
+    "" as `${number}${"px" | "rem" | "em" | "vw" | "vh" | "vmin" | "vmax" | "ch" | "lh" | "dvh" | "dvw" | "svh" | "svw" | "in" | "pt" | "pc" | "cm" | "mm"}`,
+
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/length-percentage
+  "<length-percentage>": "" as "<length>" | "<percentage>",
+
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/angle
+  "<angle>": "" as `${number}${"deg" | "rad" | "turn" | "grad"}`,
+
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/time
+  "<time>": "" as `${number}${"s" | "ms"}`,
+
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/ratio
+  "<ratio>": "" as `${number} / ${number}`,
+
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/flex_value  (the fr unit)
+  "<flex>": "" as `${number}fr`,
+
+  // ── MDN textual types ──────────────────────────────────────────────────────
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/string
   "<string>": "" as string,
+
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/url_value
   "<url>": "" as `url(${string})`,
+
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/custom-ident
+  "<custom-ident>": "" as string,
+
+  // ── MDN color types ────────────────────────────────────────────────────────
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+  "<color>": "" as
+    | `#${string}`
+    | `rgb(${number} ${number} ${number})`
+    | `rgb(${number} ${number} ${number} / ${number})`
+    | `hsl(${number} ${number}% ${number}%)`
+    | `hsl(${number} ${number}% ${number}% / ${number})`
+    | `oklch(${number} ${number} ${number})`
+    | `oklch(${number} ${number} ${number} / ${number})`
+    | `color(display-p3 ${number} ${number} ${number})`
+    | "transparent"
+    | "currentColor"
+    | "inherit",
+
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/alpha-value
+  "<alpha-value>": "" as `${number}` | `${number}%`,
+
+  // ── MDN image type ─────────────────────────────────────────────────────────
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/image
+  // Covers url(), linear-gradient(), etc. — kept as url() for the common case;
+  // gradient functions are compound shorthands typed as <string> at usage sites.
+  "<image>": "" as
+    | `url(${string})`
+    | `linear-gradient(${string})`
+    | `radial-gradient(${string})`,
+
+  // ── MDN 2D position type ───────────────────────────────────────────────────
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/position_value
+  // Used by background-position, transform-origin, object-position, etc.
+  "<position>": "" as
+    | "center"
+    | "top"
+    | "bottom"
+    | "left"
+    | "right"
+    | "top left"
+    | "top center"
+    | "top right"
+    | "center left"
+    | "center center"
+    | "center right"
+    | "bottom left"
+    | "bottom center"
+    | "bottom right"
+    | "<length-percentage>",
+
+  // ── MDN easing-function type ───────────────────────────────────────────────
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/easing-function
+  "<easing-function>": "" as
+    | "ease"
+    | "ease-in"
+    | "ease-out"
+    | "ease-in-out"
+    | "linear"
+    | `cubic-bezier(${number}, ${number}, ${number}, ${number})`
+    | `steps(${number})`
+    | `steps(${number}, ${"start" | "end" | "jump-start" | "jump-end" | "jump-none" | "jump-both"})`,
+
+  // ── MDN line-style type ────────────────────────────────────────────────────
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/line-style
+  "<line-style>": "" as
+    | "none"
+    | "hidden"
+    | "dotted"
+    | "dashed"
+    | "solid"
+    | "double"
+    | "groove"
+    | "ridge"
+    | "inset"
+    | "outset",
+
+  // ── MDN line-width type ────────────────────────────────────────────────────
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/line-width
+  "<line-width>": "" as "thin" | "medium" | "thick" | "<length>",
+
+  // ── MDN basic-shape type ───────────────────────────────────────────────────
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/basic-shape
+  // Kept as string — compound function syntax (inset, circle, polygon, path…)
+  "<basic-shape>": "" as string,
+
+  // ── Grid-specific types (defined in CSS Grid spec, referenced by MDN) ──────
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/flex_value
+  // <flex> covers fr; track sizing uses <length-percentage> | <flex> | keywords
+  "<track-breadth>": "" as
+    | "<length-percentage>"
+    | "<flex>"
+    | "min-content"
+    | "max-content"
+    | "auto",
+
+  // ── font-weight numeric values (MDN lists 100–900 as valid <number> inputs) ─
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
+  "<font-weight>": "" as
+    | "normal"
+    | "bold"
+    | "bolder"
+    | "lighter"
+    | "100"
+    | "200"
+    | "300"
+    | "400"
+    | "500"
+    | "600"
+    | "700"
+    | "800"
+    | "900",
 });
 
 export const CSS_ATTRIBUTES = cssAttributeConfig(CSS_SYNTAX, {
