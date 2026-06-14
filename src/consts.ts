@@ -9,42 +9,31 @@ import { htmlAttributeConfig } from "./html/html-attribute-config.ts";
 import { htmlTagConfig } from "./html/html-tag-config.ts";
 
 export const HTML_GLOBAL_ATTRIBUTES = htmlAttributeConfig({
-  id: "" as string | undefined,
-  class: "" as string | undefined,
-  style: "" as string | undefined,
-  title: "" as string | undefined,
-  lang: "" as string | undefined,
-  dir: "" as "ltr" | "rtl" | "auto" | undefined,
-  hidden: false as boolean | undefined,
-  tabindex: 0 as number | undefined,
-  accesskey: "" as string | undefined,
-  autocapitalize: "" as
-    | "off"
-    | "none"
-    | "on"
-    | "sentences"
-    | "words"
-    | "characters"
-    | undefined,
-  contenteditable: "" as
-    | "true"
-    | "false"
-    | "plaintext-only"
-    | boolean
-    | undefined,
-  draggable: "" as "true" | "false" | boolean | undefined,
-  spellcheck: "" as "true" | "false" | boolean | undefined,
-  role: "" as string | undefined,
+  id: "string | undefined",
+  class: "string | undefined",
+  style: "string | undefined",
+  title: "string | undefined",
+  lang: "string | undefined",
+  dir: "'ltr' | 'rtl' | 'auto' | undefined",
+  hidden: "boolean | undefined",
+  tabindex: "number | undefined",
+  accesskey: "string | undefined",
+  autocapitalize:
+    "'off' | 'none' | 'on' | 'sentences' | 'words' | 'characters' | undefined",
+  contenteditable: "'plaintext-only' | boolean | undefined",
+  draggable: "boolean | undefined",
+  spellcheck: "boolean | undefined",
+  role: "string | undefined",
 });
 
 export const HTML_TAG_DEFINITIONS = htmlTagConfig({
   a: {
     attributes: {
-      href: "" as string,
-      target: "_self" as "_self" | "_blank" | "_parent" | "_top" | undefined,
-      download: "" as string | boolean | undefined,
-      rel: "" as string | undefined,
-      hreflang: "" as string | undefined,
+      href: "string",
+      target: "'_self' | '_blank' | '_parent' | '_top' | undefined ",
+      download: "string | boolean | undefined",
+      rel: "string | undefined",
+      hreflang: "string | undefined",
     },
     innerHTML: [
       "#text",
@@ -66,11 +55,11 @@ export const HTML_TAG_DEFINITIONS = htmlTagConfig({
   },
   button: {
     attributes: {
-      type: "submit" as "submit" | "reset" | "button" | undefined,
-      disabled: false as boolean | undefined,
-      name: "" as string | undefined,
-      value: "" as string | undefined,
-      form: "" as string | undefined,
+      type: "'submit' | 'reset' | 'button' | undefined",
+      disabled: "boolean | undefined",
+      name: "string | undefined",
+      value: "string | undefined",
+      form: "string | undefined",
     },
     innerHTML: ["#text", "span", "img"],
   },
@@ -82,11 +71,11 @@ export const HTML_TAG_DEFINITIONS = htmlTagConfig({
   },
   form: {
     attributes: {
-      action: "" as string,
-      method: "get" as "get" | "post" | "dialog",
-      enctype: "" as string | undefined,
-      novalidate: false as boolean | undefined,
-      target: "_self" as "_self" | "_blank" | "_parent" | "_top" | undefined,
+      action: "string",
+      method: "'get' | 'post' | 'dialog'",
+      enctype: "string | undefined",
+      novalidate: "boolean | undefined",
+      target: "'_self' | '_blank' | '_parent' | '_top' | undefined",
     },
     innerHTML: "*",
   },
@@ -113,48 +102,39 @@ export const HTML_TAG_DEFINITIONS = htmlTagConfig({
   },
   img: {
     attributes: {
-      src: "" as string,
-      alt: "" as string,
-      width: 0 as number | undefined,
-      height: 0 as number | undefined,
-      loading: "lazy" as "lazy" | "eager" | undefined,
-      srcset: "" as string | undefined,
-      sizes: "" as string | undefined,
+      src: "string",
+      alt: "string",
+      width: "number | undefined",
+      height: "number | undefined",
+      loading: "'lazy' | 'eager' | undefined",
+      srcset: "string | undefined",
+      sizes: "string | undefined",
     },
     innerHTML: [],
   },
   input: {
     attributes: {
-      type: "text" as
-        | "text"
-        | "number"
-        | "password"
-        | "checkbox"
-        | "radio"
-        | "submit"
-        | "button"
-        | "email"
-        | "hidden",
-      value: "",
-      checked: false as boolean | undefined,
-      name: "" as string | undefined,
-      placeholder: "" as string | undefined,
-      disabled: false as boolean | undefined,
-      required: false as boolean | undefined,
-      readonly: false as boolean | undefined,
-      maxlength: 0 as number | undefined,
-      minlength: 0 as number | undefined,
-      max: "" as string | number | undefined,
-      min: "" as string | number | undefined,
-      step: "" as string | number | undefined,
-      pattern: "" as string | undefined,
+      type: "'text' | 'number' | 'password' | 'checkbox' | 'radio' | 'submit' | 'button' | 'email' | 'hidden'",
+      value: "string",
+      checked: "boolean | undefined",
+      name: "string | undefined",
+      placeholder: "string | undefined",
+      disabled: "boolean | undefined",
+      required: "boolean | undefined",
+      readonly: "boolean | undefined",
+      maxlength: "number | undefined",
+      minlength: "number | undefined",
+      max: "string | number | undefined",
+      min: "string | number | undefined",
+      step: "string | number | undefined",
+      pattern: "string | undefined",
     },
     innerHTML: [],
   },
   label: {
     attributes: {
-      for: "" as string | undefined,
-      form: "" as string | undefined,
+      for: "string | undefined",
+      form: "string | undefined",
     },
     innerHTML: ["#text", "input", "span", "img"],
   },
@@ -187,31 +167,31 @@ export const HTML_TAG_DEFINITIONS = htmlTagConfig({
   },
   td: {
     attributes: {
-      colspan: 0 as number | undefined,
-      rowspan: 0 as number | undefined,
-      headers: "" as string | undefined,
+      colspan: "number | undefined",
+      rowspan: "number | undefined",
+      headers: "string | undefined",
     },
     innerHTML: "*",
   },
   textarea: {
     attributes: {
-      name: "" as string | undefined,
-      value: "" as string,
-      placeholder: "" as string | undefined,
-      rows: 0 as number | undefined,
-      cols: 0 as number | undefined,
-      disabled: false as boolean | undefined,
-      required: false as boolean | undefined,
-      readonly: false as boolean | undefined,
-      maxlength: 0 as number | undefined,
+      name: "string | undefined",
+      value: "string",
+      placeholder: "string | undefined",
+      rows: "number | undefined",
+      cols: "number | undefined",
+      disabled: "boolean | undefined",
+      required: "boolean | undefined",
+      readonly: "boolean | undefined",
+      maxlength: "number | undefined",
     },
     innerHTML: ["#text"],
   },
   th: {
     attributes: {
-      colspan: 0 as number | undefined,
-      rowspan: 0 as number | undefined,
-      headers: "" as string | undefined,
+      colspan: "number | undefined",
+      rowspan: "number | undefined",
+      headers: "string | undefined",
     },
     innerHTML: "*",
   },
