@@ -72,8 +72,8 @@ function isSupportedPrimitive(s: string): s is SupportedPrimitivesUnion {
 }
 
 export function parseValueAgainstDSL<const DSL extends DSLString>(
-  dslString: DSL,
-  checkAgainst: unknown,
+  dslString: DSLValidate<DSL>,
+  checkAgainst: DSLInfer<DSL>,
 ): DSLInfer<DSL> {
   const parts = dslString.split("|").map((p) => p.trim());
 
