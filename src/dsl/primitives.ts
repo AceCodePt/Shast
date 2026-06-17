@@ -37,40 +37,47 @@ type SupportedKeywordUnion = keyof SupportedKeyword;
 
 export type DSLString = string;
 
+type PipeWhenExists<
+  L extends string | number,
+  R extends string | never = never,
+  S extends string = SupportedKeywordUnion,
+> = [R] extends [never] | [""]
+  ? Trim<`${L}`>
+  : `${Trim<`${L}`>} | ${Trim<DSLValidate<R, S>>}`;
+
+type SingleDSLValidate<
+  L extends string,
+  R extends string,
+  S extends string = SupportedKeywordUnion,
+> =
+  Trim<L> extends `${infer N extends number}`
+    ? PipeWhenExists<N, R, S>
+    : Trim<L> extends `\`${infer Str extends string}\``
+      ? Str extends `\$\{${infer innerDSL extends string}\}`
+        ? `\`\${${Trim<DSLValidate<innerDSL, S>>}}\``
+        : Trim<L>
+      : Trim<L> extends `'${string}'` | `"${string}"`
+        ? PipeWhenExists<L, R, S>
+        : [Extract<S, `${Trim<L>}${string}`>] extends [string]
+          ? PipeWhenExists<Extract<S, `${Trim<L>}${string}`>, R, S>
+          : `'${Trim<L>}' is not supported`;
+
 type DSLValidate<
   T extends string,
   S extends string = SupportedKeywordUnion,
-> = T extends `${infer L extends string}|${infer R extends string}`
-  ? Trim<L> extends `${infer N extends number}`
-    ? `${N} | ${Trim<DSLValidate<R, S>>}`
-    : Trim<L> extends `\`${infer Str extends string}\``
-      ? Str extends `\$\{${infer innerDSL extends string}\}`
-        ? `\`${Trim<DSLValidate<innerDSL, S>>}\``
-        : Trim<L>
-      : Trim<L> extends `'${string}'` | `"${string}"`
-        ? `${Trim<L>} | ${Trim<DSLValidate<R, S>>}`
-        : Trim<L> extends S
-          ? `${Trim<L>} | ${Trim<DSLValidate<R, S>>}`
-          : [Extract<S, `${Trim<L>}${string}`>] extends [never]
-            ? `'${Trim<L>}' is not supported`
-            : `${Trim<L>} | ${Trim<DSLValidate<R, S>>}`
-  : Trim<T> extends `${infer N extends number}`
-    ? `${N}`
-    : Trim<T> extends `\`${infer Str extends string}\``
-      ? Str extends `\$\{${infer innerDSL extends string}\}`
-        ? `\`\$\{${Trim<DSLValidate<innerDSL, S>>}\}\``
-        : Trim<T>
-      : Trim<T> extends `'${string}'` | `"${string}"`
-        ? Trim<T>
-        : Trim<T> extends S
-          ? T
-          : [Extract<S, `${Trim<T>}${string}`>] extends [never]
-            ? `'${Trim<T>}' is not supported`
-            : Extract<S, `${Trim<T>}${string}`>;
+> = T extends `"${infer Piped extends `${string}|${string}`}"${infer Maybe extends string}`
+  ? SingleDSLValidate<`"${Piped}"`, Maybe, S>
+  : T extends `'${infer Piped extends `${string}|${string}`}'${infer Maybe extends string}`
+    ? SingleDSLValidate<`'${Piped}'`, Maybe, S>
+    : T extends `\`${infer Piped extends `${string}|${string}`}\`${infer Maybe extends string}`
+      ? SingleDSLValidate<`\`${Piped}\``, Maybe, S>
+      : T extends `${infer L extends string}|${infer R extends string}`
+        ? SingleDSLValidate<L, R, S>
+        : SingleDSLValidate<T, "", S>;
 
-type InferOne<T extends string> = T extends keyof SupportedKeyword
+type SingleDSLInfer<T extends string> = T extends keyof SupportedKeyword
   ? SupportedKeyword[T]
-  : T extends `${infer N extends number}` // check if N is a number
+  : T extends `${infer N extends number}`
     ? N
     : T extends `\`${infer S extends string}\``
       ? S extends `\$\{${infer innerDSL extends string}\}`
@@ -80,17 +87,18 @@ type InferOne<T extends string> = T extends keyof SupportedKeyword
         ? S
         : never;
 
-export type DSLInfer<T extends DSLString> = T extends `${infer L}|${infer R}`
-  ? T extends `\`${infer Piped extends `${string}|${string}`}\`${infer Maybe extends string}`
+export type DSLInfer<T extends DSLString> =
+  T extends `\`${infer Piped extends `${string}|${string}`}\`${infer Maybe extends string}`
     ? Piped extends `\$\{${infer innerDSL extends string}\}`
       ? `${DSLInfer<Trim<innerDSL>>}` | DSLInfer<Trim<Maybe>>
       : `${Piped}`
-    : T extends `"${infer Piped extends `${string}|${string}`}"${infer Maybe extends string}`
+    : T extends
+          | `"${infer Piped extends `${string}|${string}`}"${infer Maybe extends string}`
+          | `'${infer Piped extends `${string}|${string}`}'${infer Maybe extends string}`
       ? `${Piped}` | DSLInfer<Maybe>
-      : T extends `'${infer Piped extends `${string}|${string}`}'${infer Maybe extends string}`
-        ? `${Piped}` | DSLInfer<Maybe>
-        : InferOne<Trim<L>> | DSLInfer<Trim<R>>
-  : InferOne<Trim<T>>;
+      : T extends `${infer L}|${infer R}`
+        ? SingleDSLInfer<Trim<L>> | DSLInfer<Trim<R>>
+        : SingleDSLInfer<Trim<T>>;
 
 // type X = DSLInfer<"'|' | \"|\" | `|` | `${'|'}`">;
 // type X = DSLInfer<`'"|"' | 1`>;
