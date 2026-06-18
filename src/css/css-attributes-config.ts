@@ -6,7 +6,7 @@ import type {
   SplitPipe,
   Trim,
 } from "../types.ts";
-import type { BaseCSSSyntaxConfig } from "./css-syntax-config.ts";
+import type { BaseCSSSyntaxConfig } from "./syntax-config/index.ts";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ArkType-style single-signature DSL validation + autocomplete.

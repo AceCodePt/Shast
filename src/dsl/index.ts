@@ -9,14 +9,13 @@ import type { Trim } from "@/types.ts";
 // [x] - Support union in template literals of primitives
 // [x] - Support union in template literals of literals
 // [x] - Support placing pipe | inside of quotes '|' / "'"
-// [ ] - Add a test: for `'"|"'` and `"'|'"`
+// [x] - Add a test: for `'"|"'`, `"'|'"` and "`|`"
+// [ ] - Add a test for multiple ${ } in string template
+// [ ] - Discuss: When should the code throw on invalid DSLString
 // [ ] - Prevent meaningless end pipe "string |"
 // [ ] - Prevent misuse of spaces "string|number" or "   string   "
 // [ ] - TODO: the type infer should receive the supported keywords as a <SK ext...>
-// [ ] - TODO: make parse
-
-// type writeUnresolvableMessage<token extends string> =
-//   `'${token}' is unresolvable`;
+// [ ] - TODO: some tests allow "'|\''" weird case to exists (LOW Priority)
 
 const SUPPORTED_PRIMITIVES = {
   string: "" as string,
@@ -37,13 +36,15 @@ type SupportedKeywordUnion = keyof SupportedKeyword;
 
 export type DSLString = string;
 
+// Small note: the never for R is critical
+// See example: dslString("string |") and auto complete after the pipe
 type PipeWhenExists<
   L extends string | number,
   R extends string | never = never,
   S extends string = SupportedKeywordUnion,
 > = [R] extends [never] | [""]
   ? Trim<`${L}`>
-  : `${Trim<`${L}`>} | ${Trim<DSLValidate<R, S>>}`;
+  : `${Trim<`${L}`>} | ${DSLValidate<R, S>}`;
 
 type SingleDSLValidate<
   L extends string,
@@ -62,18 +63,32 @@ type SingleDSLValidate<
           ? PipeWhenExists<Extract<S, `${Trim<L>}${string}`>, R, S>
           : `'${Trim<L>}' is not supported`;
 
-type DSLValidate<
+export type DSLValidate<
   T extends string,
   S extends string = SupportedKeywordUnion,
 > = T extends `"${infer Piped extends `${string}|${string}`}"${infer Maybe extends string}`
-  ? SingleDSLValidate<`"${Piped}"`, Maybe, S>
+  ? SingleDSLValidate<
+      `"${Piped}"`,
+      Maybe extends `${string}|${infer Other extends string}` ? Other : Maybe,
+      S
+    >
   : T extends `'${infer Piped extends `${string}|${string}`}'${infer Maybe extends string}`
-    ? SingleDSLValidate<`'${Piped}'`, Maybe, S>
+    ? SingleDSLValidate<
+        `'${Piped}'`,
+        Maybe extends `${string}|${infer Other extends string}` ? Other : Maybe,
+        S
+      >
     : T extends `\`${infer Piped extends `${string}|${string}`}\`${infer Maybe extends string}`
-      ? SingleDSLValidate<`\`${Piped}\``, Maybe, S>
+      ? SingleDSLValidate<
+          `\`${Piped}\``,
+          Maybe extends `${string}|${infer Other extends string}`
+            ? Other
+            : Maybe,
+          S
+        >
       : T extends `${infer L extends string}|${infer R extends string}`
         ? SingleDSLValidate<L, R, S>
-        : SingleDSLValidate<T, "", S>;
+        : SingleDSLValidate<T, never, S>;
 
 type SingleDSLInfer<T extends string> = T extends keyof SupportedKeyword
   ? SupportedKeyword[T]
@@ -121,11 +136,43 @@ export function dslString<const DSL extends DSLString>(
   return dslString;
 }
 
+function splitOutsideQuotes(dslString: string) {
+  const parts = [];
+  let current = "";
+  let inSingle = false;
+  let inDouble = false;
+  let inBacktick = false;
+
+  for (let i = 0; i < dslString.length; i++) {
+    const ch = dslString[i];
+
+    if (ch === "'" && !inDouble && !inBacktick) {
+      inSingle = !inSingle;
+      current += ch;
+    } else if (ch === '"' && !inSingle && !inBacktick) {
+      inDouble = !inDouble;
+      current += ch;
+    } else if (ch === "`" && !inSingle && !inDouble) {
+      inBacktick = !inBacktick;
+      current += ch;
+    } else if (ch === "|" && !inSingle && !inDouble && !inBacktick) {
+      parts.push(current);
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+
+  parts.push(current);
+
+  return parts;
+}
+
 export function parseValueAgainstDSL<const DSL extends DSLString>(
   dslString: DSLValidate<DSL>,
   checkAgainst: DSLInfer<DSL>,
 ): DSLInfer<DSL> {
-  const parts = dslString.split("|").map((p) => p.trim());
+  const parts = splitOutsideQuotes(dslString).map((p) => p.trim());
 
   const matches = parts.some(
     (part) =>
@@ -137,6 +184,7 @@ export function parseValueAgainstDSL<const DSL extends DSLString>(
           checkAgainst) ||
       // This is for numbers
       (!Number.isNaN(+part) && +part === checkAgainst) ||
+      // This is for string / backticks / whatever
       /^(('[^']*'))$|^(("[^"]*"))$|^((`[^`]*`))$/.test(part),
   );
 

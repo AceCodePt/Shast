@@ -1,8 +1,7 @@
-import type { Keyof } from "../types.ts";
 import type {
   BaseHTMLAttributeConfig,
   ValidateHTMLAttributeConfig,
-} from "./html-attribute-config.ts";
+} from "../attribute-config/types.ts";
 
 export type BaseHTMLTag = string;
 export type BaseInnerHTMLTagConfig<PossibleTags extends string = string> =
@@ -17,7 +16,7 @@ export type BaseHTMLTagConfig<Tags extends string = string> = Record<
   }
 >;
 
-type ValidateHTMLTagConfig<
+export type ValidateHTMLTagConfig<
   TagDefinition extends BaseHTMLTagConfig = BaseHTMLTagConfig,
 > = {
   [Tag in keyof TagDefinition]: Tag extends string
@@ -32,10 +31,4 @@ type ValidateHTMLTagConfig<
           : never;
       }
     : TagDefinition[Tag];
-};
-
-export const htmlTagConfig = <const T extends BaseHTMLTagConfig<Keyof<T>>>(
-  config: ValidateHTMLTagConfig<T>,
-) => {
-  return config as T;
 };

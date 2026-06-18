@@ -1,4 +1,4 @@
-import type { BaseCSSSyntaxConfig } from "./css-syntax-config.ts";
+import type { BaseCSSSyntaxConfig } from "./syntax-config/index.ts";
 
 export type BaseCSSProperty<
   SyntaxKeysConfig extends BaseCSSSyntaxConfig,
