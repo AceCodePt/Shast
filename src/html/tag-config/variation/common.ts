@@ -27,6 +27,9 @@ export default htmlTagConfig({
   article: {
     innerHTML: "*",
   },
+  br: {
+    innerHTML: [],
+  },
   button: {
     attributes: {
       type: "'submit' | 'reset' | 'button' | undefined",
@@ -126,7 +129,7 @@ export default htmlTagConfig({
     innerHTML: ["li"],
   },
   p: {
-    innerHTML: "*",
+    innerHTML: ["#text", "span", "a", "img", "input", "br", "label"],
   },
   section: {
     innerHTML: "*",
@@ -177,6 +180,6 @@ export default htmlTagConfig({
     innerHTML: ["th", "td"],
   },
   ul: {
-    innerHTML: ["li", "ol"],
+    innerHTML: ["li"],
   },
 });
