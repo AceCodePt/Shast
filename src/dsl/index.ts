@@ -42,9 +42,16 @@ type PipeWhenExists<
   L extends string | number,
   R extends string | never = never,
   S extends string = SupportedKeywordUnion,
-> = [R] extends [never] | [""]
+> = [R] extends [never]
   ? Trim<`${L}`>
   : `${Trim<`${L}`>} | ${DSLValidate<R, S>}`;
+
+type ValidateRestOfBackTick<
+  Str extends string | never,
+  S extends string = SupportedKeywordUnion,
+> = Str extends `\$\{${infer innerDSL extends string}\}${infer Maybe extends string}`
+  ? `\${${Trim<DSLValidate<innerDSL, S>>}}${ValidateRestOfBackTick<Maybe, S>}`
+  : `${Str}`;
 
 type SingleDSLValidate<
   L extends string,
@@ -54,50 +61,54 @@ type SingleDSLValidate<
   Trim<L> extends `${infer N extends number}`
     ? PipeWhenExists<N, R, S>
     : Trim<L> extends `\`${infer Str extends string}\``
-      ? Str extends `\$\{${infer innerDSL extends string}\}`
-        ? `\`\${${Trim<DSLValidate<innerDSL, S>>}}\``
-        : Trim<L>
+      ? PipeWhenExists<`\`${ValidateRestOfBackTick<Str, S>}\``, R, S>
       : Trim<L> extends `'${string}'` | `"${string}"`
         ? PipeWhenExists<L, R, S>
         : [Extract<S, `${Trim<L>}${string}`>] extends [string]
           ? PipeWhenExists<Extract<S, `${Trim<L>}${string}`>, R, S>
           : `'${Trim<L>}' is not supported`;
 
+type DSLStringDelimiter<
+  T extends string,
+  D extends string,
+  S extends string = SupportedKeywordUnion,
+> =
+  Trim<T> extends `${D}${infer Piped extends `${string}|${string}`}${D}${infer Maybe extends string}`
+    ? SingleDSLValidate<
+        `${D}${Piped}${D}`,
+        // We only pass the right side of the pipe so we get autocomplete
+        Maybe extends `${string}|${infer Other extends string}` ? Other : never,
+        S
+      >
+    : Trim<T> extends `${D}${infer Piped extends `${string}|${string}`}${D}`
+      ? SingleDSLValidate<`${D}${Piped}${D}`, never, S>
+      : Trim<T>;
+
 export type DSLValidate<
   T extends string,
   S extends string = SupportedKeywordUnion,
-> = T extends `"${infer Piped extends `${string}|${string}`}"${infer Maybe extends string}`
-  ? SingleDSLValidate<
-      `"${Piped}"`,
-      Maybe extends `${string}|${infer Other extends string}` ? Other : Maybe,
-      S
-    >
-  : T extends `'${infer Piped extends `${string}|${string}`}'${infer Maybe extends string}`
-    ? SingleDSLValidate<
-        `'${Piped}'`,
-        Maybe extends `${string}|${infer Other extends string}` ? Other : Maybe,
-        S
-      >
-    : T extends `\`${infer Piped extends `${string}|${string}`}\`${infer Maybe extends string}`
-      ? SingleDSLValidate<
-          `\`${Piped}\``,
-          Maybe extends `${string}|${infer Other extends string}`
-            ? Other
-            : Maybe,
-          S
-        >
-      : T extends `${infer L extends string}|${infer R extends string}`
-        ? SingleDSLValidate<L, R, S>
-        : SingleDSLValidate<T, never, S>;
+> =
+  Trim<T> extends `"${string}"` | `"${string}"${string}`
+    ? DSLStringDelimiter<T, '"', S>
+    : Trim<T> extends `'${string}'` | `'${string}'${string}`
+      ? DSLStringDelimiter<T, "'", S>
+      : Trim<T> extends `\`${string}\`` | `\`${string}\`${string}`
+        ? DSLStringDelimiter<T, "`", S>
+        : T extends `${infer L extends string}|${infer R extends string}`
+          ? SingleDSLValidate<L, R, S>
+          : SingleDSLValidate<T, never, S>;
+
+type InferRestOfBackTick<S extends string> =
+  S extends `\$\{${infer innerDSL extends string}\}${infer Rest extends string}`
+    ? `${DSLInfer<innerDSL>}${InferRestOfBackTick<Rest>}`
+    : `${S}`;
 
 type SingleDSLInfer<T extends string> = T extends keyof SupportedKeyword
   ? SupportedKeyword[T]
   : T extends `${infer N extends number}`
     ? N
     : T extends `\`${infer S extends string}\``
-      ? S extends `\$\{${infer innerDSL extends string}\}`
-        ? `${DSLInfer<innerDSL>}`
-        : `${S}`
+      ? InferRestOfBackTick<S>
       : T extends `'${infer S extends string}'` | `"${infer S extends string}"`
         ? S
         : never;
