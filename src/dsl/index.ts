@@ -1,11 +1,5 @@
 import type { Trim } from "@/types.ts";
 
-// [x] - Support placing the primitives in a type as a string
-// [x] - Support placing union types of primitives: string | number | undefined
-// [x] - Support placing union types of true, false
-// [x] - Support placing union types of numbers 0 1
-// [x] - Support placing union types of strings '' / ""
-// [x] - Support template literals ``
 // [x] - Support union in template literals of primitives
 // [x] - Support union in template literals of literals
 // [x] - Support placing pipe | inside of quotes '|' / "'"
