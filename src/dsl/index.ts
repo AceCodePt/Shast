@@ -30,9 +30,8 @@ const SUPPORTED_LITERALS = {
   false: false,
 } as const;
 
-type SupportedKeyword = typeof SUPPORTED_PRIMITIVES & typeof SUPPORTED_LITERALS;
-
-type SupportedKeywordUnion = keyof SupportedKeyword;
+export type SupportedKeywords = typeof SUPPORTED_PRIMITIVES &
+  typeof SUPPORTED_LITERALS;
 
 export type DSLString = string;
 
@@ -41,14 +40,14 @@ export type DSLString = string;
 type PipeWhenExists<
   L extends string | number,
   R extends string | never = never,
-  S extends string = SupportedKeywordUnion,
+  S extends Record<string, any> = SupportedKeywords,
 > = [R] extends [never]
   ? Trim<`${L}`>
   : `${Trim<`${L}`>} | ${DSLValidate<R, S>}`;
 
 type ValidateRestOfBackTick<
   Str extends string | never,
-  S extends string = SupportedKeywordUnion,
+  S extends Record<string, any> = SupportedKeywords,
 > = Str extends `\$\{${infer innerDSL extends string}\}${infer Maybe extends string}`
   ? `\${${Trim<DSLValidate<innerDSL, S>>}}${ValidateRestOfBackTick<Maybe, S>}`
   : `${Str}`;
@@ -56,7 +55,7 @@ type ValidateRestOfBackTick<
 type SingleDSLValidate<
   L extends string,
   R extends string,
-  S extends string = SupportedKeywordUnion,
+  S extends Record<string, any> = SupportedKeywords,
 > =
   Trim<L> extends `${infer N extends number}`
     ? PipeWhenExists<N, R, S>
@@ -64,14 +63,14 @@ type SingleDSLValidate<
       ? PipeWhenExists<`\`${ValidateRestOfBackTick<Str, S>}\``, R, S>
       : Trim<L> extends `'${string}'` | `"${string}"`
         ? PipeWhenExists<L, R, S>
-        : [Extract<S, `${Trim<L>}${string}`>] extends [string]
-          ? PipeWhenExists<Extract<S, `${Trim<L>}${string}`>, R, S>
+        : [Extract<keyof S, `${Trim<L>}${string}`>] extends [string]
+          ? PipeWhenExists<Extract<keyof S, `${Trim<L>}${string}`>, R, S>
           : `'${Trim<L>}' is not supported`;
 
 type DSLStringDelimiter<
   T extends string,
   D extends string,
-  S extends string = SupportedKeywordUnion,
+  S extends Record<string, any> = SupportedKeywords,
 > =
   Trim<T> extends `${D}${infer Piped extends `${string}|${string}`}${D}${infer Maybe extends string}`
     ? SingleDSLValidate<
@@ -80,11 +79,13 @@ type DSLStringDelimiter<
         Maybe extends `${string}|${infer Other extends string}` ? Other : never,
         S
       >
-    : Trim<T>;
+    : T extends `${infer L extends string}|${infer R extends string}`
+      ? SingleDSLValidate<L, R, S>
+      : SingleDSLValidate<T, never, S>;
 
 export type DSLValidate<
   T extends string,
-  S extends string = SupportedKeywordUnion,
+  S extends Record<string, any> = SupportedKeywords,
 > =
   Trim<T> extends `"${string}"${string}`
     ? DSLStringDelimiter<T, '"', S>
@@ -96,13 +97,15 @@ export type DSLValidate<
           ? SingleDSLValidate<L, R, S>
           : SingleDSLValidate<T, never, S>;
 
+// type Check = DSLValidate<"`${number}${'px' | 'h'}`">;
+
 type InferRestOfBackTick<S extends string> =
   S extends `${infer Before extends string}\$\{${infer innerDSL extends string}\}${infer Rest extends string}`
     ? `${Before}${DSLInfer<innerDSL>}${InferRestOfBackTick<Rest>}`
     : `${S}`;
 
-type SingleDSLInfer<T extends string> = T extends keyof SupportedKeyword
-  ? SupportedKeyword[T]
+type SingleDSLInfer<T extends string> = T extends keyof SupportedKeywords
+  ? SupportedKeywords[T]
   : T extends `${infer N extends number}`
     ? N
     : T extends `\`${infer S extends string}\``
