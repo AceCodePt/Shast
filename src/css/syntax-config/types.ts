@@ -1,14 +1,11 @@
-import type { DSLValidate } from "@/dsl/index.ts";
+import type { DSLString, DSLValidate, SupportedKeywords } from "@/dsl/index.ts";
 
-export type PrimitiveSyntaxValue = string;
-export type BaseCSSSyntaxConfig = Record<`<${string}${string}>`, string>;
+export type BaseCSSSyntaxConfig = Record<`<${string}>`, DSLString>;
 
-export type ValidatedCSSSyntaxConfig<
-  T extends BaseCSSSyntaxConfig = BaseCSSSyntaxConfig,
-> = {
+export type ValidatedCSSSyntaxConfig<T extends BaseCSSSyntaxConfig> = {
   [K in keyof T]: K extends string
-    ? K extends `<${string}${string}>`
-      ? DSLValidate<T[K]>
-      : `🛑 ERROR: The key '${K}' must be wrapped in angle brackets (e.g., '<${K}>')`
+    ? K extends `<${string}>`
+      ? DSLValidate<T[K], SupportedKeywords & T>
+      : `Should be wrapped with <>`
     : T[K];
 };
