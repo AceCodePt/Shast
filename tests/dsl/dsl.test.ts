@@ -675,8 +675,10 @@ describe("Error handling", () => {
 
   describe("malformed DSL", () => {
     test("unknown primitive throws", () => {
-      // @ts-expect-error
-      dslString(SUPPORTED_KEYWORDS, "xyz");
+      assert.throws(() =>
+        // @ts-expect-error
+        dslString(SUPPORTED_KEYWORDS, "xyz"),
+      );
       assert.throws(() =>
         // @ts-expect-error
         parseValueAgainstDSL(SUPPORTED_KEYWORDS, "xyz", "hi"),
@@ -684,8 +686,10 @@ describe("Error handling", () => {
     });
 
     test("partially-valid union throws", () => {
-      // @ts-expect-error
-      dslString(SUPPORTED_KEYWORDS, "string | xyz");
+      assert.throws(() =>
+        // @ts-expect-error
+        dslString(SUPPORTED_KEYWORDS, "string | xyz"),
+      );
       assert.throws(() =>
         // @ts-expect-error
         parseValueAgainstDSL(SUPPORTED_KEYWORDS, "string | xyz", "hi"),
@@ -693,8 +697,10 @@ describe("Error handling", () => {
     });
 
     test("empty string throws", () => {
-      // @ts-expect-error
-      dslString(SUPPORTED_KEYWORDS, "");
+      assert.throws(() =>
+        // @ts-expect-error
+        dslString(SUPPORTED_KEYWORDS, ""),
+      );
       // @ts-expect-error
       assert.throws(() => parseValueAgainstDSL(SUPPORTED_KEYWORDS, "", "hi"));
     });
