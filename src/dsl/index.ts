@@ -125,8 +125,9 @@ type SingleDSLInfer<
 export type DSLInfer<
   Keywords extends Record<string, any>,
   Text extends DSLString,
-> =
-  Trim<Text> extends `\`${infer Piped extends `${string}|${string}`}\`${infer Maybe extends string}`
+> = [Text] extends [never]
+  ? string
+  : Trim<Text> extends `\`${infer Piped extends `${string}|${string}`}\`${infer Maybe extends string}`
     ? Piped extends `${infer Before extends string}\$\{${infer innerDSL extends string}\}${infer After extends string}`
       ?
           | `${Before}${DSLInfer<Keywords, Trim<innerDSL>>}${InferRestOfBackTick<Keywords, After>}`
