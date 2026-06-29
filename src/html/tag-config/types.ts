@@ -13,6 +13,7 @@ export type BaseHTMLTagConfig<Tags extends string = string> = Record<
   {
     attributes?: BaseHTMLAttributesConfig;
     innerHTML: "*" | (Tags | "#text")[];
+    cssPseudoClass?: `:${string}`[];
   }
 >;
 

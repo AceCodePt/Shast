@@ -8,6 +8,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       target: "'_self' | '_blank' | undefined",
     },
     innerHTML: ["#text", "img", "span"],
+    cssPseudoClass: [":link", ":visited"],
   },
   br: {
     innerHTML: [],
@@ -18,6 +19,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       disabled: "boolean | undefined",
     },
     innerHTML: ["#text"],
+    cssPseudoClass: [":disabled"],
   },
   div: {
     innerHTML: "*",
@@ -45,6 +47,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       disabled: "boolean | undefined",
     },
     innerHTML: [],
+    cssPseudoClass: [":disabled", ":checked"],
   },
   li: {
     innerHTML: "*",

@@ -19,6 +19,9 @@ export const htmlTagConfig = <
     }
 
     const innerHTML = config[tag].innerHTML;
+    if (typeof innerHTML === "string") {
+      continue;
+    }
     for (const innerTag of innerHTML) {
       if (innerTag === "#text") {
         continue;

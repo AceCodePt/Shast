@@ -14,7 +14,28 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       referrerpolicy:
         "'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url' | undefined",
     },
-    innerHTML: ["#text", "img", "div", "section", "p", "ul", "h1", "h2", "h3", "h4", "h5", "h6", "span", "abbr", "cite", "code", "em", "strong", "time"],
+    innerHTML: [
+      "#text",
+      "img",
+      "div",
+      "section",
+      "p",
+      "ul",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "span",
+      "abbr",
+      "cite",
+      "code",
+      "em",
+      "strong",
+      "time",
+    ],
+    cssPseudoClass: [":link", ":visited", ":any-link", ":local-link"],
   },
   abbr: {
     attributes: {
@@ -166,12 +187,14 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       open: "boolean | undefined",
     },
     innerHTML: ["summary", "div", "p", "ul", "ol", "table"],
+    cssPseudoClass: [":open"],
   },
   dialog: {
     attributes: {
       open: "boolean | undefined",
     },
     innerHTML: "*",
+    cssPseudoClass: [":open", ":modal"],
   },
   div: {
     innerHTML: "*",
@@ -189,7 +212,34 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     innerHTML: "*",
   },
   p: {
-    innerHTML: ["#text", "span", "a", "img", "input", "br", "label", "abbr", "b", "cite", "code", "em", "i", "kbd", "mark", "q", "s", "samp", "small", "strong", "sub", "sup", "time", "u", "var", "wbr"],
+    innerHTML: [
+      "#text",
+      "span",
+      "a",
+      "img",
+      "input",
+      "br",
+      "label",
+      "abbr",
+      "b",
+      "cite",
+      "code",
+      "em",
+      "i",
+      "kbd",
+      "mark",
+      "q",
+      "s",
+      "samp",
+      "small",
+      "strong",
+      "sub",
+      "sup",
+      "time",
+      "u",
+      "var",
+      "wbr",
+    ],
   },
   search: {
     innerHTML: "*",
@@ -240,6 +290,15 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       preload: "'none' | 'metadata' | 'auto' | undefined",
     },
     innerHTML: ["source", "track"],
+    cssPseudoClass: [
+      ":playing",
+      ":paused",
+      ":muted",
+      ":volume-locked",
+      ":seeking",
+      ":buffering",
+      ":stalled",
+    ],
   },
   canvas: {
     attributes: {
@@ -269,6 +328,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       sandbox: "string | undefined",
     },
     innerHTML: [],
+    cssPseudoClass: [":fullscreen"],
   },
   img: {
     attributes: {
@@ -328,6 +388,16 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       playsinline: "boolean | undefined",
     },
     innerHTML: ["source", "track"],
+    cssPseudoClass: [
+      ":playing",
+      ":paused",
+      ":muted",
+      ":volume-locked",
+      ":seeking",
+      ":buffering",
+      ":stalled",
+      ":picture-in-picture",
+    ],
   },
 
   // ─── Forms ─────────────────────────────────────────────────────────
@@ -348,6 +418,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       popovertargetaction: "'show' | 'hide' | 'toggle' | undefined",
     },
     innerHTML: ["#text", "span", "img", "em", "strong"],
+    cssPseudoClass: [":disabled", ":enabled", ":default"],
   },
   datalist: {
     innerHTML: ["option"],
@@ -359,6 +430,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       name: "string | undefined",
     },
     innerHTML: ["legend", "div", "p", "input", "label", "select", "textarea"],
+    cssPseudoClass: [":disabled"],
   },
   form: {
     attributes: {
@@ -373,6 +445,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       rel: "string | undefined",
     },
     innerHTML: "*",
+    cssPseudoClass: [":valid", ":invalid", ":user-invalid"],
   },
   input: {
     attributes: {
@@ -414,6 +487,22 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       popovertargetaction: "'show' | 'hide' | 'toggle' | undefined",
     },
     innerHTML: [],
+    cssPseudoClass: [
+      ":disabled",
+      ":enabled",
+      ":checked",
+      ":indeterminate",
+      ":default",
+      ":valid",
+      ":invalid",
+      ":in-range",
+      ":out-of-range",
+      ":required",
+      ":optional",
+      ":placeholder-shown",
+      ":user-invalid",
+      ":autofill",
+    ],
   },
   label: {
     attributes: {
@@ -436,6 +525,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       form: "string | undefined",
     },
     innerHTML: ["#text"],
+    cssPseudoClass: [":valid", ":invalid", ":in-range", ":out-of-range"],
   },
   optgroup: {
     attributes: {
@@ -443,6 +533,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       disabled: "boolean | undefined",
     },
     innerHTML: ["option"],
+    cssPseudoClass: [":disabled"],
   },
   option: {
     attributes: {
@@ -452,6 +543,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       selected: "boolean | undefined",
     },
     innerHTML: ["#text"],
+    cssPseudoClass: [":disabled", ":checked", ":default"],
   },
   output: {
     attributes: {
@@ -467,6 +559,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       max: "number | undefined",
     },
     innerHTML: ["#text"],
+    cssPseudoClass: [":indeterminate"],
   },
   select: {
     attributes: {
@@ -480,6 +573,14 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       autofocus: "boolean | undefined",
     },
     innerHTML: ["option", "optgroup"],
+    cssPseudoClass: [
+      ":disabled",
+      ":enabled",
+      ":valid",
+      ":invalid",
+      ":required",
+      ":optional",
+    ],
   },
   textarea: {
     attributes: {
@@ -501,6 +602,16 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       spellcheck: "boolean | 'default' | undefined",
     },
     innerHTML: ["#text"],
+    cssPseudoClass: [
+      ":disabled",
+      ":enabled",
+      ":valid",
+      ":invalid",
+      ":required",
+      ":optional",
+      ":placeholder-shown",
+      ":user-invalid",
+    ],
   },
 
   // ─── Tables ─────────────────────────────────────────────────────────
@@ -576,6 +687,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       name: "string | undefined",
     },
     innerHTML: "*",
+    cssPseudoClass: [":slotted()"],
   },
   template: {
     innerHTML: "*",

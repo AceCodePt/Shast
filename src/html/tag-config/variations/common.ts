@@ -24,6 +24,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       "h5",
       "h6",
     ],
+    cssPseudoClass: [":link", ":visited", ":any-link"],
   },
   article: {
     innerHTML: "*",
@@ -40,6 +41,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       form: "string | undefined",
     },
     innerHTML: ["#text", "span", "img"],
+    cssPseudoClass: [":disabled", ":enabled"],
   },
   div: {
     innerHTML: "*",
@@ -56,6 +58,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       target: "'_self' | '_blank' | '_parent' | '_top' | undefined",
     },
     innerHTML: "*",
+    cssPseudoClass: [":valid", ":invalid"],
   },
   h1: {
     innerHTML: ["#text", "span", "a"],
@@ -109,6 +112,16 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       hidden: "boolean | undefined",
     },
     innerHTML: [],
+    cssPseudoClass: [
+      ":disabled",
+      ":enabled",
+      ":checked",
+      ":valid",
+      ":invalid",
+      ":required",
+      ":optional",
+      ":placeholder-shown",
+    ],
   },
   label: {
     attributes: {
@@ -165,6 +178,15 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       maxlength: "number | undefined",
     },
     innerHTML: ["#text"],
+    cssPseudoClass: [
+      ":disabled",
+      ":enabled",
+      ":valid",
+      ":invalid",
+      ":required",
+      ":optional",
+      ":placeholder-shown",
+    ],
   },
   th: {
     attributes: {
