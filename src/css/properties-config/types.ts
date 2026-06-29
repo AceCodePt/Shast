@@ -26,6 +26,6 @@ export type ValidateCSSPropertiesConfig<
           inherits: boolean;
           "initial-value": InferCSSSyntax<Keywords, S, P[K]["syntax"]>;
         }
-      : never
+      : `You must have the property start with -- instead like --${K}`
     : P[K];
 };
