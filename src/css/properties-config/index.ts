@@ -16,7 +16,11 @@ export const cssPropertiesConfig = <
 ) => {
   const entries = config;
   for (const key in entries) {
-    dslString(Object.assign({}, syntaxConfig, keywords), entries[key].syntax);
+    const entry = entries[key];
+    if (typeof entry === "object") {
+      const syntax = entry.syntax;
+      dslString(Object.assign({}, syntaxConfig, keywords), syntax);
+    }
   }
   return config as P;
 };
