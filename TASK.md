@@ -328,47 +328,45 @@
 
 ---
 
-## CSS Pseudo Class and Element
+### Pseudo-Class Config Builder
 
-### Pseudo Config Builder
+- [x] **`cssPseudoClassConfig` function** - validates a pseudo-class config array
+  - [x] Type validation - accepts `:` prefixed strings
+  - [x] Type validation - rejects names without `:` prefix
+  - [x] Runtime validation - throws for missing `:` prefix
+  - [x] Runtime validation - returns config unchanged
+  - [x] Edge case - empty array `[]` accepted
+  - [x] Test
 
-- [ ] **`cssPseudoConfig` function** - validates a pseudo-class/element config with scoped property DSL
-  - [ ] Type validation - accepts `:` and `::` prefixed keys
-  - [ ] Type validation - rejects names without `:` or `::` prefix
-  - [ ] Type validation - validates DSL strings for each scoped property
-  - [ ] Runtime validation - returns config unchanged
-  - [ ] Runtime validation - throws for invalid DSL in property values
+### Tag Config Pseudo-Class Declaration
+
+- [ ] Extend `BaseHTMLTagConfig` with optional `cssPseudoClass: string[]` field
+  - [ ] Type validation - accepts tag with valid pseudo-class references
+  - [ ] Type validation - rejects pseudo-class name not starting with `:`
+  - [ ] Type validation - rejects pseudo-class name that doesn't exist in any variation
+  - [ ] Type validation - tag without `cssPseudoClass` key = no pseudo-class support
+  - [ ] Type validation - tag with `cssPseudoClass: []` = no pseudo-class support
+  - [ ] Runtime validation - throws for pseudo-class name not in any existing variation config
+  - [ ] Runtime validation - accepts empty pseudo-class list
   - [ ] Runtime validation - preserves object reference
-  - [ ] Edge case - empty config `{}` accepted
+  - [ ] Edge case - multiple tags with different pseudo-class lists
   - [ ] Test
 
-### Tag Config Pseudo Declaration
+### Component CSS: Pseudo-Class Block Validation
 
-- [ ] Extend `BaseHTMLTagConfig` with optional `pseudo: string[]` field
-  - [ ] Type validation - accepts tag with valid pseudo references
-  - [ ] Type validation - rejects pseudo name not starting with `:`
-  - [ ] Type validation - rejects pseudo name not in PSEUDO config
-  - [ ] Type validation - tag without `pseudo` key = no pseudo support
-  - [ ] Type validation - tag with `pseudo: []` = no pseudo support
-  - [ ] Runtime validation - throws for pseudo name not in PSEUDO config
-  - [ ] Runtime validation - accepts empty pseudo list
-  - [ ] Runtime validation - preserves object reference
-  - [ ] Edge case - multiple tags with different pseudo lists
+- [ ] Extend `ValidateComponentCSSStructure` to validate pseudo-class blocks against tag's `cssPseudoClass`
+  - [ ] Type validation - pseudo-class with all its CSS properties passes (using shared variation's scoped properties)
+  - [ ] Type validation - pseudo-class on tag that doesn't declare it is rejected
+  - [ ] Type validation - pseudo-class on tag with `cssPseudoClass: []` is rejected
+  - [ ] Type validation - pseudo-class on tag with no `cssPseudoClass` key is rejected
+  - [ ] Type validation - multiple pseudo-classes in same css block accepted
+  - [ ] Type validation - pseudo-class inside child selector (`> child: { ":hover": {...} }`)
+  - [ ] Type validation - child selector inside pseudo-class (`":hover": { "> child": {...} }`)
+  - [ ] Type validation - pseudo-class inside nested pseudo-class (`":hover": { ":focus": {...} }`)
   - [ ] Test
 
-### Component CSS: Pseudo Block Validation
+---
 
-- [ ] Extend `ValidateComponentCSSStructure` to validate pseudo blocks against PSEUDO config
-  - [ ] Type validation - pseudo with all its scoped properties passes
-  - [ ] Type validation - pseudo with property NOT in its scope is rejected
-  - [ ] Type validation - pseudo on tag that doesn't declare it is rejected
-  - [ ] Type validation - pseudo on tag with `pseudo: []` is rejected
-  - [ ] Type validation - pseudo on tag with no `pseudo` key is rejected
-  - [ ] Type validation - multiple pseudos in same css block accepted
-  - [ ] Type validation - invalid DSL value in pseudo's scoped property rejected
-  - [ ] Type validation - pseudo inside child selector (`> child: { ":hover": {...} }`)
-  - [ ] Type validation - child selector inside pseudo (`":hover": { "> child": {...} }`)
-  - [ ] Type validation - pseudo inside nested pseudo (`":hover": { ":focus": {...} }`)
   - [ ] Test
 
 ### Files
