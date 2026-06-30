@@ -367,20 +367,42 @@
 
 ---
 
+### Pseudo-Element Config Builder
+
+- [ ] **`cssPseudoElementConfig` function** - validates a pseudo-element config array
+  - [ ] Type validation - accepts `::` prefixed strings
+  - [ ] Type validation - rejects names without `::` prefix
+  - [ ] Runtime validation - throws for missing `::` prefix
+  - [ ] Runtime validation - returns config unchanged
+  - [ ] Edge case - empty array `[]` accepted
   - [ ] Test
 
-### Files
+### Tag Config Pseudo-Element Declaration
 
-| File | Change |
-|------|--------|
-| `src/css/pseudo-config/index.ts` | New - `cssPseudoConfig` builder |
-| `src/css/pseudo-config/types.ts` | New - types |
-| `src/html/tag-config/types.ts` | Extend with optional `pseudo: string[]` |
-| `src/html/tag-config/index.ts` | Validate pseudo refs at runtime |
-| `src/create-component.ts` | ValidateComponentCSSStructure merges pseudo config per-tag |
-| `tests/css/pseudo-config.test.ts` | New - builder tests |
-| `tests/html/tag-config.test.ts` | Add pseudo key tests |
-| `tests/create-component.test.ts` | Add pseudo CSS block tests |
+- [x] Extend `BaseHTMLTagConfig` with optional `cssPseudoElement: string[]` field
+  - [x] Type validation - accepts tag with valid pseudo-element references
+  - [x] Type validation - rejects pseudo-element name not starting with `::`
+  - [x] Type validation - tag without `cssPseudoElement` key = no pseudo-element support
+  - [x] Type validation - tag with `cssPseudoElement: []` = no pseudo-element support
+  - [x] Runtime validation - validates pseudo-element config passes through
+  - [x] Edge case - multiple tags with different pseudo-element lists
+  - [x] Test
+
+### Component CSS: Pseudo-Element Block Validation
+
+- [ ] Extend `ValidateComponentCSSStructure` to validate pseudo-element blocks against tag's `cssPseudoElement`
+  - [ ] Type validation - pseudo-element with all its CSS properties passes
+  - [ ] Type validation - pseudo-element on tag that doesn't declare it is rejected
+  - [ ] Type validation - pseudo-element on tag with `cssPseudoElement: []` is rejected
+  - [ ] Type validation - pseudo-element on tag with no `cssPseudoElement` key is rejected
+  - [ ] Type validation - multiple pseudo-elements in same css block accepted
+  - [ ] Type validation - pseudo-element inside child selector (`> child: { "::placeholder": {...} }`)
+  - [ ] Type validation - child selector inside pseudo-element (`"::placeholder": { "> child": {...} }`)
+  - [ ] Type validation - pseudo-element inside pseudo-class (`":hover": { "::placeholder": {...} }`)
+  - [ ] Type validation - pseudo-class inside pseudo-element (`"::placeholder": { ":hover": {...} }`)
+  - [ ] Test
+
+---
 
 ### Variation System (Tag-level)
 
@@ -408,13 +430,3 @@
   - [ ] Pseudo blocks in component css work after variant merge
   - [ ] Pseudo block can override variation's CSS properties
   - [ ] Test
-
-### Files
-
-| File | Change |
-|------|--------|
-| `src/html/tag-config/types.ts` | Extend with optional `variations` type |
-| `src/html/tag-config/index.ts` | Runtime validation of variation CSS |
-| `src/create-component.ts` | ValidateComponentCSSStructure intersects variation CSS |
-| `tests/create-component.test.ts` | Add variation CSS merge tests |
-
