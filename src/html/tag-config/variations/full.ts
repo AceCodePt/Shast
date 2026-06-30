@@ -36,151 +36,261 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       "time",
     ],
     cssPseudoClass: [":link", ":visited", ":any-link", ":local-link"],
+    cssPseudoElement: [],
   },
   abbr: {
     attributes: {
       title: "string | undefined",
     },
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   address: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   b: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "em", "strong"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   bdi: {
     attributes: {
       dir: "'ltr' | 'rtl' | 'auto' | undefined",
     },
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   bdo: {
     attributes: {
       dir: "'ltr' | 'rtl'",
     },
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   blockquote: {
     attributes: {
       cite: "string | undefined",
     },
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   br: {
+    attributes: {},
     innerHTML: [],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   cite: {
+    attributes: {},
     innerHTML: ["#text", "a"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   code: {
+    attributes: {},
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   data: {
     attributes: {
       value: "string",
     },
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   dfn: {
     attributes: {
       title: "string | undefined",
     },
     innerHTML: ["#text", "abbr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   em: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "strong"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   i: {
+    attributes: {},
     innerHTML: ["#text", "span"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   kbd: {
+    attributes: {},
     innerHTML: ["#text", "kbd"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   mark: {
+    attributes: {},
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   q: {
     attributes: {
       cite: "string | undefined",
     },
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   rp: {
+    attributes: {},
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   rt: {
+    attributes: {},
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   ruby: {
+    attributes: {},
     innerHTML: ["#text", "rp", "rt"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   s: {
+    attributes: {},
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   samp: {
+    attributes: {},
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   small: {
+    attributes: {},
     innerHTML: ["#text", "span"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   span: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   strong: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "em"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   sub: {
+    attributes: {},
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   sup: {
+    attributes: {},
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   time: {
     attributes: {
       datetime: "string | undefined",
     },
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   u: {
+    attributes: {},
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   var: {
+    attributes: {},
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   wbr: {
+    attributes: {},
     innerHTML: [],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
 
   // ─── Headings ──────────────────────────────────────────────────────
   h1: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "em", "strong", "small", "abbr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   h2: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "em", "strong", "small", "abbr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   h3: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "em", "strong", "small", "abbr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   h4: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "em", "strong", "small", "abbr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   h5: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "em", "strong", "small", "abbr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   h6: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "em", "strong", "small", "abbr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   hgroup: {
+    attributes: {},
     innerHTML: ["h1", "h2", "h3", "h4", "h5", "h6", "p"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
 
   // ─── Sectioning & Layout ───────────────────────────────────────────
   article: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   aside: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   details: {
     attributes: {
@@ -188,6 +298,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: ["summary", "div", "p", "ul", "ol", "table"],
     cssPseudoClass: [":open"],
+    cssPseudoElement: [],
   },
   dialog: {
     attributes: {
@@ -195,23 +306,40 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: "*",
     cssPseudoClass: [":open", ":modal"],
+    cssPseudoElement: [],
   },
   div: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   footer: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   header: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   main: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   nav: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   p: {
+    attributes: {},
     innerHTML: [
       "#text",
       "span",
@@ -240,32 +368,58 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       "var",
       "wbr",
     ],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   search: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   section: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   summary: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "em", "strong"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
 
   // ─── Lists ─────────────────────────────────────────────────────────
   dd: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   dl: {
+    attributes: {},
     innerHTML: ["dt", "dd"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   dt: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "abbr", "em", "strong"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   li: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   menu: {
+    attributes: {},
     innerHTML: ["li"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   ol: {
     attributes: {
@@ -274,9 +428,14 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       type: "'1' | 'a' | 'A' | 'i' | 'I' | undefined",
     },
     innerHTML: ["li"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   ul: {
+    attributes: {},
     innerHTML: ["li"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
 
   // ─── Media ─────────────────────────────────────────────────────────
@@ -299,6 +458,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       ":buffering",
       ":stalled",
     ],
+    cssPseudoElement: [],
   },
   canvas: {
     attributes: {
@@ -306,12 +466,20 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       height: "number | undefined",
     },
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   figcaption: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   figure: {
+    attributes: {},
     innerHTML: ["img", "video", "audio", "canvas", "picture", "figcaption"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   iframe: {
     attributes: {
@@ -329,6 +497,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: [],
     cssPseudoClass: [":fullscreen"],
+    cssPseudoElement: [],
   },
   img: {
     attributes: {
@@ -348,9 +517,14 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
         "'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url' | undefined",
     },
     innerHTML: [],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   picture: {
+    attributes: {},
     innerHTML: ["source", "img"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   source: {
     attributes: {
@@ -363,6 +537,8 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       height: "number | undefined",
     },
     innerHTML: [],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   track: {
     attributes: {
@@ -373,6 +549,8 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       default: "boolean | undefined",
     },
     innerHTML: [],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   video: {
     attributes: {
@@ -398,6 +576,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       ":stalled",
       ":picture-in-picture",
     ],
+    cssPseudoElement: [],
   },
 
   // ─── Forms ─────────────────────────────────────────────────────────
@@ -419,9 +598,13 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: ["#text", "span", "img", "em", "strong"],
     cssPseudoClass: [":disabled", ":enabled", ":default"],
+    cssPseudoElement: [],
   },
   datalist: {
+    attributes: {},
     innerHTML: ["option"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   fieldset: {
     attributes: {
@@ -431,6 +614,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: ["legend", "div", "p", "input", "label", "select", "textarea"],
     cssPseudoClass: [":disabled"],
+    cssPseudoElement: [],
   },
   form: {
     attributes: {
@@ -446,6 +630,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: "*",
     cssPseudoClass: [":valid", ":invalid", ":user-invalid"],
+    cssPseudoElement: [],
   },
   input: {
     attributes: {
@@ -503,6 +688,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       ":user-invalid",
       ":autofill",
     ],
+    cssPseudoElement: [],
   },
   label: {
     attributes: {
@@ -510,9 +696,14 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       form: "string | undefined",
     },
     innerHTML: ["#text", "input", "span", "img", "abbr", "em", "strong"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   legend: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "label"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   meter: {
     attributes: {
@@ -526,6 +717,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: ["#text"],
     cssPseudoClass: [":valid", ":invalid", ":in-range", ":out-of-range"],
+    cssPseudoElement: [],
   },
   optgroup: {
     attributes: {
@@ -534,6 +726,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: ["option"],
     cssPseudoClass: [":disabled"],
+    cssPseudoElement: [],
   },
   option: {
     attributes: {
@@ -544,6 +737,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: ["#text"],
     cssPseudoClass: [":disabled", ":checked", ":default"],
+    cssPseudoElement: [],
   },
   output: {
     attributes: {
@@ -552,6 +746,8 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       name: "string | undefined",
     },
     innerHTML: ["#text", "span"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   progress: {
     attributes: {
@@ -560,6 +756,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: ["#text"],
     cssPseudoClass: [":indeterminate"],
+    cssPseudoElement: [],
   },
   select: {
     attributes: {
@@ -581,6 +778,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       ":required",
       ":optional",
     ],
+    cssPseudoElement: [],
   },
   textarea: {
     attributes: {
@@ -612,29 +810,43 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       ":placeholder-shown",
       ":user-invalid",
     ],
+    cssPseudoElement: [],
   },
 
   // ─── Tables ─────────────────────────────────────────────────────────
   caption: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   col: {
     attributes: {
       span: "number | undefined",
     },
     innerHTML: [],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   colgroup: {
     attributes: {
       span: "number | undefined",
     },
     innerHTML: ["col"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   table: {
+    attributes: {},
     innerHTML: ["caption", "colgroup", "thead", "tbody", "tfoot", "tr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   tbody: {
+    attributes: {},
     innerHTML: ["tr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   td: {
     attributes: {
@@ -643,9 +855,14 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       headers: "string | undefined",
     },
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   tfoot: {
+    attributes: {},
     innerHTML: ["tr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   th: {
     attributes: {
@@ -656,12 +873,20 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       abbr: "string | undefined",
     },
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   thead: {
+    attributes: {},
     innerHTML: ["tr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   tr: {
+    attributes: {},
     innerHTML: ["th", "td"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
 
   // ─── Interactive & Scripting ────────────────────────────────────────
@@ -671,6 +896,8 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       datetime: "string | undefined",
     },
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   ins: {
     attributes: {
@@ -678,9 +905,14 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       datetime: "string | undefined",
     },
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   pre: {
+    attributes: {},
     innerHTML: ["#text", "code", "samp", "kbd"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   slot: {
     attributes: {
@@ -688,8 +920,12 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: "*",
     cssPseudoClass: [":slotted()"],
+    cssPseudoElement: [],
   },
   template: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
 });

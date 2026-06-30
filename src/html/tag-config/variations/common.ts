@@ -25,12 +25,19 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       "h6",
     ],
     cssPseudoClass: [":link", ":visited", ":any-link"],
+    cssPseudoElement: [],
   },
   article: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   br: {
+    attributes: {},
     innerHTML: [],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   button: {
     attributes: {
@@ -42,12 +49,19 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: ["#text", "span", "img"],
     cssPseudoClass: [":disabled", ":enabled"],
+    cssPseudoElement: [],
   },
   div: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   footer: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   form: {
     attributes: {
@@ -59,27 +73,49 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: "*",
     cssPseudoClass: [":valid", ":invalid"],
+    cssPseudoElement: [],
   },
   h1: {
+    attributes: {},
     innerHTML: ["#text", "span", "a"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   h2: {
+    attributes: {},
     innerHTML: ["#text", "span", "a"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   h3: {
+    attributes: {},
     innerHTML: ["#text", "span", "a"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   h4: {
+    attributes: {},
     innerHTML: ["#text", "span", "a"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   h5: {
+    attributes: {},
     innerHTML: ["#text", "span", "a"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   h6: {
+    attributes: {},
     innerHTML: ["#text", "span", "a"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   header: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   img: {
     attributes: {
@@ -92,6 +128,8 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       sizes: "string | undefined",
     },
     innerHTML: [],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   input: {
     attributes: {
@@ -122,6 +160,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       ":optional",
       ":placeholder-shown",
     ],
+    cssPseudoElement: [],
   },
   label: {
     attributes: {
@@ -129,33 +168,62 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       form: "string | undefined",
     },
     innerHTML: ["#text", "input", "span", "img"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   li: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   main: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   nav: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   ol: {
+    attributes: {},
     innerHTML: ["li"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   p: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "img", "input", "br", "label"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   section: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   span: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   table: {
+    attributes: {},
     innerHTML: ["thead", "tbody", "tr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   tbody: {
+    attributes: {},
     innerHTML: ["tr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   td: {
     attributes: {
@@ -164,6 +232,8 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       headers: "string | undefined",
     },
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   textarea: {
     attributes: {
@@ -187,6 +257,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       ":optional",
       ":placeholder-shown",
     ],
+    cssPseudoElement: [],
   },
   th: {
     attributes: {
@@ -195,14 +266,25 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       headers: "string | undefined",
     },
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   thead: {
+    attributes: {},
     innerHTML: ["tr"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   tr: {
+    attributes: {},
     innerHTML: ["th", "td"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   ul: {
+    attributes: {},
     innerHTML: ["li"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
 });

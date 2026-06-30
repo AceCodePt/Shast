@@ -9,9 +9,13 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: ["#text", "img", "span"],
     cssPseudoClass: [":link", ":visited"],
+    cssPseudoElement: [],
   },
   br: {
+    attributes: {},
     innerHTML: [],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   button: {
     attributes: {
@@ -20,18 +24,31 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: ["#text"],
     cssPseudoClass: [":disabled"],
+    cssPseudoElement: [],
   },
   div: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   h1: {
+    attributes: {},
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   h2: {
+    attributes: {},
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   h3: {
+    attributes: {},
     innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   img: {
     attributes: {
@@ -39,6 +56,8 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       alt: "string",
     },
     innerHTML: [],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   input: {
     attributes: {
@@ -48,17 +67,30 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     },
     innerHTML: [],
     cssPseudoClass: [":disabled", ":checked"],
+    cssPseudoElement: [],
   },
   li: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   p: {
+    attributes: {},
     innerHTML: ["#text", "span", "a", "br"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   span: {
+    attributes: {},
     innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
   ul: {
+    attributes: {},
     innerHTML: ["li"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
   },
 });
