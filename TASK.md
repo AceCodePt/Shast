@@ -367,26 +367,13 @@
 
 ---
 
-### Pseudo-Element Config Builder
-
-- [ ] **`cssPseudoElementConfig` function** - validates a pseudo-element config array
-  - [ ] Type validation - accepts `::` prefixed strings
-  - [ ] Type validation - rejects names without `::` prefix
-  - [ ] Runtime validation - throws for missing `::` prefix
-  - [ ] Runtime validation - returns config unchanged
-  - [ ] Edge case - empty array `[]` accepted
-  - [ ] Test
-
 ### Tag Config Pseudo-Element Declaration
 
-- [x] Extend `BaseHTMLTagConfig` with optional `cssPseudoElement: string[]` field
-  - [x] Type validation - accepts tag with valid pseudo-element references
-  - [x] Type validation - rejects pseudo-element name not starting with `::`
-  - [x] Type validation - tag without `cssPseudoElement` key = no pseudo-element support
-  - [x] Type validation - tag with `cssPseudoElement: []` = no pseudo-element support
-  - [x] Runtime validation - validates pseudo-element config passes through
+- [x] Extend `BaseHTMLTagConfig` with optional `cssPseudoElement` field
+  - [x] Type validation - accepts `::` prefixed pseudo-element strings in tag config
+  - [x] Type validation - rejects tags with pseudo-element names not starting with `::`
+  - [x] Type validation - tag with `cssPseudoElement: []` = no additional pseudo-element support
   - [x] Edge case - multiple tags with different pseudo-element lists
-  - [x] Test
 
 ### Component CSS: Pseudo-Element Block Validation
 
