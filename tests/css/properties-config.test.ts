@@ -32,8 +32,8 @@ describe("cssPropertiesConfig", () => {
           {
             "--a": {
               syntax: "<percentage>";
-              inherits: boolean;
-              "initial-value": `${number}%`;
+              inherits: true;
+              "initial-value": `1%`;
             };
           }
         >
@@ -62,13 +62,13 @@ describe("cssPropertiesConfig", () => {
           {
             "--a": {
               syntax: "<percentage>";
-              inherits: boolean;
-              "initial-value": `${number}%`;
+              inherits: true;
+              "initial-value": `1%`;
             };
             "--_a": {
               syntax: "<integer>";
-              inherits: boolean;
-              "initial-value": `${bigint}`;
+              inherits: false;
+              "initial-value": `1`;
             };
           }
         >

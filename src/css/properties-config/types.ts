@@ -24,10 +24,18 @@ export type ValidateCSSPropertiesConfig<
       ? {
           syntax: P[K]["syntax"] extends string
             ? DSLValidate<S, P[K]["syntax"]>
-            : undefined;
-          inherits: boolean;
+            : string;
+          inherits: P[K]["inherits"] extends boolean
+            ? P[K]["inherits"]
+            : boolean;
           "initial-value": P[K]["syntax"] extends string
-            ? InferCSSSyntax<Keywords, S, P[K]["syntax"]>
+            ? P[K]["initial-value"] extends InferCSSSyntax<
+                Keywords,
+                S,
+                P[K]["syntax"]
+              >
+              ? P[K]["initial-value"]
+              : InferCSSSyntax<Keywords, S, P[K]["syntax"]>
             : P[K]["initial-value"];
         }
       : `You must have the property start with -- instead like --${K}`

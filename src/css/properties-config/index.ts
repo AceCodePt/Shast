@@ -22,9 +22,8 @@ export const cssPropertiesConfig = <
       );
     }
     const entry = entries[key];
-    if (typeof entry === "object") {
-      const syntax = entry.syntax;
-      dslString(Object.assign({}, syntaxConfig, keywords), syntax);
+    if (typeof entry === "object" && entry.syntax) {
+      dslString(Object.assign({}, syntaxConfig, keywords), entry.syntax);
     }
   }
   return config as P;
