@@ -32,18 +32,6 @@ export const CSS_PROPERTIES = cssPropertiesConfig(
   },
 );
 
-// index.html
-// <div>
-// <div> asdfssfd </div>
-// </div>
-
-// index.css
-// div {
-//    span {
-// asdfasdfa
-// }
-// }
-
 // Abstract Syntax tree
 const card = createComponent(
   SUPPORTED_KEYWORDS,
