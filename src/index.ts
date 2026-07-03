@@ -3,12 +3,14 @@
 import { cssPropertiesConfig } from "./css/properties-config/index.ts";
 import {
   CSS_ATTRIBUTES,
+  CSS_PSEUDO_CLASSES,
   CSS_SYNTAX,
   HTML_GLOBAL_ATTRIBUTES,
   HTML_TAG_DEFINITIONS,
 } from "./consts.ts";
 import { createComponent } from "./create-component.ts";
 import { SUPPORTED_KEYWORDS } from "./dsl/index.ts";
+import type { InferCSSAttributesConfig } from "./css/attribute-config/types.ts";
 
 export const CSS_PROPERTIES = cssPropertiesConfig(
   SUPPORTED_KEYWORDS,
@@ -20,9 +22,9 @@ export const CSS_PROPERTIES = cssPropertiesConfig(
       "initial-value": "1%",
     },
     "--_a": {
-      syntax: "<integer>",
+      syntax: "<percentage>",
       inherits: false,
-      "initial-value": "1",
+      "initial-value": "1%",
     },
     "--background-color": {
       syntax: "<color>",
@@ -32,40 +34,62 @@ export const CSS_PROPERTIES = cssPropertiesConfig(
   },
 );
 
-// Abstract Syntax tree
-const card = createComponent(
+// index.html
+// <div> <span> asdfasd </div></div>
+
+// index.css
+// div {
+//  div  {
+//   bg: color
+//  }
+// }
+
+// div div { bg: color }
+
+type X = InferCSSAttributesConfig<
+  typeof SUPPORTED_KEYWORDS,
+  typeof CSS_SYNTAX,
+  typeof CSS_ATTRIBUTES
+>;
+
+const card1 = createComponent(
   SUPPORTED_KEYWORDS,
   HTML_GLOBAL_ATTRIBUTES,
   HTML_TAG_DEFINITIONS,
   CSS_SYNTAX,
   CSS_ATTRIBUTES,
+  CSS_PSEUDO_CLASSES,
   CSS_PROPERTIES,
   {
-    tag: "div",
-    attributes: {},
+    tag: "a",
+    attributes: { dir: "ltr", href: "" },
     innerHTML: {
-      img: {
+      image: {
         tag: "img",
+        attributes: { alt: "", src: "" },
       },
-      title: {
-        tag: "h1",
-      },
-      points: {
-        tag: "ul",
+      text: {
+        tag: "div",
         innerHTML: {
-          point: {
-            tag: "li",
+          check: {
+            tag: "div",
           },
         },
       },
     },
     css: {
       width: "100%",
-      height: "100%",
-      "--background-color": "currentColor",
-      "> points": {
-        padding: "10px",
-        "> point": {},
+      "align-content": "flex-start",
+      "--_a": "100%",
+      ":hover": {
+        "align-items": "end",
+      },
+      "::before": {},
+      ":visited": {},
+      "> text": {
+        "> check": {
+          width: "100%",
+        },
       },
     },
   },

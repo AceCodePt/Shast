@@ -4,7 +4,7 @@ import { htmlTagConfig } from "../index.ts";
 export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   a: {
     attributes: {
-      href: "string | undefined",
+      href: "string",
       target: "'_self' | '_blank' | undefined",
     },
     innerHTML: ["#text", "img", "span"],
@@ -30,25 +30,49 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     attributes: {},
     innerHTML: "*",
     cssPseudoClass: [],
-    cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
+    cssPseudoElement: [
+      "::before",
+      "::after",
+      "::first-letter",
+      "::first-line",
+      "::selection",
+    ],
   },
   h1: {
     attributes: {},
     innerHTML: ["#text"],
     cssPseudoClass: [],
-    cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
+    cssPseudoElement: [
+      "::before",
+      "::after",
+      "::first-letter",
+      "::first-line",
+      "::selection",
+    ],
   },
   h2: {
     attributes: {},
     innerHTML: ["#text"],
     cssPseudoClass: [],
-    cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
+    cssPseudoElement: [
+      "::before",
+      "::after",
+      "::first-letter",
+      "::first-line",
+      "::selection",
+    ],
   },
   h3: {
     attributes: {},
     innerHTML: ["#text"],
     cssPseudoClass: [],
-    cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
+    cssPseudoElement: [
+      "::before",
+      "::after",
+      "::first-letter",
+      "::first-line",
+      "::selection",
+    ],
   },
   img: {
     attributes: {
@@ -73,13 +97,26 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     attributes: {},
     innerHTML: "*",
     cssPseudoClass: [],
-    cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection", "::marker"],
+    cssPseudoElement: [
+      "::before",
+      "::after",
+      "::first-letter",
+      "::first-line",
+      "::selection",
+      "::marker",
+    ],
   },
   p: {
     attributes: {},
     innerHTML: ["#text", "span", "a", "br"],
     cssPseudoClass: [],
-    cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
+    cssPseudoElement: [
+      "::before",
+      "::after",
+      "::first-letter",
+      "::first-line",
+      "::selection",
+    ],
   },
   span: {
     attributes: {},
@@ -91,6 +128,12 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     attributes: {},
     innerHTML: ["li"],
     cssPseudoClass: [],
-    cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
+    cssPseudoElement: [
+      "::before",
+      "::after",
+      "::first-letter",
+      "::first-line",
+      "::selection",
+    ],
   },
 });

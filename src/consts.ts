@@ -7,8 +7,10 @@ import commonHTMLAttributes from "./html/attribute-config/variations/common.ts";
 import commonHTMLTag from "./html/tag-config/variations/common.ts";
 import commonCSSSyntax from "./css/syntax-config/variations/common.ts";
 import commonCSSAttributes from "./css/attribute-config/variations/common.ts";
+import commonCSSPseudoClasses from "./css/pseudo-class-config/variations/common.ts";
 
 export const HTML_GLOBAL_ATTRIBUTES = commonHTMLAttributes;
 export const HTML_TAG_DEFINITIONS = commonHTMLTag;
 export const CSS_SYNTAX = commonCSSSyntax;
 export const CSS_ATTRIBUTES = commonCSSAttributes;
+export const CSS_PSEUDO_CLASSES = commonCSSPseudoClasses;

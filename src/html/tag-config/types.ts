@@ -4,13 +4,13 @@ import type {
   ValidateHTMLAttributesConfig,
 } from "../attribute-config/types.ts";
 
-export type BaseHTMLTag = string;
+type BaseHTMLTag = string;
 type BaseInnerHTMLTagConfig<PossibleTags extends string> =
   | "*"
   | (PossibleTags | "#text")[];
 
 export type BaseHTMLTagConfig = Record<
-  string,
+  BaseHTMLTag,
   {
     attributes?: BaseHTMLAttributesConfig;
     innerHTML?: BaseInnerHTMLTagConfig<string>;

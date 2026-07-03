@@ -1,9 +1,14 @@
 import { test, describe } from "node:test";
 import assert from "node:assert";
+import { cssSyntaxConfig } from "../src/css/syntax-config/index.ts";
+import { cssAttributeConfig } from "../src/css/attribute-config/index.ts";
+import { cssPropertiesConfig } from "../src/css/properties-config/index.ts";
 import { createComponent } from "../src/create-component.ts";
 import { htmlAttributeConfig } from "../src/html/attribute-config/index.ts";
 import { htmlTagConfig } from "../src/html/tag-config/index.ts";
 import { SUPPORTED_KEYWORDS } from "../src/dsl/index.ts";
+
+const EMPTY_PSEUDO_CLASSES = [] as const;
 
 // ==========================================
 // 1. SETUP STATIC TEST SCHEMAS
@@ -13,13 +18,22 @@ const MOCK_SHARED_ATTRIBUTES = htmlAttributeConfig(SUPPORTED_KEYWORDS, {
   class: "string",
 });
 
-const MOCK_TAG_ATTRIBUTES = htmlTagConfig(SUPPORTED_KEYWORDS, {
-  div: { innerHTML: "*" },
-  p: { innerHTML: ["#text"] },
-  img: { attributes: { src: "string", alt: "string" }, innerHTML: [] },
-  ul: { innerHTML: ["li"] },
-  li: { innerHTML: ["#text"] },
+const MOCK_TAG_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+  div: { attributes: {}, innerHTML: "*", cssPseudoClass: [], cssPseudoElement: [] },
+  p: { attributes: {}, innerHTML: ["#text"], cssPseudoClass: [], cssPseudoElement: [] },
+  img: {
+    attributes: { src: "string", alt: "string" },
+    innerHTML: [],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  ul: { attributes: {}, innerHTML: ["li"], cssPseudoClass: [], cssPseudoElement: [] },
+  li: { attributes: {}, innerHTML: ["#text"], cssPseudoClass: [], cssPseudoElement: [] },
 });
+
+const MOCK_CSS_SYNTAX = cssSyntaxConfig(SUPPORTED_KEYWORDS, {});
+const MOCK_CSS_ATTRIBUTES = cssAttributeConfig(SUPPORTED_KEYWORDS, MOCK_CSS_SYNTAX, {});
+const MOCK_CSS_PROPERTIES = cssPropertiesConfig(SUPPORTED_KEYWORDS, MOCK_CSS_SYNTAX, {});
 
 // ==========================================
 // 2. COMPONENT VALIDATION TEST SUITE
@@ -29,7 +43,7 @@ describe("validateComponent & createComponent", () => {
     test("should fail if node is null or not an object", () => {
       assert.throws(
         () =>
-          createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, null as any),
+          createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, null as any),
         /Validation Error: Provided node is not a valid component object/,
       );
     });
@@ -37,14 +51,14 @@ describe("validateComponent & createComponent", () => {
     test("should fail if tag is missing or is not a string", () => {
       assert.throws(
         () =>
-          createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, {
+          createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, {
             innerHTML: "text",
           }),
         /Validation Error: Component node is missing a valid string 'tag' property/,
       );
       assert.throws(
         () =>
-          createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, {
+          createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, {
             tag: 123,
           }),
         /Validation Error: Component node is missing a valid string 'tag' property/,
@@ -54,7 +68,7 @@ describe("validateComponent & createComponent", () => {
     test("should fail if tag is not recognized in the registry", () => {
       assert.throws(
         () =>
-          createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, {
+          createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, {
             tag: "section",
           }),
         /Structural Error: '<section>' is not a recognized configuration tag in your registry/,
@@ -65,11 +79,11 @@ describe("validateComponent & createComponent", () => {
   describe("Attribute Validation Firewall", () => {
     test("should pass valid explicit tag attributes and optional global attributes", () => {
       assert.doesNotThrow(() => {
-        createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, {
+        createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, {
           tag: "img",
           src: "logo.jpg",
           alt: "My Logo",
-          id: "main-logo", // Global property
+          id: "main-logo",
         } as const);
       });
     });
@@ -77,9 +91,9 @@ describe("validateComponent & createComponent", () => {
     test("should fail when encountering undocumented attributes", () => {
       assert.throws(
         () =>
-          createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, {
+          createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, {
             tag: "p",
-            href: "https://google.com", // Valid for <a>, invalid for <p>
+            href: "https://google.com",
           }),
         /Attribute Error: Property 'href' is not a valid attribute for <p> or the Global configuration registry/,
       );
@@ -89,7 +103,7 @@ describe("validateComponent & createComponent", () => {
   describe("Void Element Controls", () => {
     test("should pass void elements when innerHTML is absent", () => {
       assert.doesNotThrow(() => {
-        createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, {
+        createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, {
           tag: "img",
           src: "pic.png",
           alt: "Image text",
@@ -100,7 +114,7 @@ describe("validateComponent & createComponent", () => {
     test("should fail void elements if string content is passed", () => {
       assert.throws(
         () =>
-          createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, {
+          createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, {
             tag: "img",
             src: "pic.png",
             alt: "Image text",
@@ -114,7 +128,7 @@ describe("validateComponent & createComponent", () => {
   describe("Text Content Controls", () => {
     test("should fail element with string content if it accepts text nodes", () => {
       assert.throws(() => {
-        createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, {
+        createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, {
           tag: "p",
           innerHTML: "Clean inline content" as any,
         } as const);
@@ -124,9 +138,9 @@ describe("validateComponent & createComponent", () => {
     test("should fail element with string content if it explicitly bars text nodes", () => {
       assert.throws(
         () =>
-          createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, {
+          createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, {
             tag: "ul",
-            innerHTML: ["Illegal Direct Text Node Element"], // <ul> can only hold <li> blocks
+            innerHTML: ["Illegal Direct Text Node Element"],
           }),
         /Validation Error: Tag '<ul>' innerHTML cannot contain a string without the #text/,
       );
@@ -136,7 +150,7 @@ describe("validateComponent & createComponent", () => {
   describe("Structural Hierarchy Arrays", () => {
     test("should pass valid nested configurations matching allowed child arrays", () => {
       assert.doesNotThrow(() => {
-        createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, {
+        createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, {
           tag: "ul",
           innerHTML: [
             {
@@ -153,12 +167,12 @@ describe("validateComponent & createComponent", () => {
     test("should catch illegal child elements placed inside structural limits", () => {
       assert.throws(
         () =>
-          createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, {
+          createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, {
             tag: "ul",
             innerHTML: [
               {
                 badChild: {
-                  tag: "p", // <p> is prohibited directly inside <ul> per mock configuration
+                  tag: "p",
                   innerHTML: ["Bad nested block"],
                 },
               },
@@ -171,7 +185,7 @@ describe("validateComponent & createComponent", () => {
     test("should bubble up validation errors during recursive deep nested tree tracking", () => {
       assert.throws(
         () =>
-          createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, {
+          createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, {
             tag: "ul",
             innerHTML: [
               {
@@ -180,7 +194,7 @@ describe("validateComponent & createComponent", () => {
                   innerHTML: [
                     {
                       invalidGrandchild: {
-                        tag: "div", // <li> only accepts text strings, not structural <div> components
+                        tag: "div",
                       },
                     },
                   ] as any,
@@ -195,7 +209,7 @@ describe("validateComponent & createComponent", () => {
     test("should fail on totally unparseable child dictionary nodes", () => {
       assert.throws(
         () =>
-          createComponent(MOCK_TAG_ATTRIBUTES, MOCK_SHARED_ATTRIBUTES, {
+          createComponent(SUPPORTED_KEYWORDS, MOCK_SHARED_ATTRIBUTES, MOCK_TAG_CONFIG, MOCK_CSS_SYNTAX, MOCK_CSS_ATTRIBUTES, MOCK_CSS_PROPERTIES, {
             tag: "div",
             innerHTML: [
               {

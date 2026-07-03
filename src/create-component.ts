@@ -1,145 +1,223 @@
-import type { BaseCSSAttributesConfig } from "./css/attribute-config/types.ts";
+import type {
+  BaseCSSAttributesConfig,
+  InferCSSAttributesConfig,
+} from "./css/attribute-config/types.ts";
 import type { BaseCSSPropertiesConfig } from "./css/properties-config/types.ts";
+import type { BaseCSSPseudoClassConfig } from "./css/pseudo-class-config/types.ts";
 import type { BaseCSSSyntaxConfig } from "./css/syntax-config/types.ts";
-import type { DSLInfer, SupportedKeywords } from "./dsl/index.ts";
+import type { DSLInfer } from "./dsl/index.ts";
 import type {
   BaseHTMLAttributesConfig,
   InferHTMLAttributesConfig,
 } from "./html/attribute-config/types.ts";
 import type { BaseHTMLTagConfig } from "./html/tag-config/types.ts";
-import type { Keyof, MakeUndefinedOptional } from "./types.ts";
+import type { MakeUndefinedOptional } from "./types.ts";
 
-type BaseComponentInnerHTMLStructure = Record<string, BaseComponentStructure | string> | string;
+type BaseComponentInnerHTMLStructure =
+  | string
+  | Record<string, BaseComponentStructure | string>;
 
-type BaseComponentStructure<
-> = {
-  tag: string;
-  attributes?: Record<string, string>;
+type BaseComponentStructure = {
+  tag?: string;
+  attributes?: Record<string, any>;
   innerHTML?: BaseComponentInnerHTMLStructure;
-  css?: Record<string, any>;
+  css?: Record<string, unknown>;
 };
 
-type IsTextAllowed<
+type IsTagElementVoid<
   HTMLTagConfig extends BaseHTMLTagConfig,
   Tag extends keyof HTMLTagConfig,
-> = "*" extends HTMLTagConfig[Tag]["innerHTML"]
-  ? true
-  : "#text" extends HTMLTagConfig[Tag]["innerHTML"][number]
-    ? true
-    : false;
+> = HTMLTagConfig[Tag]["innerHTML"] extends [] ? true : false;
 
-export type ValidateComponentInnerHTMLStructure<
+type MaybeAttributes<
+  Keywords extends Record<string, any>,
+  HTMLAttributesConfig extends BaseHTMLAttributesConfig | undefined,
+> = HTMLAttributesConfig extends BaseComponentInnerHTMLStructure
+  ? {
+      [K in keyof HTMLAttributesConfig]: K extends string
+        ? undefined extends DSLInfer<Keywords, HTMLAttributesConfig[K]>
+          ? never
+          : "attributes"
+        : never;
+    }[keyof HTMLAttributesConfig]
+  : never;
+
+type ValidateComponentInnerHTMLStructure<
   Keywords extends Record<string, any>,
   HTMLAttributesConfig extends BaseHTMLAttributesConfig,
   HTMLTagConfig extends BaseHTMLTagConfig,
   CSSSyntaxConfig extends BaseCSSSyntaxConfig,
   CSSAttributesConfig extends BaseCSSAttributesConfig,
+  CSSPseudoClassConfig extends BaseCSSPseudoClassConfig,
   CSSPropertiesConfig extends BaseCSSPropertiesConfig,
-  Tag extends keyof HTMLTagConfig,
+  Tags extends keyof HTMLTagConfig,
   T extends BaseComponentInnerHTMLStructure,
-> = Exclude<
-  {
-    [K in keyof T]: K extends string
-      ? T[K] extends BaseComponentStructure
-        ? [
-            Extract<
-              | HTMLTagConfig[Tag]["innerHTML"][number]
-              | HTMLTagConfig[Tag]["innerHTML"],
-              T[K]["tag"] | "*"
-            >,
-          ] extends [never]
-          ? { tag: Exclude<HTMLTagConfig[Tag]["innerHTML"][number], "#text"> }
-          : ValidateComponentStructure<
-              Keywords,
-              HTMLAttributesConfig,
-              HTMLTagConfig,
-              CSSSyntaxConfig,
-              CSSAttributesConfig,
-              CSSPropertiesConfig,
-              T[K]
-            >
-        : true extends IsTextAllowed<HTMLTagConfig, Tag>
-          ? T[K]
-          : never
-      : T[K];
-  },
-  true extends IsTextAllowed<HTMLTagConfig, Tag> ? never : string
->;
-
-export type ValidateComponentCSSStructure<
-  Keywords extends Record<string, any>,
-  CSSSyntaxConfig extends BaseCSSSyntaxConfig,
-  CSSAttributesConfig extends BaseCSSAttributesConfig,
-  CSSPropertiesConfig extends BaseCSSPropertiesConfig,
-  T extends BaseComponentStructure,
-> = {
-  [K in keyof CSSAttributesConfig]?: K extends string
-    ? DSLInfer<Keywords & CSSSyntaxConfig, CSSAttributesConfig[K]>
-    : CSSAttributesConfig[K];
-} & {
-  [K in keyof CSSPropertiesConfig]?: K extends `--${string}`
-    ? DSLInfer<Keywords & CSSSyntaxConfig, CSSPropertiesConfig[K]["syntax"]>
-    : CSSPropertiesConfig[K];
-} & (T["innerHTML"] extends Record<string, BaseComponentStructure | string>
+> =
+  T extends Record<string, any>
     ? {
-        [K in keyof T["innerHTML"] as `> ${K & string}`]?: T["innerHTML"][K] extends BaseComponentStructure
-          ? ValidateComponentCSSStructure<
-              Keywords,
-              CSSSyntaxConfig,
-              CSSAttributesConfig,
-              CSSPropertiesConfig,
-              T["innerHTML"][K]
-            >
-          : T["innerHTML"][K];
-      }
-    : {});
-
-export type ValidateComponentStructure<
-  Keywords extends Record<string, any>,
-  HTMLAttributesConfig extends BaseHTMLAttributesConfig,
-  HTMLTagConfig extends BaseHTMLTagConfig,
-  CSSSyntaxConfig extends BaseCSSSyntaxConfig,
-  CSSAttributesConfig extends BaseCSSAttributesConfig,
-  CSSPropertiesConfig extends BaseCSSPropertiesConfig,
-  T extends BaseComponentStructure,
-> = {
-  [K in keyof T]: K extends string
-    ? K extends "tag"
-      ? Keyof<HTMLTagConfig>
-      : K extends "attributes"
-        ? MakeUndefinedOptional<
-            Partial<InferHTMLAttributesConfig<Keywords, HTMLAttributesConfig>> &
-              (HTMLTagConfig[T["tag"]]["attributes"] extends BaseHTMLAttributesConfig
-                ? InferHTMLAttributesConfig<
-                    SupportedKeywords,
-                    HTMLTagConfig[T["tag"]]["attributes"]
-                  >
-                : {})
-          >
-        : K extends "innerHTML"
-          ? T["innerHTML"] extends BaseComponentInnerHTMLStructure
-            ? ValidateComponentInnerHTMLStructure<
+        [K in keyof T]: K extends string
+          ? T[K] extends string
+            ? T[K]
+            : ValidateComponentStructure<
                 Keywords,
                 HTMLAttributesConfig,
                 HTMLTagConfig,
                 CSSSyntaxConfig,
                 CSSAttributesConfig,
+                CSSPseudoClassConfig,
                 CSSPropertiesConfig,
-                T["tag"],
-                T["innerHTML"]
+                Tags,
+                T[K]
               >
-            : BaseComponentInnerHTMLStructure
+          : T[K];
+      }
+    : T;
+
+type ValidateComponentCSSStructure<
+  Keywords extends Record<string, any>,
+  HTMLTagConfig extends BaseHTMLTagConfig,
+  CSSSyntaxConfig extends BaseCSSSyntaxConfig,
+  CSSAttributesConfig extends BaseCSSAttributesConfig,
+  CSSPseudoClassConfig extends BaseCSSPseudoClassConfig,
+  CSSPropertiesConfig extends BaseCSSPropertiesConfig,
+  T extends BaseComponentStructure,
+  IsInPseudoElement extends boolean,
+> = {
+  [K in keyof T["innerHTML"] as `> ${K & string}`]?: K extends string
+    ? T["innerHTML"][K] extends Record<string, any>
+      ? ValidateComponentCSSStructure<
+          Keywords,
+          HTMLTagConfig,
+          CSSSyntaxConfig,
+          CSSAttributesConfig,
+          CSSPseudoClassConfig,
+          CSSPropertiesConfig,
+          T["innerHTML"][K],
+          IsInPseudoElement
+        >
+      : never
+    : T["innerHTML"][K];
+} & Partial<
+  InferCSSAttributesConfig<Keywords, CSSSyntaxConfig, CSSAttributesConfig>
+> & {
+    [K in keyof CSSPropertiesConfig]?: K extends `--${string}`
+      ? CSSPropertiesConfig[K]["syntax"] extends string
+        ? DSLInfer<Keywords & CSSSyntaxConfig, CSSPropertiesConfig[K]["syntax"]>
+        : never
+      : CSSPropertiesConfig[K];
+  } & {
+    [K in
+      | CSSPseudoClassConfig[number]
+      | (T["tag"] extends string
+          ? HTMLTagConfig[T["tag"]]["cssPseudoClass"] extends any[]
+            ? HTMLTagConfig[T["tag"]]["cssPseudoClass"][number]
+            : never
+          : never)]?: ValidateComponentCSSStructure<
+      Keywords,
+      HTMLTagConfig,
+      CSSSyntaxConfig,
+      CSSAttributesConfig,
+      CSSPseudoClassConfig,
+      CSSPropertiesConfig,
+      T,
+      IsInPseudoElement
+    >;
+  } & (false extends IsInPseudoElement
+    ? {
+        [K in T["tag"] extends string
+          ? HTMLTagConfig[T["tag"]]["cssPseudoElement"] extends any[]
+            ? HTMLTagConfig[T["tag"]]["cssPseudoElement"][number]
+            : never
+          : never]?: ValidateComponentCSSStructure<
+          Keywords,
+          HTMLTagConfig,
+          CSSSyntaxConfig,
+          CSSAttributesConfig,
+          CSSPseudoClassConfig,
+          CSSPropertiesConfig,
+          T,
+          true
+        >;
+      }
+    : {});
+
+type ValidateComponentStructure<
+  Keywords extends Record<string, any>,
+  HTMLAttributesConfig extends BaseHTMLAttributesConfig,
+  HTMLTagConfig extends BaseHTMLTagConfig,
+  CSSSyntaxConfig extends BaseCSSSyntaxConfig,
+  CSSAttributesConfig extends BaseCSSAttributesConfig,
+  CSSPseudoClassConfig extends BaseCSSPseudoClassConfig,
+  CSSPropertiesConfig extends BaseCSSPropertiesConfig,
+  Tags extends keyof HTMLTagConfig,
+  T extends BaseComponentStructure,
+> = T["tag"] extends Tags
+  ? {
+      [K in keyof T]: K extends string
+        ? K extends "tag"
+          ? T[K]
           : K extends "css"
             ? ValidateComponentCSSStructure<
                 Keywords,
+                HTMLTagConfig,
                 CSSSyntaxConfig,
                 CSSAttributesConfig,
+                CSSPseudoClassConfig,
                 CSSPropertiesConfig,
-                T
+                T,
+                false
               >
-            : null
-    : T[K];
-};
+            : K extends "attributes"
+              ? MakeUndefinedOptional<
+                  InferHTMLAttributesConfig<
+                    Keywords,
+                    HTMLAttributesConfig &
+                      (HTMLTagConfig[T["tag"]]["attributes"] extends BaseHTMLAttributesConfig
+                        ? HTMLTagConfig[T["tag"]]["attributes"]
+                        : {})
+                  >
+                >
+              : K extends "innerHTML"
+                ? HTMLTagConfig[T["tag"]]["innerHTML"] extends []
+                  ? `No innerHTML for void elements` & { _err: true }
+                  : T[K] extends BaseComponentInnerHTMLStructure
+                    ? ValidateComponentInnerHTMLStructure<
+                        Keywords,
+                        HTMLAttributesConfig,
+                        HTMLTagConfig,
+                        CSSSyntaxConfig,
+                        CSSAttributesConfig,
+                        CSSPseudoClassConfig,
+                        CSSPropertiesConfig,
+                        "*" extends HTMLTagConfig[T["tag"]]["innerHTML"]
+                          ? keyof HTMLTagConfig & Tags
+                          : HTMLTagConfig[T["tag"]]["innerHTML"] extends any[]
+                            ? HTMLTagConfig[T["tag"]]["innerHTML"][number] &
+                                Tags
+                            : never,
+                        T[K]
+                      >
+                    : never
+                : never
+        : never;
+    } & {} & (true extends IsTagElementVoid<HTMLTagConfig, T["tag"]>
+        ? {}
+        : {
+            innerHTML?: {};
+          }) &
+      ("attributes" extends MaybeAttributes<
+        Keywords,
+        HTMLTagConfig[T["tag"]]["attributes"]
+      >
+        ? {
+            attributes: {};
+          }
+        : {
+            attributes?: {};
+          })
+  : {
+      tag: Exclude<Tags, "#text">;
+    };
 
 export function createComponent<
   const Keywords extends Record<string, any>,
@@ -147,6 +225,7 @@ export function createComponent<
   const HTMLTagConfig extends BaseHTMLTagConfig,
   const CSSSyntaxConfig extends BaseCSSSyntaxConfig,
   const CSSAttributesConfig extends BaseCSSAttributesConfig,
+  const CSSPseudoClassConfig extends BaseCSSPseudoClassConfig,
   const CSSPropertiesConfig extends BaseCSSPropertiesConfig,
   const T extends BaseComponentStructure,
 >(
@@ -155,6 +234,7 @@ export function createComponent<
   _HTMLTagConfig: HTMLTagConfig,
   _CSSSyntaxConfig: CSSSyntaxConfig,
   _CSSAttributesConfig: CSSAttributesConfig,
+  _CSSPseudoClassConfig: CSSPseudoClassConfig,
   _CSSPropertiesConfig: CSSPropertiesConfig,
   config: ValidateComponentStructure<
     Keywords,
@@ -162,7 +242,9 @@ export function createComponent<
     HTMLTagConfig,
     CSSSyntaxConfig,
     CSSAttributesConfig,
+    CSSPseudoClassConfig,
     CSSPropertiesConfig,
+    keyof HTMLTagConfig,
     T
   >,
 ) {
