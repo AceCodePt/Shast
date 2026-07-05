@@ -10,7 +10,6 @@ import {
 } from "./consts.ts";
 import { createComponent } from "./create-component.ts";
 import { SUPPORTED_KEYWORDS } from "./dsl/index.ts";
-import type { InferCSSAttributesConfig } from "./css/attribute-config/types.ts";
 
 export const CSS_PROPERTIES = cssPropertiesConfig(
   SUPPORTED_KEYWORDS,
@@ -45,12 +44,6 @@ export const CSS_PROPERTIES = cssPropertiesConfig(
 // }
 
 // div div { bg: color }
-
-type X = InferCSSAttributesConfig<
-  typeof SUPPORTED_KEYWORDS,
-  typeof CSS_SYNTAX,
-  typeof CSS_ATTRIBUTES
->;
 
 const card1 = createComponent(
   SUPPORTED_KEYWORDS,

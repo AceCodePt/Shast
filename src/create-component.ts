@@ -22,6 +22,9 @@ type BaseComponentStructure = {
   attributes?: Record<string, any>;
   innerHTML?: BaseComponentInnerHTMLStructure;
   css?: Record<string, unknown>;
+  // This is to make the stuff extra premissible so types won't
+  // get screwed over
+  [att: string]: unknown;
 };
 
 type IsTagElementVoid<
