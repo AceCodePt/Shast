@@ -5,8 +5,6 @@ import { htmlTagConfig } from "@/html/tag-config/index.ts";
 import type { ValidateHTMLTagConfig } from "@/html/tag-config/types.ts";
 import { assertType, type Equal } from "../type-utils.ts";
 
-const EMPTY_PSEUDO_CLASSES = [] as const;
-
 describe("htmlTagConfig", () => {
   describe("Type Validation", () => {
     test("accepts a valid single tag config", () => {
@@ -226,14 +224,14 @@ describe("htmlTagConfig", () => {
           cssPseudoElement: [];
         };
       };
-      const _config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {} as Config);
+      const _config = htmlTagConfig(SUPPORTED_KEYWORDS, {} as Config);
       assertType<Equal<typeof _config, Config>>();
     });
   });
 
   describe("Runtime Validation", () => {
     test("accepts a tag with an empty innerHTML array", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         br: {
           innerHTML: [],
           attributes: {},
@@ -252,7 +250,7 @@ describe("htmlTagConfig", () => {
     });
 
     test("accepts a tag with #text in innerHTML", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         p: {
           innerHTML: ["#text"],
           attributes: {},
@@ -273,7 +271,7 @@ describe("htmlTagConfig", () => {
     test("accepts a * wildcard innerHTML (type-level only, runtime requires explicit tags)", () => {
       // The * wildcard is accepted at the type level but runtime iterates the string
       // as individual characters, so use explicit tag references instead
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         div: {
           innerHTML: ["span"],
           attributes: {},
@@ -304,7 +302,7 @@ describe("htmlTagConfig", () => {
     });
 
     test("accepts a tag referencing another known tag in innerHTML", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         ul: {
           innerHTML: ["li"],
           attributes: {},
@@ -335,7 +333,7 @@ describe("htmlTagConfig", () => {
     });
 
     test("accepts tags with valid DSL string attributes", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         a: {
           attributes: {
             href: "string | undefined",
@@ -360,7 +358,7 @@ describe("htmlTagConfig", () => {
     });
 
     test("accepts multiple tags with attributes and cross-references", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         ul: {
           attributes: { id: "string | undefined" },
           innerHTML: ["li"],
@@ -391,7 +389,7 @@ describe("htmlTagConfig", () => {
     });
 
     test("returns the same object reference", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         span: {
           innerHTML: ["#text"],
           attributes: {},
@@ -410,7 +408,7 @@ describe("htmlTagConfig", () => {
     });
 
     test("accepts a tag with literal union attribute", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         bdo: {
           attributes: { dir: "'ltr' | 'rtl' | 'auto' | undefined" },
           innerHTML: ["#text"],
@@ -429,7 +427,7 @@ describe("htmlTagConfig", () => {
     });
 
     test("a tag can reference itself in innerHTML", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         div: {
           innerHTML: ["div"],
           attributes: {},
@@ -448,7 +446,7 @@ describe("htmlTagConfig", () => {
     });
 
     test("a tag can have both #text and another tag in innerHTML", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         p: {
           innerHTML: ["#text", "span"],
           attributes: {},
@@ -479,7 +477,7 @@ describe("htmlTagConfig", () => {
     });
 
     test("different tags can have different attribute sets", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         a: {
           attributes: { href: "string", rel: "string | undefined" },
           innerHTML: ["#text"],
@@ -531,7 +529,7 @@ describe("htmlTagConfig", () => {
   describe("Error handling", () => {
     test("throws when innerHTML references an unknown tag", () => {
       assert.throws(() =>
-        htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+        htmlTagConfig(SUPPORTED_KEYWORDS, {
           div: {
             // @ts-expect-error
             innerHTML: ["span"],
@@ -546,7 +544,7 @@ describe("htmlTagConfig", () => {
     test("throws for invalid DSL string in an attribute value", () => {
       assert.throws(
         () =>
-          htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+          htmlTagConfig(SUPPORTED_KEYWORDS, {
             div: {
               // @ts-expect-error
               attributes: { id: "xyz" },
@@ -561,7 +559,7 @@ describe("htmlTagConfig", () => {
 
     test("throws when innerHTML references a tag that is only defined elsewhere", () => {
       assert.throws(() =>
-        htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+        htmlTagConfig(SUPPORTED_KEYWORDS, {
           p: {
             // @ts-expect-error - span is not defined in this config
             innerHTML: ["#text", "span"],
@@ -576,7 +574,7 @@ describe("htmlTagConfig", () => {
     test("throws for partially invalid union in attribute", () => {
       assert.throws(
         () =>
-          htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+          htmlTagConfig(SUPPORTED_KEYWORDS, {
             div: {
               // @ts-expect-error
               attributes: { id: "string | xyz" },
@@ -592,12 +590,12 @@ describe("htmlTagConfig", () => {
 
   describe("Edge Cases", () => {
     test("empty tag config is accepted", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {});
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {});
       assert.deepStrictEqual(config, {});
     });
 
     test("single tag with empty innerHTML and no attributes", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         br: {
           innerHTML: [],
           attributes: {},
@@ -616,7 +614,7 @@ describe("htmlTagConfig", () => {
     });
 
     test("object reference identity preserved for complex config", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         div: {
           innerHTML: ["span"],
           attributes: {},
@@ -647,7 +645,7 @@ describe("htmlTagConfig", () => {
     });
 
     test("tag can have attributes with template literal DSL", () => {
-      const config = htmlTagConfig(SUPPORTED_KEYWORDS, EMPTY_PSEUDO_CLASSES, {
+      const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
         div: {
           attributes: { style: "`${string}` | undefined" },
           innerHTML: [],
@@ -667,9 +665,6 @@ describe("htmlTagConfig", () => {
   });
 
   describe("Pseudo-Class Validation", () => {
-    const VALID_PSEUDO_CLASSES = [":hover", ":focus", ":active"] as const;
-    type ValidPseudoClass = typeof VALID_PSEUDO_CLASSES[number];
-
     describe("Type Validation", () => {
       test("accepts tag with valid pseudo-class references", () => {
         assertType<
@@ -683,8 +678,7 @@ describe("htmlTagConfig", () => {
                   cssPseudoClass: [":hover", ":focus"];
                   cssPseudoElement: [];
                 };
-              },
-              ValidPseudoClass
+              }
             >,
             {
               button: {
@@ -710,41 +704,13 @@ describe("htmlTagConfig", () => {
                   cssPseudoClass: ["hover"];
                   cssPseudoElement: [];
                 };
-              },
-              ValidPseudoClass
+              }
             >,
             {
               button: {
                 innerHTML: ["#text"];
                 attributes: {};
-                cssPseudoClass: ValidPseudoClass[];
-                cssPseudoElement: [];
-              };
-            }
-          >
-        >();
-      });
-
-      test("rejects pseudo-class name not in the supported config", () => {
-        assertType<
-          Equal<
-            ValidateHTMLTagConfig<
-              SupportedKeywords,
-              {
-                button: {
-                  innerHTML: ["#text"];
-                  attributes: {};
-                  cssPseudoClass: [":invalid"];
-                  cssPseudoElement: [];
-                };
-              },
-              ValidPseudoClass
-            >,
-            {
-              button: {
-                innerHTML: ["#text"];
-                attributes: {};
-                cssPseudoClass: ValidPseudoClass[];
+                cssPseudoClass: `:${string}`[];
                 cssPseudoElement: [];
               };
             }
@@ -764,8 +730,7 @@ describe("htmlTagConfig", () => {
                   cssPseudoClass: [];
                   cssPseudoElement: [];
                 };
-              },
-              ValidPseudoClass
+              }
             >,
             {
               button: {
@@ -781,24 +746,8 @@ describe("htmlTagConfig", () => {
     });
 
     describe("Runtime Validation", () => {
-      test("throws for pseudo-class name not in supported config", () => {
-        assert.throws(
-          () =>
-            htmlTagConfig(SUPPORTED_KEYWORDS, VALID_PSEUDO_CLASSES, {
-              button: {
-                innerHTML: ["#text"],
-                attributes: {},
-                // @ts-expect-error
-                cssPseudoClass: [":invalid"],
-                cssPseudoElement: [],
-              },
-            }),
-          /Pseudo-class ".*" is not defined/,
-        );
-      });
-
       test("accepts empty pseudo-class list", () => {
-        const config = htmlTagConfig(SUPPORTED_KEYWORDS, VALID_PSEUDO_CLASSES, {
+        const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
           button: {
             innerHTML: ["#text"],
             attributes: {},
@@ -817,7 +766,7 @@ describe("htmlTagConfig", () => {
       });
 
       test("preserves object reference", () => {
-        const config = htmlTagConfig(SUPPORTED_KEYWORDS, VALID_PSEUDO_CLASSES, {
+        const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
           button: {
             innerHTML: ["#text"],
             attributes: {},
@@ -829,7 +778,7 @@ describe("htmlTagConfig", () => {
       });
 
       test("accepts valid pseudo-class references", () => {
-        const config = htmlTagConfig(SUPPORTED_KEYWORDS, VALID_PSEUDO_CLASSES, {
+        const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
           button: {
             innerHTML: ["#text"],
             attributes: {},
@@ -850,7 +799,7 @@ describe("htmlTagConfig", () => {
 
     describe("Edge Cases", () => {
       test("multiple tags with different pseudo-class lists", () => {
-        const config = htmlTagConfig(SUPPORTED_KEYWORDS, VALID_PSEUDO_CLASSES, {
+        const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
           button: {
             innerHTML: ["#text"],
             attributes: {},
@@ -893,7 +842,7 @@ describe("htmlTagConfig", () => {
       });
 
       test("tag with cssPseudoClass: [] after one with non-empty list", () => {
-        const config = htmlTagConfig(SUPPORTED_KEYWORDS, VALID_PSEUDO_CLASSES, {
+        const config = htmlTagConfig(SUPPORTED_KEYWORDS, {
           button: {
             innerHTML: [],
             attributes: {},
