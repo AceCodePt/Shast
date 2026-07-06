@@ -43,8 +43,6 @@ export const CSS_PROPERTIES = cssPropertiesConfig(
 //  }
 // }
 
-// div div { bg: color }
-
 const card1 = createComponent(
   SUPPORTED_KEYWORDS,
   HTML_GLOBAL_ATTRIBUTES,
