@@ -43,7 +43,7 @@ export const CSS_PROPERTIES = cssPropertiesConfig(
 //  }
 // }
 
-const card1 = createComponent(
+createComponent(
   SUPPORTED_KEYWORDS,
   HTML_GLOBAL_ATTRIBUTES,
   HTML_TAG_DEFINITIONS,
