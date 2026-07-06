@@ -162,7 +162,7 @@ describe("validateComponent & createComponent", () => {
               alt: "My Logo",
               id: "main-logo",
             },
-          } as const,
+          },
         );
       });
     });
@@ -208,7 +208,7 @@ describe("validateComponent & createComponent", () => {
               src: "pic.png",
               alt: "Image text",
             },
-          } as const,
+          },
         );
       });
     });
@@ -301,7 +301,7 @@ describe("validateComponent & createComponent", () => {
                 innerHTML: "text",
               },
             },
-          } as const,
+          },
         );
       });
     });

@@ -60,7 +60,9 @@ type ValidateComponentInnerHTMLStructure<
     ? {
         [K in keyof T]: K extends string
           ? T[K] extends string
-            ? T[K]
+            ? "#text" extends Tags
+              ? T[K]
+              : `This element cannot contain strings`
             : ValidateComponentStructure<
                 Keywords,
                 HTMLAttributesConfig,
@@ -74,7 +76,11 @@ type ValidateComponentInnerHTMLStructure<
               >
           : T[K];
       }
-    : T;
+    : T extends string
+      ? "#text" extends Tags
+        ? T
+        : `This element cannot contain a string`
+      : never;
 
 type ValidateComponentCSSStructure<
   Keywords extends Record<string, any>,
@@ -193,10 +199,9 @@ type ValidateComponentStructure<
                         CSSPseudoClassConfig,
                         CSSPropertiesConfig,
                         "*" extends HTMLTagConfig[T["tag"]]["innerHTML"]
-                          ? keyof HTMLTagConfig & Tags
+                          ? keyof HTMLTagConfig | "#text"
                           : HTMLTagConfig[T["tag"]]["innerHTML"] extends any[]
-                            ? HTMLTagConfig[T["tag"]]["innerHTML"][number] &
-                                Tags
+                            ? HTMLTagConfig[T["tag"]]["innerHTML"][number]
                             : never,
                         T[K]
                       >
@@ -247,7 +252,7 @@ export function createComponent<
     CSSAttributesConfig,
     CSSPseudoClassConfig,
     CSSPropertiesConfig,
-    keyof HTMLTagConfig,
+    keyof HTMLTagConfig | "#text",
     T
   >,
 ) {
