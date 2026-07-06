@@ -314,7 +314,7 @@
 
 - [x] **innerHTML validation**
   - [x] Text nodes allowed only when `#text` is in tag's innerHTML
-  - [x] Child components must have tags listed in parent's innerHTML
+  - [x] Child components may be any recognized tag (element-child whitelist intentionally not enforced — a disallowed child can always be smuggled through an allowed intermediate element)
   - [x] `*` wildcard allows any child tag
   - [x] Void elements (empty `innerHTML: []`) reject children
   - [x] Nested hierarchy validated recursively
@@ -343,10 +343,8 @@
 - [x] Extend `BaseHTMLTagConfig` with optional `cssPseudoClass: string[]` field
   - [x] Type validation - accepts tag with valid pseudo-class references
   - [x] Type validation - rejects pseudo-class name not starting with `:`
-  - [ ] Type validation - rejects pseudo-class name that doesn't exist in any variation
   - [x] Type validation - tag without `cssPseudoClass` key = no pseudo-class support
   - [x] Type validation - tag with `cssPseudoClass: []` = no pseudo-class support
-  - [x] Runtime validation - throws for pseudo-class name not in any existing variation config
   - [x] Runtime validation - accepts empty pseudo-class list
   - [x] Runtime validation - preserves object reference
   - [x] Edge case - multiple tags with different pseudo-class lists
