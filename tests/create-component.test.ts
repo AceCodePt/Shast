@@ -79,7 +79,8 @@ describe("validateComponent & createComponent", () => {
             MOCK_CSS_ATTRIBUTES,
             EMPTY_PSEUDO_CLASSES,
             MOCK_CSS_PROPERTIES,
-            null as any,
+            //@ts-expect-error
+            null,
           ),
         /Validation Error: Provided node is not a valid component object/,
       );
