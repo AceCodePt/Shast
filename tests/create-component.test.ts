@@ -45,7 +45,7 @@ const MOCK_TAG_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   li: {
     attributes: {},
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "div"],
     cssPseudoClass: [],
     cssPseudoElement: [],
   },
@@ -145,25 +145,31 @@ describe("validateComponent & createComponent", () => {
   });
 
   describe("Attribute Validation Firewall", () => {
-    test("should pass valid explicit tag attributes and optional global attributes", () => {
-      assert.doesNotThrow(() => {
-        createComponent(
-          SUPPORTED_KEYWORDS,
-          MOCK_SHARED_ATTRIBUTES,
-          MOCK_TAG_CONFIG,
-          MOCK_CSS_SYNTAX,
-          MOCK_CSS_ATTRIBUTES,
-          EMPTY_PSEUDO_CLASSES,
-          MOCK_CSS_PROPERTIES,
-          {
-            tag: "img",
-            attributes: {
-              src: "logo.jpg",
-              alt: "My Logo",
-              id: "main-logo",
-            },
+    test("accepts valid explicit tag attributes and optional global attributes", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        MOCK_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        MOCK_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        MOCK_CSS_PROPERTIES,
+        {
+          tag: "img",
+          attributes: {
+            src: "logo.jpg",
+            alt: "My Logo",
+            id: "main-logo",
           },
-        );
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "img",
+        attributes: {
+          src: "logo.jpg",
+          alt: "My Logo",
+          id: "main-logo",
+        },
       });
     });
 
@@ -192,24 +198,29 @@ describe("validateComponent & createComponent", () => {
   });
 
   describe("Void Element Controls", () => {
-    test("should pass void elements when innerHTML is absent", () => {
-      assert.doesNotThrow(() => {
-        createComponent(
-          SUPPORTED_KEYWORDS,
-          MOCK_SHARED_ATTRIBUTES,
-          MOCK_TAG_CONFIG,
-          MOCK_CSS_SYNTAX,
-          MOCK_CSS_ATTRIBUTES,
-          EMPTY_PSEUDO_CLASSES,
-          MOCK_CSS_PROPERTIES,
-          {
-            tag: "img",
-            attributes: {
-              src: "pic.png",
-              alt: "Image text",
-            },
+    test("accepts void elements when innerHTML is absent", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        MOCK_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        MOCK_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        MOCK_CSS_PROPERTIES,
+        {
+          tag: "img",
+          attributes: {
+            src: "pic.png",
+            alt: "Image text",
           },
-        );
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "img",
+        attributes: {
+          src: "pic.png",
+          alt: "Image text",
+        },
       });
     });
 
@@ -242,21 +253,23 @@ describe("validateComponent & createComponent", () => {
   });
 
   describe("Text Content Controls", () => {
-    test("should fail element with string content if it accepts text nodes", () => {
-      assert.throws(() => {
-        createComponent(
-          SUPPORTED_KEYWORDS,
-          MOCK_SHARED_ATTRIBUTES,
-          MOCK_TAG_CONFIG,
-          MOCK_CSS_SYNTAX,
-          MOCK_CSS_ATTRIBUTES,
-          EMPTY_PSEUDO_CLASSES,
-          MOCK_CSS_PROPERTIES,
-          {
-            tag: "p",
-            innerHTML: "Clean inline content",
-          },
-        );
+    test("accepts string content when the element accepts text nodes", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        MOCK_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        MOCK_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        MOCK_CSS_PROPERTIES,
+        {
+          tag: "p",
+          innerHTML: "Clean inline content",
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "p",
+        innerHTML: "Clean inline content",
       });
     });
 
@@ -283,30 +296,38 @@ describe("validateComponent & createComponent", () => {
   });
 
   describe("Structural Hierarchy Arrays", () => {
-    test("should pass valid nested configurations matching allowed child arrays", () => {
-      assert.doesNotThrow(() => {
-        createComponent(
-          SUPPORTED_KEYWORDS,
-          MOCK_SHARED_ATTRIBUTES,
-          MOCK_TAG_CONFIG,
-          MOCK_CSS_SYNTAX,
-          MOCK_CSS_ATTRIBUTES,
-          EMPTY_PSEUDO_CLASSES,
-          MOCK_CSS_PROPERTIES,
-          {
-            tag: "ul",
-            innerHTML: {
-              child1: {
-                tag: "li",
-                innerHTML: "text",
-              },
+    test("accepts valid nested configurations matching allowed child arrays", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        MOCK_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        MOCK_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        MOCK_CSS_PROPERTIES,
+        {
+          tag: "ul",
+          innerHTML: {
+            child1: {
+              tag: "li",
+              innerHTML: "text",
             },
           },
-        );
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "ul",
+        innerHTML: {
+          child1: {
+            tag: "li",
+            innerHTML: "text",
+          },
+        },
       });
     });
 
-    test("should catch illegal child elements placed inside structural limits", () => {
+    test("rejects a direct child whose tag is not in the parent's innerHTML whitelist", () => {
+      // <ul> only permits <li>, so a direct <p> child is invalid.
       assert.throws(
         () =>
           createComponent(
@@ -321,18 +342,74 @@ describe("validateComponent & createComponent", () => {
               tag: "ul",
               innerHTML: {
                 badChild: {
-                  // @ts-ignore
+                  // @ts-expect-error - p is not a permitted child of ul
                   tag: "p",
                   innerHTML: "Bad nested block",
                 },
               },
             },
           ),
-        /Structural Error: '<ul>' cannot contain a '<p>' element. Allowed elements: \[li\]/,
+        /Structural Error: '<p>' is not a permitted child of <ul>/,
       );
     });
 
-    test("should bubble up validation errors during recursive deep nested tree tracking", () => {
+    test("allows a tag to appear deep in the tree through an allowed intermediate element", () => {
+      // The whitelist is per-level, not transitive: <ul> forbids <div> as a
+      // direct child, but <li> permits <div>, and <div> permits anything, so
+      // `ul > li > div > p` passes. This mirrors the intentional `a > div >
+      // button` escape hatch.
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        MOCK_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        MOCK_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        MOCK_CSS_PROPERTIES,
+        {
+          tag: "ul",
+          innerHTML: {
+            item: {
+              tag: "li",
+              innerHTML: {
+                wrapper: {
+                  tag: "div",
+                  innerHTML: {
+                    text: {
+                      tag: "p",
+                      innerHTML: "Deeply nested",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "ul",
+        innerHTML: {
+          item: {
+            tag: "li",
+            innerHTML: {
+              wrapper: {
+                tag: "div",
+                innerHTML: {
+                  text: {
+                    tag: "p",
+                    innerHTML: "Deeply nested",
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+    });
+
+    test("gates a grandchild by its immediate parent, not the outer ancestor", () => {
+      // <li> permits #text and <div> but not <p>; the grandchild is validated
+      // against <li>, so a <p> here is rejected even though <ul> is the root.
       assert.throws(
         () =>
           createComponent(
@@ -350,15 +427,15 @@ describe("validateComponent & createComponent", () => {
                   tag: "li",
                   innerHTML: {
                     invalidGrandchild: {
-                      // @ts-ignore
-                      tag: "div",
+                      // @ts-expect-error - li does not permit p
+                      tag: "p",
                     },
                   },
                 },
               },
             },
           ),
-        /Structural Error: '<li>' cannot contain a '<div>' element. Allowed elements: \[#text\]/,
+        /Structural Error: '<p>' is not a permitted child of <li>/,
       );
     });
   });

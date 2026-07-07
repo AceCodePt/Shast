@@ -314,7 +314,8 @@
 
 - [x] **innerHTML validation**
   - [x] Text nodes allowed only when `#text` is in tag's innerHTML
-  - [x] Child components may be any recognized tag (element-child whitelist intentionally not enforced — a disallowed child can always be smuggled through an allowed intermediate element)
+  - [x] Direct children must have tags listed in the parent's innerHTML (whitelist enforced per level, e.g. `ul` accepts only `li`)
+  - [x] Whitelist is not transitive: a tag can still appear via an allowed intermediate element (`a > div > button` passes even when `a > button` does not) — enforcing this transitively is intentionally out of scope
   - [x] `*` wildcard allows any child tag
   - [x] Void elements (empty `innerHTML: []`) reject children
   - [x] Nested hierarchy validated recursively

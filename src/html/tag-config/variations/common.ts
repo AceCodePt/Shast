@@ -23,6 +23,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       "h4",
       "h5",
       "h6",
+      "span",
     ],
     cssPseudoClass: [":link", ":visited", ":any-link"],
     cssPseudoElement: ["::before", "::after", "::selection"],
