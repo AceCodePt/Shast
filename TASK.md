@@ -361,16 +361,17 @@
 
 ### Component CSS: Pseudo-Class Block Validation
 
-- [ ] Extend `ValidateComponentCSSStructure` to validate pseudo-class blocks against tag's `cssPseudoClass`
-  - [ ] Type validation - pseudo-class with all its CSS properties passes (using shared variation's scoped properties)
-  - [ ] Type validation - pseudo-class on tag that doesn't declare it is rejected
-  - [ ] Type validation - pseudo-class on tag with `cssPseudoClass: []` is rejected
-  - [ ] Type validation - pseudo-class on tag with no `cssPseudoClass` key is rejected
-  - [ ] Type validation - multiple pseudo-classes in same css block accepted
-  - [ ] Type validation - pseudo-class inside child selector (`> child: { ":hover": {...} }`)
-  - [ ] Type validation - child selector inside pseudo-class (`":hover": { "> child": {...} }`)
-  - [ ] Type validation - pseudo-class inside nested pseudo-class (`":hover": { ":focus": {...} }`)
-  - [ ] Test
+- [x] Extend `ValidateComponentCSSStructure` to validate pseudo-class blocks against tag's `cssPseudoClass`
+  - [x] Type validation - pseudo-class with all its CSS properties passes
+  - [x] Type validation - pseudo-class on tag that doesn't declare it is rejected
+  - [x] Type validation - pseudo-class on tag with `cssPseudoClass: []` is rejected
+  - [x] Type validation - pseudo-class on tag with no `cssPseudoClass` key is rejected
+  - [x] Type validation - multiple pseudo-classes in same css block accepted
+  - [x] Type validation - globally-configured pseudo-class accepted on any tag
+  - [x] Type validation - pseudo-class inside child selector (`> child: { ":hover": {...} }`)
+  - [x] Type validation - child selector inside pseudo-class (`":hover": { "> child": {...} }`)
+  - [x] Type validation - pseudo-class inside nested pseudo-class (`":hover": { ":focus": {...} }`)
+  - [x] Test
 
 ---
 
@@ -384,17 +385,18 @@
 
 ### Component CSS: Pseudo-Element Block Validation
 
-- [ ] Extend `ValidateComponentCSSStructure` to validate pseudo-element blocks against tag's `cssPseudoElement`
-  - [ ] Type validation - pseudo-element with all its CSS properties passes
-  - [ ] Type validation - pseudo-element on tag that doesn't declare it is rejected
-  - [ ] Type validation - pseudo-element on tag with `cssPseudoElement: []` is rejected
-  - [ ] Type validation - pseudo-element on tag with no `cssPseudoElement` key is rejected
-  - [ ] Type validation - multiple pseudo-elements in same css block accepted
-  - [ ] Type validation - pseudo-element inside child selector (`> child: { "::placeholder": {...} }`)
-  - [ ] Type validation - child selector inside pseudo-element (`"::placeholder": { "> child": {...} }`)
-  - [ ] Type validation - pseudo-element inside pseudo-class (`":hover": { "::placeholder": {...} }`)
-  - [ ] Type validation - pseudo-class inside pseudo-element (`"::placeholder": { ":hover": {...} }`)
-  - [ ] Test
+- [x] Extend `ValidateComponentCSSStructure` to validate pseudo-element blocks against tag's `cssPseudoElement`
+  - [x] Type validation - pseudo-element with all its CSS properties passes
+  - [x] Type validation - pseudo-element on tag that doesn't declare it is rejected
+  - [x] Type validation - pseudo-element on tag with `cssPseudoElement: []` is rejected
+  - [x] Type validation - pseudo-element on tag with no `cssPseudoElement` key is rejected
+  - [x] Type validation - multiple pseudo-elements in same css block accepted
+  - [x] Type validation - pseudo-element inside child selector (`> child: { "::placeholder": {...} }`)
+  - [x] Type validation - child selector inside pseudo-element (`"::placeholder": { "> child": {...} }`)
+  - [x] Type validation - pseudo-element inside pseudo-class (`":hover": { "::placeholder": {...} }`)
+  - [x] Type validation - pseudo-class inside pseudo-element (`"::placeholder": { ":hover": {...} }`)
+  - [x] Type validation - pseudo-element nested inside a pseudo-element is rejected
+  - [x] Test
 
 ---
 

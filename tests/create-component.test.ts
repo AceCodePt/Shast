@@ -746,4 +746,555 @@ describe("validateComponent & createComponent", () => {
       });
     });
   });
+
+  describe("Component CSS: Pseudo-Class Block Validation", () => {
+    const PSEUDO_CSS_ATTRIBUTES = cssAttributeConfig(
+      SUPPORTED_KEYWORDS,
+      MOCK_CSS_SYNTAX,
+      {
+        color: "string",
+        display: "'block' | 'inline' | 'none'",
+      },
+    );
+    const PSEUDO_CSS_PROPERTIES = cssPropertiesConfig(
+      SUPPORTED_KEYWORDS,
+      MOCK_CSS_SYNTAX,
+      {},
+    );
+    const GLOBAL_PSEUDO = [":active"] as const;
+
+    const PSEUDO_TAG_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
+      button: {
+        attributes: {},
+        innerHTML: ["#text"],
+        cssPseudoClass: [":hover", ":focus"],
+        cssPseudoElement: [],
+      },
+      span: {
+        attributes: {},
+        innerHTML: ["#text"],
+        cssPseudoClass: [],
+        cssPseudoElement: [],
+      },
+      div: {
+        attributes: {},
+        innerHTML: "*",
+        cssPseudoClass: [],
+        cssPseudoElement: [],
+      },
+    });
+
+    test("accepts a declared pseudo-class block containing CSS properties", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PSEUDO_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PSEUDO_CSS_ATTRIBUTES,
+        GLOBAL_PSEUDO,
+        PSEUDO_CSS_PROPERTIES,
+        {
+          tag: "button",
+          innerHTML: "Click",
+          css: {
+            color: "black",
+            ":hover": { color: "red", display: "block" },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "button",
+        innerHTML: "Click",
+        css: {
+          color: "black",
+          ":hover": { color: "red", display: "block" },
+        },
+      });
+    });
+
+    test("accepts multiple declared pseudo-classes in the same css block", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PSEUDO_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PSEUDO_CSS_ATTRIBUTES,
+        GLOBAL_PSEUDO,
+        PSEUDO_CSS_PROPERTIES,
+        {
+          tag: "button",
+          innerHTML: "Click",
+          css: {
+            ":hover": { color: "red" },
+            ":focus": { color: "blue" },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "button",
+        innerHTML: "Click",
+        css: {
+          ":hover": { color: "red" },
+          ":focus": { color: "blue" },
+        },
+      });
+    });
+
+    test("accepts a globally-configured pseudo-class on any tag", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PSEUDO_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PSEUDO_CSS_ATTRIBUTES,
+        GLOBAL_PSEUDO,
+        PSEUDO_CSS_PROPERTIES,
+        {
+          tag: "span",
+          innerHTML: "text",
+          css: {
+            ":active": { color: "red" },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "span",
+        innerHTML: "text",
+        css: {
+          ":active": { color: "red" },
+        },
+      });
+    });
+
+    test("accepts a pseudo-class inside a child selector, scoped to the child's tag", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PSEUDO_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PSEUDO_CSS_ATTRIBUTES,
+        GLOBAL_PSEUDO,
+        PSEUDO_CSS_PROPERTIES,
+        {
+          tag: "div",
+          innerHTML: { label: { tag: "button", innerHTML: "Hi" } },
+          css: {
+            "> label": { ":hover": { color: "red" } },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "div",
+        innerHTML: { label: { tag: "button", innerHTML: "Hi" } },
+        css: {
+          "> label": { ":hover": { color: "red" } },
+        },
+      });
+    });
+
+    test("accepts a child selector inside a pseudo-class block", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PSEUDO_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PSEUDO_CSS_ATTRIBUTES,
+        GLOBAL_PSEUDO,
+        PSEUDO_CSS_PROPERTIES,
+        {
+          tag: "div",
+          innerHTML: { label: { tag: "button", innerHTML: "Hi" } },
+          css: {
+            ":active": { "> label": { color: "red" } },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "div",
+        innerHTML: { label: { tag: "button", innerHTML: "Hi" } },
+        css: {
+          ":active": { "> label": { color: "red" } },
+        },
+      });
+    });
+
+    test("accepts a pseudo-class nested inside another pseudo-class", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PSEUDO_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PSEUDO_CSS_ATTRIBUTES,
+        GLOBAL_PSEUDO,
+        PSEUDO_CSS_PROPERTIES,
+        {
+          tag: "button",
+          innerHTML: "Click",
+          css: {
+            ":hover": { ":focus": { color: "red" } },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "button",
+        innerHTML: "Click",
+        css: {
+          ":hover": { ":focus": { color: "red" } },
+        },
+      });
+    });
+
+    test("rejects a pseudo-class the tag does not declare and is not global", () => {
+      createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PSEUDO_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PSEUDO_CSS_ATTRIBUTES,
+        GLOBAL_PSEUDO,
+        PSEUDO_CSS_PROPERTIES,
+        {
+          tag: "button",
+          innerHTML: "Click",
+          css: {
+            // @ts-expect-error
+            ":disabled": { color: "red" },
+          },
+        },
+      );
+    });
+
+    test("rejects a pseudo-class on a tag with an empty cssPseudoClass list", () => {
+      createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PSEUDO_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PSEUDO_CSS_ATTRIBUTES,
+        GLOBAL_PSEUDO,
+        PSEUDO_CSS_PROPERTIES,
+        {
+          tag: "span",
+          innerHTML: "text",
+          css: {
+            // @ts-expect-error
+            ":hover": { color: "red" },
+          },
+        },
+      );
+    });
+
+    test("rejects a pseudo-class on a tag with no cssPseudoClass key", () => {
+      const NO_PSEUDO_TAG_CONFIG = {
+        widget: {
+          attributes: {},
+          innerHTML: ["#text"],
+          cssPseudoElement: [],
+        },
+      };
+      createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        NO_PSEUDO_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PSEUDO_CSS_ATTRIBUTES,
+        GLOBAL_PSEUDO,
+        PSEUDO_CSS_PROPERTIES,
+        {
+          tag: "widget",
+          innerHTML: "text",
+          css: {
+            // @ts-expect-error
+            ":hover": { color: "red" },
+          },
+        },
+      );
+    });
+  });
+
+  describe("Component CSS: Pseudo-Element Block Validation", () => {
+    const PE_CSS_ATTRIBUTES = cssAttributeConfig(
+      SUPPORTED_KEYWORDS,
+      MOCK_CSS_SYNTAX,
+      {
+        color: "string",
+        display: "'block' | 'inline' | 'none'",
+      },
+    );
+    const PE_CSS_PROPERTIES = cssPropertiesConfig(
+      SUPPORTED_KEYWORDS,
+      MOCK_CSS_SYNTAX,
+      {},
+    );
+
+    const PE_TAG_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
+      field: {
+        attributes: {},
+        innerHTML: ["#text"],
+        cssPseudoClass: [":hover"],
+        cssPseudoElement: ["::placeholder"],
+      },
+      box: {
+        attributes: {},
+        innerHTML: "*",
+        cssPseudoClass: [],
+        cssPseudoElement: ["::before", "::after"],
+      },
+      span: {
+        attributes: {},
+        innerHTML: ["#text"],
+        cssPseudoClass: [],
+        cssPseudoElement: [],
+      },
+    });
+
+    test("accepts a declared pseudo-element block containing CSS properties", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PE_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PE_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        PE_CSS_PROPERTIES,
+        {
+          tag: "field",
+          innerHTML: "x",
+          css: {
+            color: "black",
+            "::placeholder": { color: "gray", display: "block" },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "field",
+        innerHTML: "x",
+        css: {
+          color: "black",
+          "::placeholder": { color: "gray", display: "block" },
+        },
+      });
+    });
+
+    test("accepts multiple declared pseudo-elements in the same css block", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PE_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PE_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        PE_CSS_PROPERTIES,
+        {
+          tag: "box",
+          innerHTML: "x",
+          css: {
+            "::before": { color: "red" },
+            "::after": { color: "blue" },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "box",
+        innerHTML: "x",
+        css: {
+          "::before": { color: "red" },
+          "::after": { color: "blue" },
+        },
+      });
+    });
+
+    test("accepts a pseudo-element inside a child selector, scoped to the child's tag", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PE_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PE_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        PE_CSS_PROPERTIES,
+        {
+          tag: "box",
+          innerHTML: { fld: { tag: "field", innerHTML: "x" } },
+          css: {
+            "> fld": { "::placeholder": { color: "gray" } },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "box",
+        innerHTML: { fld: { tag: "field", innerHTML: "x" } },
+        css: {
+          "> fld": { "::placeholder": { color: "gray" } },
+        },
+      });
+    });
+
+    test("accepts a child selector inside a pseudo-element block", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PE_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PE_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        PE_CSS_PROPERTIES,
+        {
+          tag: "box",
+          innerHTML: { item: { tag: "span", innerHTML: "x" } },
+          css: {
+            "::before": { "> item": { color: "red" } },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "box",
+        innerHTML: { item: { tag: "span", innerHTML: "x" } },
+        css: {
+          "::before": { "> item": { color: "red" } },
+        },
+      });
+    });
+
+    test("accepts a pseudo-element inside a pseudo-class block", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PE_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PE_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        PE_CSS_PROPERTIES,
+        {
+          tag: "field",
+          innerHTML: "x",
+          css: {
+            ":hover": { "::placeholder": { color: "gray" } },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "field",
+        innerHTML: "x",
+        css: {
+          ":hover": { "::placeholder": { color: "gray" } },
+        },
+      });
+    });
+
+    test("accepts a pseudo-class inside a pseudo-element block", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PE_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PE_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        PE_CSS_PROPERTIES,
+        {
+          tag: "field",
+          innerHTML: "x",
+          css: {
+            "::placeholder": { ":hover": { color: "gray" } },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "field",
+        innerHTML: "x",
+        css: {
+          "::placeholder": { ":hover": { color: "gray" } },
+        },
+      });
+    });
+
+    test("rejects a pseudo-element the tag does not declare", () => {
+      createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PE_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PE_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        PE_CSS_PROPERTIES,
+        {
+          tag: "field",
+          innerHTML: "x",
+          css: {
+            // @ts-expect-error
+            "::before": { color: "red" },
+          },
+        },
+      );
+    });
+
+    test("rejects a pseudo-element on a tag with an empty cssPseudoElement list", () => {
+      createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PE_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PE_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        PE_CSS_PROPERTIES,
+        {
+          tag: "span",
+          innerHTML: "x",
+          css: {
+            // @ts-expect-error
+            "::placeholder": { color: "red" },
+          },
+        },
+      );
+    });
+
+    test("rejects a pseudo-element on a tag with no cssPseudoElement key", () => {
+      const NO_PE_TAG_CONFIG = {
+        plain: {
+          attributes: {},
+          innerHTML: ["#text"],
+          cssPseudoClass: [],
+        },
+      };
+      createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        NO_PE_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PE_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        PE_CSS_PROPERTIES,
+        {
+          tag: "plain",
+          innerHTML: "x",
+          css: {
+            // @ts-expect-error
+            "::placeholder": { color: "red" },
+          },
+        },
+      );
+    });
+
+    test("rejects a pseudo-element nested inside another pseudo-element", () => {
+      createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        PE_TAG_CONFIG,
+        MOCK_CSS_SYNTAX,
+        PE_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        PE_CSS_PROPERTIES,
+        {
+          tag: "box",
+          innerHTML: "x",
+          css: {
+            "::before": {
+              // @ts-expect-error
+              "::after": { color: "red" },
+            },
+          },
+        },
+      );
+    });
+  });
 });
