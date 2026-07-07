@@ -10,9 +10,6 @@ import { SUPPORTED_KEYWORDS } from "../src/dsl/index.ts";
 
 const EMPTY_PSEUDO_CLASSES = [] as const;
 
-// ==========================================
-// 1. SETUP STATIC TEST SCHEMAS
-// ==========================================
 const MOCK_SHARED_ATTRIBUTES = htmlAttributeConfig(SUPPORTED_KEYWORDS, {
   id: "string | undefined",
   class: "string | undefined",
@@ -51,6 +48,51 @@ const MOCK_TAG_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
 });
 
+const MOCK_INHERIT_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
+  a: {
+    attributes: {},
+    innerHTML: ["#text", "h1", "span", "ul", "div"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  h1: {
+    attributes: {},
+    innerHTML: ["#text", "span", "b"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  span: {
+    attributes: {},
+    innerHTML: ["#text", "b"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  b: {
+    attributes: {},
+    innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  ul: {
+    attributes: {},
+    innerHTML: ["li"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  li: {
+    attributes: {},
+    innerHTML: ["#text", "div", "span", "b"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  div: {
+    attributes: {},
+    innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+});
+
 const MOCK_CSS_SYNTAX = cssSyntaxConfig(SUPPORTED_KEYWORDS, {});
 const MOCK_CSS_ATTRIBUTES = cssAttributeConfig(
   SUPPORTED_KEYWORDS,
@@ -63,9 +105,6 @@ const MOCK_CSS_PROPERTIES = cssPropertiesConfig(
   {},
 );
 
-// ==========================================
-// 2. COMPONENT VALIDATION TEST SUITE
-// ==========================================
 describe("validateComponent & createComponent", () => {
   describe("Baseline Structural Checks", () => {
     test("should fail if node is null or not an object", () => {
@@ -327,7 +366,6 @@ describe("validateComponent & createComponent", () => {
     });
 
     test("rejects a direct child whose tag is not in the parent's innerHTML whitelist", () => {
-      // <ul> only permits <li>, so a direct <p> child is invalid.
       assert.throws(
         () =>
           createComponent(
@@ -342,7 +380,7 @@ describe("validateComponent & createComponent", () => {
               tag: "ul",
               innerHTML: {
                 badChild: {
-                  // @ts-expect-error - p is not a permitted child of ul
+                  // @ts-expect-error
                   tag: "p",
                   innerHTML: "Bad nested block",
                 },
@@ -353,63 +391,7 @@ describe("validateComponent & createComponent", () => {
       );
     });
 
-    test("allows a tag to appear deep in the tree through an allowed intermediate element", () => {
-      // The whitelist is per-level, not transitive: <ul> forbids <div> as a
-      // direct child, but <li> permits <div>, and <div> permits anything, so
-      // `ul > li > div > p` passes. This mirrors the intentional `a > div >
-      // button` escape hatch.
-      const config = createComponent(
-        SUPPORTED_KEYWORDS,
-        MOCK_SHARED_ATTRIBUTES,
-        MOCK_TAG_CONFIG,
-        MOCK_CSS_SYNTAX,
-        MOCK_CSS_ATTRIBUTES,
-        EMPTY_PSEUDO_CLASSES,
-        MOCK_CSS_PROPERTIES,
-        {
-          tag: "ul",
-          innerHTML: {
-            item: {
-              tag: "li",
-              innerHTML: {
-                wrapper: {
-                  tag: "div",
-                  innerHTML: {
-                    text: {
-                      tag: "p",
-                      innerHTML: "Deeply nested",
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      );
-      assert.deepStrictEqual(config, {
-        tag: "ul",
-        innerHTML: {
-          item: {
-            tag: "li",
-            innerHTML: {
-              wrapper: {
-                tag: "div",
-                innerHTML: {
-                  text: {
-                    tag: "p",
-                    innerHTML: "Deeply nested",
-                  },
-                },
-              },
-            },
-          },
-        },
-      });
-    });
-
     test("gates a grandchild by its immediate parent, not the outer ancestor", () => {
-      // <li> permits #text and <div> but not <p>; the grandchild is validated
-      // against <li>, so a <p> here is rejected even though <ul> is the root.
       assert.throws(
         () =>
           createComponent(
@@ -427,7 +409,7 @@ describe("validateComponent & createComponent", () => {
                   tag: "li",
                   innerHTML: {
                     invalidGrandchild: {
-                      // @ts-expect-error - li does not permit p
+                      // @ts-expect-error
                       tag: "p",
                     },
                   },
@@ -437,6 +419,331 @@ describe("validateComponent & createComponent", () => {
           ),
         /Structural Error: '<p>' is not a permitted child of <li>/,
       );
+    });
+  });
+
+  describe("innerHTML Structural Inheritance", () => {
+    test("conjunctive intersection: a > h1 > span is accepted", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        MOCK_INHERIT_CONFIG,
+        MOCK_CSS_SYNTAX,
+        MOCK_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        MOCK_CSS_PROPERTIES,
+        {
+          tag: "a",
+          innerHTML: {
+            heading: {
+              tag: "h1",
+              innerHTML: {
+                label: {
+                  tag: "span",
+                  innerHTML: "hi",
+                },
+              },
+            },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "a",
+        innerHTML: {
+          heading: {
+            tag: "h1",
+            innerHTML: {
+              label: {
+                tag: "span",
+                innerHTML: "hi",
+              },
+            },
+          },
+        },
+      });
+    });
+
+    test("conjunctive intersection rejects a tag the outer ancestor forbids: a > h1 > b", () => {
+      assert.throws(
+        () =>
+          createComponent(
+            SUPPORTED_KEYWORDS,
+            MOCK_SHARED_ATTRIBUTES,
+            MOCK_INHERIT_CONFIG,
+            MOCK_CSS_SYNTAX,
+            MOCK_CSS_ATTRIBUTES,
+            EMPTY_PSEUDO_CLASSES,
+            MOCK_CSS_PROPERTIES,
+            {
+              tag: "a",
+              innerHTML: {
+                heading: {
+                  tag: "h1",
+                  innerHTML: {
+                    label: {
+                      // @ts-expect-error
+                      tag: "b",
+                    },
+                  },
+                },
+              },
+            },
+          ),
+        /Structural Error/,
+      );
+    });
+
+    test("nested `*` accepts a tag in the inherited ancestral set: a > div > span", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        MOCK_INHERIT_CONFIG,
+        MOCK_CSS_SYNTAX,
+        MOCK_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        MOCK_CSS_PROPERTIES,
+        {
+          tag: "a",
+          innerHTML: {
+            wrapper: {
+              tag: "div",
+              innerHTML: {
+                label: {
+                  tag: "span",
+                  innerHTML: "hi",
+                },
+              },
+            },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "a",
+        innerHTML: {
+          wrapper: {
+            tag: "div",
+            innerHTML: {
+              label: {
+                tag: "span",
+                innerHTML: "hi",
+              },
+            },
+          },
+        },
+      });
+    });
+
+    test("nested `*` is restricted to the inherited set: a > div > b is rejected", () => {
+      assert.throws(
+        () =>
+          createComponent(
+            SUPPORTED_KEYWORDS,
+            MOCK_SHARED_ATTRIBUTES,
+            MOCK_INHERIT_CONFIG,
+            MOCK_CSS_SYNTAX,
+            MOCK_CSS_ATTRIBUTES,
+            EMPTY_PSEUDO_CLASSES,
+            MOCK_CSS_PROPERTIES,
+            {
+              tag: "a",
+              innerHTML: {
+                wrapper: {
+                  tag: "div",
+                  innerHTML: {
+                    label: {
+                      // @ts-expect-error
+                      tag: "b",
+                    },
+                  },
+                },
+              },
+            },
+          ),
+        /Structural Error/,
+      );
+    });
+
+    test("reset structural tag: a > ul > li is accepted", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        MOCK_INHERIT_CONFIG,
+        MOCK_CSS_SYNTAX,
+        MOCK_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        MOCK_CSS_PROPERTIES,
+        {
+          tag: "a",
+          innerHTML: {
+            list: {
+              tag: "ul",
+              innerHTML: {
+                item: {
+                  tag: "li",
+                  innerHTML: "hi",
+                },
+              },
+            },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "a",
+        innerHTML: {
+          list: {
+            tag: "ul",
+            innerHTML: {
+              item: {
+                tag: "li",
+                innerHTML: "hi",
+              },
+            },
+          },
+        },
+      });
+    });
+
+    test("reset structural tag ignores the ancestral set: a > ul > span is rejected", () => {
+      assert.throws(
+        () =>
+          createComponent(
+            SUPPORTED_KEYWORDS,
+            MOCK_SHARED_ATTRIBUTES,
+            MOCK_INHERIT_CONFIG,
+            MOCK_CSS_SYNTAX,
+            MOCK_CSS_ATTRIBUTES,
+            EMPTY_PSEUDO_CLASSES,
+            MOCK_CSS_PROPERTIES,
+            {
+              tag: "a",
+              innerHTML: {
+                list: {
+                  tag: "ul",
+                  innerHTML: {
+                    item: {
+                      // @ts-expect-error
+                      tag: "span",
+                    },
+                  },
+                },
+              },
+            },
+          ),
+        /Structural Error/,
+      );
+    });
+
+    test("ancestral set re-emerges below a reset tag: a > ul > li > div is accepted", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        MOCK_INHERIT_CONFIG,
+        MOCK_CSS_SYNTAX,
+        MOCK_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        MOCK_CSS_PROPERTIES,
+        {
+          tag: "a",
+          innerHTML: {
+            list: {
+              tag: "ul",
+              innerHTML: {
+                item: {
+                  tag: "li",
+                  innerHTML: {
+                    box: {
+                      tag: "div",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "a",
+        innerHTML: {
+          list: {
+            tag: "ul",
+            innerHTML: {
+              item: {
+                tag: "li",
+                innerHTML: {
+                  box: {
+                    tag: "div",
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+    });
+
+    test("re-emerged ancestral set rejects a tag only the immediate parent allows: a > ul > li > b", () => {
+      assert.throws(
+        () =>
+          createComponent(
+            SUPPORTED_KEYWORDS,
+            MOCK_SHARED_ATTRIBUTES,
+            MOCK_INHERIT_CONFIG,
+            MOCK_CSS_SYNTAX,
+            MOCK_CSS_ATTRIBUTES,
+            EMPTY_PSEUDO_CLASSES,
+            MOCK_CSS_PROPERTIES,
+            {
+              tag: "a",
+              innerHTML: {
+                list: {
+                  tag: "ul",
+                  innerHTML: {
+                    item: {
+                      tag: "li",
+                      innerHTML: {
+                        emphasis: {
+                          // @ts-expect-error
+                          tag: "b",
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          ),
+        /Structural Error/,
+      );
+    });
+
+    test("root `*` accepts any tag: div > b is accepted", () => {
+      const config = createComponent(
+        SUPPORTED_KEYWORDS,
+        MOCK_SHARED_ATTRIBUTES,
+        MOCK_INHERIT_CONFIG,
+        MOCK_CSS_SYNTAX,
+        MOCK_CSS_ATTRIBUTES,
+        EMPTY_PSEUDO_CLASSES,
+        MOCK_CSS_PROPERTIES,
+        {
+          tag: "div",
+          innerHTML: {
+            emphasis: {
+              tag: "b",
+              innerHTML: "hi",
+            },
+          },
+        },
+      );
+      assert.deepStrictEqual(config, {
+        tag: "div",
+        innerHTML: {
+          emphasis: {
+            tag: "b",
+            innerHTML: "hi",
+          },
+        },
+      });
     });
   });
 });

@@ -256,11 +256,24 @@ type ValidateComponentStructure<
       tag: Exclude<CurrentAllowedTags, "#text">;
     };
 
+type AllowedTagSet = Set<string> | null;
+
+function intersectAllowed(
+  inheritedAllowed: AllowedTagSet,
+  list: readonly string[],
+): Set<string> {
+  if (inheritedAllowed === null) {
+    return new Set(list);
+  }
+  return new Set(list.filter((entry) => inheritedAllowed.has(entry)));
+}
+
 function validateComponentNode(
   node: unknown,
   keywords: Record<string, any>,
   globalAttributes: BaseHTMLAttributesConfig,
   tagConfig: BaseHTMLTagConfig,
+  inheritedAllowed: AllowedTagSet,
 ): void {
   if (node === null || typeof node !== "object" || Array.isArray(node)) {
     throw new Error(
@@ -294,7 +307,6 @@ function validateComponentNode(
           `Attribute Error: Property '${attributeKey}' is not a valid attribute for <${tag}> or the Global configuration registry`,
         );
       }
-      // Delegate value validation to the existing DSL validator.
       parseValueAgainstDSL(keywords, dsl, value);
     }
   }
@@ -318,13 +330,24 @@ function validateComponentNode(
     return;
   }
 
-  const allowsAnyChild = innerHTMLConfig === "*";
-  const allowedChildTags = Array.isArray(innerHTMLConfig)
-    ? innerHTMLConfig
-    : [];
-  const allowsText =
-    allowsAnyChild ||
-    (Array.isArray(innerHTMLConfig) && innerHTMLConfig.includes("#text"));
+  const isWildcard = innerHTMLConfig === "*";
+  const ownList = Array.isArray(innerHTMLConfig) ? innerHTMLConfig : [];
+  const declaresText = ownList.includes("#text");
+  const allowsText = isWildcard || declaresText;
+
+  let childAllowed: AllowedTagSet;
+  let forwardAllowed: AllowedTagSet;
+  if (isWildcard) {
+    childAllowed = inheritedAllowed;
+    forwardAllowed = inheritedAllowed;
+  } else if (declaresText) {
+    const intersected = intersectAllowed(inheritedAllowed, ownList);
+    childAllowed = intersected;
+    forwardAllowed = intersected;
+  } else {
+    childAllowed = new Set(ownList);
+    forwardAllowed = inheritedAllowed;
+  }
 
   if (typeof innerHTML === "string") {
     if (!allowsText) {
@@ -344,22 +367,26 @@ function validateComponentNode(
       }
       continue;
     }
-    // Enforce the direct-child whitelist against this tag's `innerHTML` list.
-    // Deeper nesting is gated per level, so the transitive case is not blocked.
     const childTag =
       child !== null && typeof child === "object"
         ? (child as BaseComponentStructure).tag
         : undefined;
     if (
-      !allowsAnyChild &&
+      childAllowed !== null &&
       typeof childTag === "string" &&
-      !allowedChildTags.includes(childTag)
+      !childAllowed.has(childTag)
     ) {
       throw new Error(
         `Structural Error: '<${childTag}>' is not a permitted child of <${tag}>`,
       );
     }
-    validateComponentNode(child, keywords, globalAttributes, tagConfig);
+    validateComponentNode(
+      child,
+      keywords,
+      globalAttributes,
+      tagConfig,
+      forwardAllowed,
+    );
   }
 }
 
@@ -398,6 +425,7 @@ export function createComponent<
     supportedKeywords,
     htmlAttributesConfig,
     htmlTagConfig,
+    null,
   );
   return config as T;
 }

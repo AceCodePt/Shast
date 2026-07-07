@@ -43,6 +43,49 @@ export const CSS_PROPERTIES = cssPropertiesConfig(
 //  }
 // }
 
+// createComponent(
+//   SUPPORTED_KEYWORDS,
+//   HTML_GLOBAL_ATTRIBUTES,
+//   HTML_TAG_DEFINITIONS,
+//   CSS_SYNTAX,
+//   CSS_ATTRIBUTES,
+//   CSS_PSEUDO_CLASSES,
+//   CSS_PROPERTIES,
+//   {
+//     tag: "a",
+//     attributes: { dir: "ltr", href: "" },
+//     innerHTML: {
+//       image: {
+//         tag: "img",
+//         attributes: { alt: "", src: "" },
+//       },
+//       text: {
+//         tag: "div",
+//         innerHTML: {
+//           check: {
+//             tag: "div",
+//           },
+//         },
+//       },
+//     },
+//     css: {
+//       width: "100%",
+//       "align-content": "flex-start",
+//       "--_a": "100%",
+//       ":hover": {
+//         "align-items": "end",
+//       },
+//       "::before": {},
+//       ":visited": {},
+//       "> text": {
+//         "> check": {
+//           width: "100%",
+//         },
+//       },
+//     },
+//   },
+// );
+
 createComponent(
   SUPPORTED_KEYWORDS,
   HTML_GLOBAL_ATTRIBUTES,
@@ -52,15 +95,10 @@ createComponent(
   CSS_PSEUDO_CLASSES,
   CSS_PROPERTIES,
   {
-    tag: "a",
-    attributes: { dir: "ltr", href: "" },
+    tag: "ul",
     innerHTML: {
-      image: {
-        tag: "img",
-        attributes: { alt: "", src: "" },
-      },
       text: {
-        tag: "div",
+        tag: "li",
         innerHTML: {
           check: {
             tag: "div",
@@ -76,7 +114,6 @@ createComponent(
         "align-items": "end",
       },
       "::before": {},
-      ":visited": {},
       "> text": {
         "> check": {
           width: "100%",

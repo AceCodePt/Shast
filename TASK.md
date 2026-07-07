@@ -313,13 +313,21 @@
   - [x] Optional attributes (`| undefined`) accept omission
 
 - [x] **innerHTML validation**
-  - [x] Text nodes allowed only when `#text` is in tag's innerHTML
-  - [x] Direct children must have tags listed in the parent's innerHTML (whitelist enforced per level, e.g. `ul` accepts only `li`)
-  - [x] Whitelist is not transitive: a tag can still appear via an allowed intermediate element (`a > div > button` passes even when `a > button` does not) — enforcing this transitively is intentionally out of scope
-  - [x] `*` wildcard allows any child tag
+  - [x] Text nodes allowed only when the tag allows text (`*` or `#text` in innerHTML)
   - [x] Void elements (empty `innerHTML: []`) reject children
   - [x] Nested hierarchy validated recursively
   - [x] Mixed text + child components
+
+- [x] **innerHTML structural inheritance** - the set of allowed child tags propagates down the tree, gated by whether a tag declares `#text`; compile and runtime must agree
+  - [x] Type Validation
+  - [x] Runtime Validation
+  - [x] Test
+  - [x] `#text`-bearing tag is *conjunctive*: its children are validated against `inheritedAllowed ∩ tag.innerHTML`, and it narrows the inherited set for everything nested below it
+  - [x] Non-`#text` array tag is a *reset*: its direct children are validated against exactly `tag.innerHTML`, and it passes the inherited set through unchanged
+  - [x] The inherited restriction re-emerges one level below a reset tag (`a > ul > li` validates `li`'s children against `a.innerHTML ∩ li.innerHTML`)
+  - [x] `*` tag *inherits* the ancestral set: a root `*` accepts any tag, but a nested `*` is limited to the inherited set (e.g. `ul > li > div > <x>` restricts `<x>`)
+  - [x] Intersection example: `a > h1 > span` limited to `a.innerHTML ∩ h1.innerHTML`; a tag allowed by `h1` alone (e.g. `b`) is rejected under `a`
+  - [x] Structural example: `a > ul` accepts only `li`
 
 - [x] **CSS validation**
   - [x] Property values validated against CSS syntax config via `DSLInfer`
