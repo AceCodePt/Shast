@@ -1,4 +1,4 @@
-import { SUPPORTED_KEYWORDS } from "@/dsl/index.ts";
+import { SUPPORTED_KEYWORDS, type DSLInfer } from "@/dsl/index.ts";
 import { htmlAttributeConfig } from "../index.ts";
 
 export default htmlAttributeConfig(SUPPORTED_KEYWORDS, {
