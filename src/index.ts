@@ -3,7 +3,7 @@
 import { cssPropertiesConfig } from "./css/properties-config/index.ts";
 import {
   CSS_ATTRIBUTES,
-  CSS_PSEUDO_CLASSES,
+  CSS_GLOBAL_PSEUDO_CLASSES,
   CSS_SYNTAX,
   HTML_GLOBAL_ATTRIBUTES,
   HTML_TAG_DEFINITIONS,
@@ -49,8 +49,8 @@ export const CSS_PROPERTIES = cssPropertiesConfig(
 //   HTML_TAG_DEFINITIONS,
 //   CSS_SYNTAX,
 //   CSS_ATTRIBUTES,
-//   CSS_PSEUDO_CLASSES,
-//   CSS_PROPERTIES,
+//   CSS_GLOBAL_PSEUDO_CLASSES,
+//   CSS_GLOBAL_PROPERTIES,
 //   {
 //     tag: "a",
 //     attributes: { dir: "ltr", href: "" },
@@ -76,7 +76,6 @@ export const CSS_PROPERTIES = cssPropertiesConfig(
 //         "align-items": "end",
 //       },
 //       "::before": {},
-//       ":visited": {},
 //       "> text": {
 //         "> check": {
 //           width: "100%",
@@ -85,43 +84,6 @@ export const CSS_PROPERTIES = cssPropertiesConfig(
 //     },
 //   },
 // );
-
-createComponent(
-  SUPPORTED_KEYWORDS,
-  HTML_GLOBAL_ATTRIBUTES,
-  HTML_TAG_DEFINITIONS,
-  CSS_SYNTAX,
-  CSS_ATTRIBUTES,
-  CSS_PSEUDO_CLASSES,
-  CSS_PROPERTIES,
-  {
-    tag: "ul",
-    innerHTML: {
-      text: {
-        tag: "li",
-        innerHTML: {
-          check: {
-            tag: "div",
-          },
-        },
-      },
-    },
-    css: {
-      width: "100%",
-      "align-content": "flex-start",
-      "--_a": "100%",
-      ":hover": {
-        "align-items": "end",
-      },
-      "::before": {},
-      "> text": {
-        "> check": {
-          width: "100%",
-        },
-      },
-    },
-  },
-);
 
 // console.log(
 //   renderComponent(

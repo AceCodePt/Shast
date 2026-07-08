@@ -13,4 +13,4 @@ export const HTML_GLOBAL_ATTRIBUTES = commonHTMLAttributes;
 export const HTML_TAG_DEFINITIONS = commonHTMLTag;
 export const CSS_SYNTAX = commonCSSSyntax;
 export const CSS_ATTRIBUTES = commonCSSAttributes;
-export const CSS_PSEUDO_CLASSES = commonCSSPseudoClasses;
+export const CSS_GLOBAL_PSEUDO_CLASSES = commonCSSPseudoClasses;
