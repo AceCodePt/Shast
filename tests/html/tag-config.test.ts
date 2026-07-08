@@ -710,7 +710,7 @@ describe("htmlTagConfig", () => {
               button: {
                 innerHTML: ["#text"];
                 attributes: {};
-                cssPseudoClass: `:${string}`[];
+                cssPseudoClass: `:${string}${string}`[];
                 cssPseudoElement: [];
               };
             }
