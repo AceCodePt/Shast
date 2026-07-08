@@ -17,7 +17,7 @@ type BaseComponentInnerHTMLStructure =
   | string
   | Record<string, BaseComponentStructure | string>;
 
-type BaseComponentStructure = {
+export type BaseComponentStructure = {
   tag?: string;
   attributes?: Record<string, any>;
   innerHTML?: BaseComponentInnerHTMLStructure;
@@ -181,7 +181,7 @@ type ValidateComponentCSSStructure<
       }
     : {});
 
-type ValidateComponentStructure<
+export type ValidateComponentStructure<
   Keywords extends Record<string, any>,
   HTMLAttributesConfig extends BaseHTMLAttributesConfig,
   HTMLTagConfig extends BaseHTMLTagConfig,
