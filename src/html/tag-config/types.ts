@@ -3,22 +3,20 @@ import type {
   BaseHTMLAttributesConfig,
   ValidateHTMLAttributesConfig,
 } from "../attribute-config/types.ts";
-import type { BaseCSSPseudoClassConfig } from "@/css/pseudo-class-config/types.ts";
 
-type BaseHTMLTag = string;
 type BaseInnerHTMLTagConfig<PossibleTags extends string> =
   | "*"
   | (PossibleTags | "#text")[];
 
-export type BaseHTMLTagConfig = Record<
-  BaseHTMLTag,
-  {
+export type BaseHTMLTagConfig = {
+  [tag: string]: {
     attributes?: BaseHTMLAttributesConfig | undefined;
     innerHTML?: BaseInnerHTMLTagConfig<string> | undefined;
     cssPseudoClass?: string[] | undefined;
     cssPseudoElement?: string[] | undefined;
-  }
->;
+    [rest: string]: unknown;
+  };
+};
 
 export type ValidateHTMLTagConfig<
   Keywords extends Record<string, any>,
@@ -40,9 +38,9 @@ export type ValidateHTMLTagConfig<
         >
           ? TagDefinition[Tag]["innerHTML"]
           : BaseInnerHTMLTagConfig<Keyof<TagDefinition>>;
-        cssPseudoClass: TagDefinition[Tag]["cssPseudoClass"] extends BaseCSSPseudoClassConfig
+        cssPseudoClass: TagDefinition[Tag]["cssPseudoClass"] extends `:${string}${string}`[]
           ? TagDefinition[Tag]["cssPseudoClass"]
-          : BaseCSSPseudoClassConfig;
+          : `:${string}${string}`[];
         cssPseudoElement: TagDefinition[Tag]["cssPseudoElement"] extends `::${string}${string}`[]
           ? TagDefinition[Tag]["cssPseudoElement"]
           : `::${string}${string}`[];

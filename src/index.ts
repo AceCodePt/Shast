@@ -1,19 +1,17 @@
-// Let's first describe the basic types
-
 import { cssPropertiesConfig } from "./css/properties-config/index.ts";
 import {
-  CSS_ATTRIBUTES,
-  CSS_GLOBAL_PSEUDO_CLASSES,
-  CSS_SYNTAX,
-  HTML_GLOBAL_ATTRIBUTES,
-  HTML_TAG_DEFINITIONS,
+  CSS_ATTRIBUTES_CONFIG,
+  CSS_GLOBAL_PSEUDO_CLASSES_CONFIG,
+  CSS_SYNTAX_CONFIG,
+  HTML_GLOBAL_ATTRIBUTES_CONFIG,
+  HTML_TAGS_CONFIG,
 } from "./consts.ts";
-import { createComponent } from "./create-component.ts";
 import { SUPPORTED_KEYWORDS } from "./dsl/index.ts";
+import engine from "./engine.ts";
 
-export const CSS_PROPERTIES = cssPropertiesConfig(
+export const CSS_GLOBAL_PROPERTIES = cssPropertiesConfig(
   SUPPORTED_KEYWORDS,
-  CSS_SYNTAX,
+  CSS_SYNTAX_CONFIG,
   {
     "--a": {
       syntax: "<alpha-value>",
@@ -33,57 +31,63 @@ export const CSS_PROPERTIES = cssPropertiesConfig(
   },
 );
 
-// index.html
-// <div> <span> asdfasd </div></div>
+const { createComponent } = engine({
+  supportedKeywords: SUPPORTED_KEYWORDS,
+  htmlAttributesConfig: HTML_GLOBAL_ATTRIBUTES_CONFIG,
+  htmlTagConfig: HTML_TAGS_CONFIG,
+  cssSyntaxConfig: CSS_SYNTAX_CONFIG,
+  cssAttributesConfig: CSS_ATTRIBUTES_CONFIG,
+  cssPseudoClassConfig: CSS_GLOBAL_PSEUDO_CLASSES_CONFIG,
+  cssPropertiesConfig: CSS_GLOBAL_PROPERTIES,
+});
 
-// index.css
-// div {
-//  div  {
-//   bg: color
-//  }
-// }
+createComponent({
+  tag: "a",
+  css: {
+    width: "100px",
+  },
+});
 
-// createComponent(
-//   SUPPORTED_KEYWORDS,
-//   HTML_GLOBAL_ATTRIBUTES,
-//   HTML_TAG_DEFINITIONS,
-//   CSS_SYNTAX,
-//   CSS_ATTRIBUTES,
-//   CSS_GLOBAL_PSEUDO_CLASSES,
-//   CSS_GLOBAL_PROPERTIES,
-//   {
-//     tag: "a",
-//     attributes: { dir: "ltr", href: "" },
-//     innerHTML: {
-//       image: {
-//         tag: "img",
-//         attributes: { alt: "", src: "" },
-//       },
-//       text: {
-//         tag: "div",
-//         innerHTML: {
-//           check: {
-//             tag: "div",
-//           },
-//         },
-//       },
-//     },
-//     css: {
-//       width: "100%",
-//       "align-content": "flex-start",
-//       "--_a": "100%",
-//       ":hover": {
-//         "align-items": "end",
-//       },
-//       "::before": {},
-//       "> text": {
-//         "> check": {
-//           width: "100%",
-//         },
-//       },
-//     },
-//   },
-// );
+// const card =
+createComponent({
+  tag: "a",
+  attributes: { dir: "ltr", href: "" },
+  innerHTML: {
+    image: {
+      tag: "img",
+      attributes: { alt: "", src: "" },
+    },
+    content: {
+      tag: "div",
+      innerHTML: {
+        title: {
+          tag: "h1",
+          innerHTML: "My awesome product",
+        },
+        subtitle: {
+          tag: "h1",
+          innerHTML: "Small description about production",
+        },
+      },
+    },
+  },
+  css: {
+    width: "100px",
+    "align-content": "flex-start",
+    "--_a": "100%",
+    ":hover": {
+      "align-items": "end",
+    },
+    "::before": {},
+    ":visited": {},
+    "> content": {
+      "> title": {
+        color: "hsl(1 1% 1%)",
+      },
+      "> subtitle": {},
+    },
+  },
+});
 
 // console.log(
 //   renderComponent(
