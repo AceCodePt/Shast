@@ -268,7 +268,7 @@ function intersectAllowed(
   return new Set(list.filter((entry) => inheritedAllowed.has(entry)));
 }
 
-function validateComponentNode(
+export function validateComponentNode(
   node: unknown,
   keywords: Record<string, any>,
   globalAttributes: BaseHTMLAttributesConfig,
