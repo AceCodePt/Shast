@@ -187,7 +187,7 @@ describe("cssSyntaxConfig", () => {
       const input = {
         "<length>": "`${number}${'px'}`" as const,
       } as const;
-      const config = cssSyntaxConfig(SUPPORTED_KEYWORDS, input as any);
+      const config = cssSyntaxConfig(SUPPORTED_KEYWORDS, input);
       assert.strictEqual(config, input);
     });
   });
@@ -238,9 +238,76 @@ describe("cssSyntaxConfig", () => {
     });
   });
 
+  describe("Circular Reference Detection", () => {
+    test("throws for self-referencing token", () => {
+      assert.throws(
+        () =>
+          cssSyntaxConfig(SUPPORTED_KEYWORDS, {
+            "<a>": "<a>",
+          }),
+        /Circular reference/,
+      );
+    });
+
+    test("throws for indirect circular reference (a -> b -> a)", () => {
+      assert.throws(
+        () =>
+          cssSyntaxConfig(SUPPORTED_KEYWORDS, {
+            "<a>": "<b>",
+            "<b>": "<a>",
+          }),
+        /Circular reference/,
+      );
+    });
+
+    test("throws for longer cycle (a -> b -> c -> a)", () => {
+      assert.throws(
+        () =>
+          cssSyntaxConfig(SUPPORTED_KEYWORDS, {
+            "<a>": "<b>",
+            "<b>": "<c>",
+            "<c>": "<a>",
+          }),
+        /Circular reference/,
+      );
+    });
+
+    test("throws for self-reference in union", () => {
+      assert.throws(
+        () =>
+          cssSyntaxConfig(SUPPORTED_KEYWORDS, {
+            "<length>": "`${number}${'px'}`",
+            "<length-percentage>": "<length> | <length-percentage>",
+          }),
+        /Circular reference/,
+      );
+    });
+
+    test("throws for cross-cycle in union (a -> b | c, b -> a)", () => {
+      assert.throws(
+        () =>
+          cssSyntaxConfig(SUPPORTED_KEYWORDS, {
+            "<a>": "<b> | <c>",
+            "<b>": "<a>",
+            "<c>": "`${number}%`",
+          }),
+        /Circular reference/,
+      );
+    });
+
+    test("accepts acyclic references", () => {
+      const config = cssSyntaxConfig(SUPPORTED_KEYWORDS, {
+        "<length>": "`${number}${'px'}`",
+        "<percentage>": "`${number}%`",
+        "<length-percentage>": "<length> | <percentage>",
+      });
+      assert.ok(config);
+    });
+  });
+
   describe("Edge Cases", () => {
     test("empty config is accepted", () => {
-      const config = cssSyntaxConfig(SUPPORTED_KEYWORDS, {} as any);
+      const config = cssSyntaxConfig(SUPPORTED_KEYWORDS, {});
       assert.deepStrictEqual(config, {});
     });
 
