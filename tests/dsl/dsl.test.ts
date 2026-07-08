@@ -854,14 +854,18 @@ describe("Error handling", () => {
       );
     });
 
-    test("unknown keyword in template interpolation is type-level error only", () => {
-      // Runtime treats it as a valid backtick-quoted string literal
-      dslString(SUPPORTED_KEYWORDS, "`/${${unknown}}/`");
-      assert.strictEqual(
-        // @ts-expect-error — unknown keyword is invalid at type level
-        parseValueAgainstDSL(SUPPORTED_KEYWORDS, "`/${${unknown}}/`", ""),
-        "",
-      );
+    describe("unknown keyword in template interpolation", () => {
+      test("Runtime Validation", () => {
+        assert.throws(() =>
+          dslString(SUPPORTED_KEYWORDS, "`/${${unknown}}/`"),
+        );
+      });
+      test("Parse", () => {
+        assert.throws(() =>
+          // @ts-expect-error — unknown keyword can't be inferred, produces never
+          parseValueAgainstDSL(SUPPORTED_KEYWORDS, "`/${${unknown}}/`", ""),
+        );
+      });
     });
   });
 
