@@ -7,18 +7,6 @@ export function renderCSSPropertiesConfig(
 
   const parts: string[] = [];
   for (const [key, value] of entries) {
-    if (!key.startsWith("--")) {
-      throw new Error(
-        `You must have the property start with -- instead like --${key}`,
-      );
-    }
-
-    if (value["initial-value"] === undefined) {
-      throw new Error(
-        `initial-value is required for property "${key}"`,
-      );
-    }
-
     let block = `@property ${key} {\n`;
     block += `  syntax: "${value.syntax}";\n`;
     block += `  inherits: ${value.inherits};\n`;
