@@ -3,6 +3,7 @@ import type {
   BaseHTMLAttributesConfig,
   ValidateHTMLAttributesConfig,
 } from "../attribute-config/types.ts";
+import type { BaseCSSPseudoClassConfig } from "@/css/pseudo-class-config/types.ts";
 
 type BaseHTMLTag = string;
 type BaseInnerHTMLTagConfig<PossibleTags extends string> =
@@ -39,12 +40,12 @@ export type ValidateHTMLTagConfig<
         >
           ? TagDefinition[Tag]["innerHTML"]
           : BaseInnerHTMLTagConfig<Keyof<TagDefinition>>;
-        cssPseudoClass: TagDefinition[Tag]["cssPseudoClass"] extends `:${string}`[]
+        cssPseudoClass: TagDefinition[Tag]["cssPseudoClass"] extends BaseCSSPseudoClassConfig
           ? TagDefinition[Tag]["cssPseudoClass"]
-          : `:${string}`[];
-        cssPseudoElement: TagDefinition[Tag]["cssPseudoElement"] extends `::${string}`[]
+          : BaseCSSPseudoClassConfig;
+        cssPseudoElement: TagDefinition[Tag]["cssPseudoElement"] extends `::${string}${string}`[]
           ? TagDefinition[Tag]["cssPseudoElement"]
-          : `::${string}`[];
+          : `::${string}${string}`[];
       }
     : TagDefinition[Tag];
 };
