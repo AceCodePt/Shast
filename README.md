@@ -1,2 +1,2 @@
 # css-ts-syntax
-This is a library meant to input the syntax and output rather if a value adhear to that syntax.
+This is a library meant to take a syntax as input and output whether a value adheres to that syntax.
