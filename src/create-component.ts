@@ -237,7 +237,7 @@ export type ValidateComponentStructure<
                     : never
                 : never
         : never;
-    } & {} & (true extends IsTagElementVoid<HTMLTagConfig, T["tag"]>
+    } & { css?: {} } & (true extends IsTagElementVoid<HTMLTagConfig, T["tag"]>
         ? {}
         : {
             innerHTML?: {};
