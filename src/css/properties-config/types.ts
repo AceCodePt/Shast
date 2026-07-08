@@ -5,9 +5,9 @@ import type {
 } from "../syntax-config/types.ts";
 
 export type BaseCSSPropertyValue = {
-  syntax?: string;
-  inherits?: boolean;
-  "initial-value"?: string;
+  syntax?: string | undefined;
+  inherits?: boolean | undefined;
+  "initial-value"?: string | undefined;
 };
 export type BaseCSSPropertiesConfig = Record<
   `--${string}`,
