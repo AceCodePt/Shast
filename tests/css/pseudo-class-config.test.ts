@@ -7,7 +7,9 @@ import { assertType, type Equal } from "../type-utils.ts";
 describe("cssPseudoClassConfig", () => {
   describe("Type Validation", () => {
     test("accepts `:` prefixed strings", () => {
-      assertType<Equal<BaseCSSPseudoClassConfig, readonly `:${string}`[]>>();
+      assertType<
+        Equal<BaseCSSPseudoClassConfig, readonly `:${string}${string}`[]>
+      >();
     });
 
     test("rejects names without `:` prefix", () => {
@@ -18,7 +20,10 @@ describe("cssPseudoClassConfig", () => {
         >
       >();
       assertType<
-        Equal<["hover"] extends readonly `:${string}`[] ? true : false, false>
+        Equal<
+          ["hover"] extends readonly `:${string}${string}`[] ? true : false,
+          false
+        >
       >();
     });
   });
