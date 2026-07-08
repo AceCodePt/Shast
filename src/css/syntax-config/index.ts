@@ -1,4 +1,4 @@
-import { dslString } from "@/dsl/index.ts";
+import { dslString, detectCircularReferences } from "@/dsl/index.ts";
 import type { BaseCSSSyntaxConfig, ValidatedCSSSyntaxConfig } from "./types.ts";
 
 export function cssSyntaxConfig<
@@ -12,6 +12,8 @@ export function cssSyntaxConfig<
     const item = config[key];
     dslString(Object.assign({}, supportedKeywords, config), item);
   }
+
+  detectCircularReferences(config as Record<string, string>);
 
   return config as T;
 }

@@ -189,6 +189,76 @@ export function dslString<
   return dslString;
 }
 
+export function extractTokenReferences(dsl: string): string[] {
+  const tokens: string[] = [];
+  let inSingle = false;
+  let inDouble = false;
+  let inBacktick = false;
+
+  for (let i = 0; i < dsl.length; i++) {
+    const ch = dsl[i];
+    if (ch === "'" && !inDouble && !inBacktick) inSingle = !inSingle;
+    else if (ch === '"' && !inSingle && !inBacktick) inDouble = !inDouble;
+    else if (ch === "`" && !inSingle && !inDouble) inBacktick = !inBacktick;
+    else if (ch === "<" && !inSingle && !inDouble) {
+      const end = dsl.indexOf(">", i);
+      if (end !== -1) {
+        tokens.push(dsl.slice(i, end + 1));
+        i = end;
+      }
+    }
+  }
+
+  return tokens;
+}
+
+export function detectCircularReferences(
+  config: Record<string, string>,
+): void {
+  for (const key in config) {
+    const refs = extractTokenReferences(config[key]!);
+    if (refs.includes(key)) {
+      throw new Error(
+        `Circular reference detected: token "${key}" references itself`,
+      );
+    }
+  }
+
+  const graph = new Map<string, string[]>();
+  for (const key in config) {
+    const refs = extractTokenReferences(config[key]!).filter(
+      (ref) => ref in config && ref !== key,
+    );
+    graph.set(key, refs);
+  }
+
+  const visited = new Set<string>();
+  const inStack = new Set<string>();
+
+  function dfs(node: string, path: string[]): void {
+    visited.add(node);
+    inStack.add(node);
+
+    for (const neighbor of graph.get(node) ?? []) {
+      if (!visited.has(neighbor)) {
+        dfs(neighbor, [...path, neighbor]);
+      } else if (inStack.has(neighbor)) {
+        throw new Error(
+          `Circular reference detected: ${path.join(" -> ")} -> ${neighbor}`,
+        );
+      }
+    }
+
+    inStack.delete(node);
+  }
+
+  for (const key of graph.keys()) {
+    if (!visited.has(key)) {
+      dfs(key, [key]);
+    }
+  }
+}
+
 function splitOutsideQuotes(dslString: string) {
   const parts = [];
   let current = "";
