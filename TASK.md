@@ -171,11 +171,11 @@
     - [x] Runtime Validation
     - [x] Parse
     - [x] Test
-  - [x] Fails on unknown keyword in template interpolation `` `/${${unknown}}/` `` *(type-level only, runtime treats as quoted string)*
+  - [x] Fails on unknown keyword in template interpolation `` `/${${unknown}}/` `` *(runtime now rejects as well)*
     - [x] Type Validation
     - [x] Type Inference
-    - [ ] Runtime Validation
-    - [ ] Parse
+    - [x] Runtime Validation
+    - [x] Parse
     - [x] Test
   - [x] Fails on type mismatch in `parseValueAgainstDSL` - value doesn't match DSL
     - [x] `"string"` rejects non-strings (number, boolean, undefined)
@@ -241,7 +241,7 @@
   - [x] Test
 
 - [x] **Edge Cases**
-  - [ ] Circular or self-referencing syntax tokens
+  - [x] Circular or self-referencing syntax tokens
   - [x] Unknown token reference raises error
   - [x] Mixed token + literal unions
 
@@ -278,9 +278,10 @@
   - [x] Default handling
 
 - [x] **`initial-value` field**
-  - [x] Validated against resolved syntax type
-  - [x] Optional (may be omitted)
-  - [x] Must match the `syntax` DSL at the type level
+  - [x] Validated against resolved syntax type (runtime)
+  - [x] Validated against resolved syntax type (type-level)
+  - [x] Required (must be defined, per spec unless `syntax: "*"`)
+  - [x] Must match the `syntax` DSL at runtime
 
 - [x] **Property name validation** - names must start with `--`
   - [x] Type-level error for invalid names
@@ -337,92 +338,201 @@
 
 ---
 
-### Pseudo-Class Config Builder
+## Render Component
 
-- [x] **`cssPseudoClassConfig` function** - validates a pseudo-class config array
-  - [x] Type validation - accepts `:` prefixed strings
-  - [x] Type validation - rejects names without `:` prefix
-  - [x] Runtime validation - throws for missing `:` prefix
-  - [x] Runtime validation - returns config unchanged
-  - [x] Edge case - empty array `[]` accepted
-  - [x] Test
-
-### Tag Config Pseudo-Class Declaration
-
-- [x] Extend `BaseHTMLTagConfig` with optional `cssPseudoClass: string[]` field
-  - [x] Type validation - accepts tag with valid pseudo-class references
-  - [x] Type validation - rejects pseudo-class name not starting with `:`
-  - [x] Type validation - tag without `cssPseudoClass` key = no pseudo-class support
-  - [x] Type validation - tag with `cssPseudoClass: []` = no pseudo-class support
-  - [x] Runtime validation - accepts empty pseudo-class list
-  - [x] Runtime validation - preserves object reference
-  - [x] Edge case - multiple tags with different pseudo-class lists
-  - [x] Test
-
-### Component CSS: Pseudo-Class Block Validation
-
-- [x] Extend `ValidateComponentCSSStructure` to validate pseudo-class blocks against tag's `cssPseudoClass`
-  - [x] Type validation - pseudo-class with all its CSS properties passes
-  - [x] Type validation - pseudo-class on tag that doesn't declare it is rejected
-  - [x] Type validation - pseudo-class on tag with `cssPseudoClass: []` is rejected
-  - [x] Type validation - pseudo-class on tag with no `cssPseudoClass` key is rejected
-  - [x] Type validation - multiple pseudo-classes in same css block accepted
-  - [x] Type validation - globally-configured pseudo-class accepted on any tag
-  - [x] Type validation - pseudo-class inside child selector (`> child: { ":hover": {...} }`)
-  - [x] Type validation - child selector inside pseudo-class (`":hover": { "> child": {...} }`)
-  - [x] Type validation - pseudo-class inside nested pseudo-class (`":hover": { ":focus": {...} }`)
-  - [x] Test
-
----
-
-### Tag Config Pseudo-Element Declaration
-
-- [x] Extend `BaseHTMLTagConfig` with optional `cssPseudoElement` field
-  - [x] Type validation - accepts `::` prefixed pseudo-element strings in tag config
-  - [x] Type validation - rejects tags with pseudo-element names not starting with `::`
-  - [x] Type validation - tag with `cssPseudoElement: []` = no additional pseudo-element support
-  - [x] Edge case - multiple tags with different pseudo-element lists
-
-### Component CSS: Pseudo-Element Block Validation
-
-- [x] Extend `ValidateComponentCSSStructure` to validate pseudo-element blocks against tag's `cssPseudoElement`
-  - [x] Type validation - pseudo-element with all its CSS properties passes
-  - [x] Type validation - pseudo-element on tag that doesn't declare it is rejected
-  - [x] Type validation - pseudo-element on tag with `cssPseudoElement: []` is rejected
-  - [x] Type validation - pseudo-element on tag with no `cssPseudoElement` key is rejected
-  - [x] Type validation - multiple pseudo-elements in same css block accepted
-  - [x] Type validation - pseudo-element inside child selector (`> child: { "::placeholder": {...} }`)
-  - [x] Type validation - child selector inside pseudo-element (`"::placeholder": { "> child": {...} }`)
-  - [x] Type validation - pseudo-element inside pseudo-class (`":hover": { "::placeholder": {...} }`)
-  - [x] Type validation - pseudo-class inside pseudo-element (`"::placeholder": { ":hover": {...} }`)
-  - [x] Type validation - pseudo-element nested inside a pseudo-element is rejected
-  - [x] Test
-
----
-
-### Variation System (Tag-level)
-
-- [ ] Extend `BaseHTMLTagConfig` with optional `variations` field
-  - [ ] Each variation maps a name to a partial CSS block
-  - [ ] Variation CSS validated against CSSAttributesConfig + CSSPropertiesConfig
-  - [ ] Type validation - rejects variation with invalid DSL
-  - [ ] Type validation - rejects variation with unknown CSS property
-  - [ ] Type validation - rejects variation with `--` property not in CSSPropertiesConfig
-  - [ ] Type validation - accepts tag with empty variations `{}`
-  - [ ] Type validation - accepts tag without `variations` key
-  - [ ] Runtime validation - throws for invalid DSL in variation CSS
-  - [ ] Runtime validation - preserves object reference
-  - [ ] Edge case - multiple tags with different variation sets
+- [ ] **`renderComponent` function** - converts a component structure to separate HTML and CSS strings
+  - [ ] Type Validation
+  - [ ] Runtime Validation
   - [ ] Test
 
-### Component Variation Selection
+- [ ] **HTML string output**
+  - [ ] Tag name rendered correctly
+  - [ ] Void elements (`br`, `hr`, `img`) self-close properly
+  - [ ] Non-void elements wrap children
 
-- [ ] Component selects variation via `attributes.variant`
-  - [ ] Type validation - valid `variant` matching a variation passes
-  - [ ] Type validation - `variant` value not in variations is rejected
-  - [ ] Type validation - `variant` on tag with no variations is rejected
-  - [ ] Type validation - component without `variant` on tag with variations accepted
+- [ ] **Attribute rendering**
+  - [ ] Attributes serialized to HTML attribute syntax
+  - [ ] Boolean attributes (`true` renders without value, `false` omits attribute)
+  - [ ] Undefined/optional attributes omitted
+  - [ ] Global attributes applied to all components
+  - [ ] Tag-specific attributes applied correctly
+
+- [ ] **Text & children rendering**
+  - [ ] Text nodes rendered as-is
+  - [ ] Child components rendered recursively
+  - [ ] Mixed text and component children in correct order
+  - [ ] Void elements reject children (error or ignored)
+
+- [ ] **CSS string output**
+  - [ ] Each component receives unique CSS class for isolation
+  - [ ] Inline `css` block properties collected as scoped CSS rules
+  - [ ] Child CSS selectors (`> childName`) applied to corresponding children
+  - [ ] Pseudo-class blocks included in scoped styles
+  - [ ] Pseudo-element blocks included in scoped styles
+  - [ ] Variation CSS merged with inline CSS
+  - [ ] Property values validated against CSS syntax at runtime
+  - [ ] CSS output separate from HTML string (user handles integration)
+
+- [ ] **Edge Cases**
+  - [ ] Empty component (no children, no CSS)
+  - [ ] Deeply nested components
+  - [ ] Components with all optional attributes omitted
+  - [ ] Components with variations applied
+
+---
+
+## Render CSS Properties Config using the @property rule
+
+- [x] **`renderCSSPropertiesConfig` function** - converts custom properties object to CSS string
+  - [x] Runtime Validation
+  - [x] Test
+
+- [x] **Custom property rendering**
+  - [x] Properties with `--` prefix rendered correctly
+  - [x] `initial-value` always rendered (required per spec)
+  - [x] Properties output in correct CSS `@property` format
+
+- [x] **Edge Cases**
+  - [x] Empty custom properties object
+  - [x] Multiple properties with mixed types
+  - [x] Numeric string values
+
+---
+
+## Pseudo-Class Config Builder
+
+- [x] **`cssPseudoClassConfig` builder** - validates a pseudo-class config array
+  - [x] Type Validation
+  - [x] Type Inference
+  - [x] Runtime Validation
+  - [x] Test
+
+- [x] **Prefix validation**
+  - [x] Accepts `:` prefixed strings
+  - [x] Rejects names without `:` prefix
+  - [x] Runtime throws for missing `:` prefix
+  - [x] Returns config unchanged
+
+- [x] **Edge Cases**
+  - [x] Empty array `[]` accepted
+
+## Tag Config Pseudo-Class Declaration
+
+- [x] **Extend `BaseHTMLTagConfig` with optional `cssPseudoClass: string[]` field**
+  - [x] Type Validation
+  - [x] Type Inference
+  - [x] Runtime Validation
+  - [x] Test
+
+- [x] **Declaration rules**
+  - [x] Accepts tag with valid pseudo-class references
+  - [x] Rejects pseudo-class name not starting with `:`
+  - [x] Tag without `cssPseudoClass` key = no pseudo-class support
+  - [x] Tag with `cssPseudoClass: []` = no pseudo-class support
+  - [x] Runtime accepts empty pseudo-class list
+  - [x] Runtime preserves object reference
+
+- [x] **Edge Cases**
+  - [x] Multiple tags with different pseudo-class lists
+
+## Component CSS: Pseudo-Class Block Validation
+
+- [x] **Extend `ValidateComponentCSSStructure` to validate pseudo-class blocks against tag's `cssPseudoClass`**
+  - [x] Type Validation
+  - [x] Type Inference
+  - [x] Test
+
+- [x] **Block rules**
+  - [x] Pseudo-class with all its CSS properties passes
+  - [x] Pseudo-class on tag that doesn't declare it is rejected
+  - [x] Pseudo-class on tag with `cssPseudoClass: []` is rejected
+  - [x] Pseudo-class on tag with no `cssPseudoClass` key is rejected
+  - [x] Multiple pseudo-classes in same css block accepted
+  - [x] Globally-configured pseudo-class accepted on any tag
+
+- [x] **Nesting**
+  - [x] Pseudo-class inside child selector (`> child: { ":hover": {...} }`)
+  - [x] Child selector inside pseudo-class (`":hover": { "> child": {...} }`)
+  - [x] Pseudo-class inside nested pseudo-class (`":hover": { ":focus": {...} }`)
+
+---
+
+## Tag Config Pseudo-Element Declaration
+
+- [x] **Extend `BaseHTMLTagConfig` with optional `cssPseudoElement` field**
+  - [x] Type Validation
+  - [x] Type Inference
+  - [ ] Runtime Validation
+  - [ ] Test
+
+- [x] **Declaration rules**
+  - [x] Accepts `::` prefixed pseudo-element strings in tag config
+  - [x] Rejects pseudo-element names not starting with `::`
+  - [x] Tag with `cssPseudoElement: []` = no additional pseudo-element support
+
+- [x] **Edge Cases**
+  - [x] Multiple tags with different pseudo-element lists
+
+## Component CSS: Pseudo-Element Block Validation
+
+- [x] **Extend `ValidateComponentCSSStructure` to validate pseudo-element blocks against tag's `cssPseudoElement`**
+  - [x] Type Validation
+  - [x] Type Inference
+  - [x] Test
+
+- [x] **Block rules**
+  - [x] Pseudo-element with all its CSS properties passes
+  - [x] Pseudo-element on tag that doesn't declare it is rejected
+  - [x] Pseudo-element on tag with `cssPseudoElement: []` is rejected
+  - [x] Pseudo-element on tag with no `cssPseudoElement` key is rejected
+  - [x] Multiple pseudo-elements in same css block accepted
+  - [x] Pseudo-element nested inside another pseudo-element is rejected
+
+- [x] **Nesting**
+  - [x] Pseudo-element inside child selector (`> child: { "::placeholder": {...} }`)
+  - [x] Child selector inside pseudo-element (`"::placeholder": { "> child": {...} }`)
+  - [x] Pseudo-element inside pseudo-class (`":hover": { "::placeholder": {...} }`)
+  - [x] Pseudo-class inside pseudo-element (`"::placeholder": { ":hover": {...} }`)
+
+---
+
+## Variation System (Tag-level)
+
+- [ ] **Extend `BaseHTMLTagConfig` with optional `variations` field**
+  - [ ] Type Validation
+  - [ ] Type Inference
+  - [ ] Runtime Validation
+  - [ ] Test
+
+- [ ] **Validation rules**
+  - [ ] Each variation maps a name to a partial CSS block
+  - [ ] Variation CSS validated against CSSAttributesConfig + CSSPropertiesConfig
+  - [ ] Rejects variation with invalid DSL
+  - [ ] Rejects variation with unknown CSS property
+  - [ ] Rejects variation with `--` property not in CSSPropertiesConfig
+  - [ ] Accepts tag with empty variations `{}`
+  - [ ] Accepts tag without `variations` key
+  - [ ] Runtime throws for invalid DSL in variation CSS
+  - [ ] Runtime preserves object reference
+
+- [ ] **Edge Cases**
+  - [ ] Multiple tags with different variation sets
+
+## Component Variation Selection
+
+- [ ] **Component selects variation via `attributes.variant`**
+  - [ ] Type Validation
+  - [ ] Type Inference
+  - [ ] Runtime Validation
+  - [ ] Test
+
+- [ ] **Selection rules**
+  - [ ] Valid `variant` matching a variation passes
+  - [ ] `variant` value not in variations is rejected
+  - [ ] `variant` on tag with no variations is rejected
+  - [ ] Component without `variant` on tag with variations accepted
+
+- [ ] **Merge behavior**
   - [ ] Variation CSS merged with inline `css` (inline overrides)
   - [ ] Pseudo blocks in component css work after variant merge
   - [ ] Pseudo block can override variation's CSS properties
-  - [ ] Test
