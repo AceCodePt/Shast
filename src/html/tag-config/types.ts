@@ -12,10 +12,10 @@ type BaseInnerHTMLTagConfig<PossibleTags extends string> =
 export type BaseHTMLTagConfig = Record<
   BaseHTMLTag,
   {
-    attributes?: BaseHTMLAttributesConfig;
-    innerHTML?: BaseInnerHTMLTagConfig<string>;
-    cssPseudoClass?: string[];
-    cssPseudoElement?: string[];
+    attributes?: BaseHTMLAttributesConfig | undefined;
+    innerHTML?: BaseInnerHTMLTagConfig<string> | undefined;
+    cssPseudoClass?: string[] | undefined;
+    cssPseudoElement?: string[] | undefined;
   }
 >;
 
