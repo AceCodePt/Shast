@@ -94,13 +94,18 @@ describe("cssPropertiesConfig", () => {
       });
     });
 
-    test("accepts a property without initial-value", () => {
-      const config = (cssPropertiesConfig as any)(SUPPORTED_KEYWORDS, SYNTAX, {
-        "--a": { syntax: "<number>", inherits: false },
-      });
-      assert.deepStrictEqual(config, {
-        "--a": { syntax: "<number>", inherits: false },
-      });
+    test("missing initial-value throws at runtime", () => {
+      assert.throws(
+        () =>
+          cssPropertiesConfig(SUPPORTED_KEYWORDS, SYNTAX, {
+            // @ts-expect-error
+            "--a": {
+              syntax: "<number>",
+              inherits: false,
+            },
+          }),
+        /initial-value is required/,
+      );
     });
 
     test("accepts a property with boolean inherits", () => {
@@ -121,11 +126,19 @@ describe("cssPropertiesConfig", () => {
     });
 
     test("accepts a property with template literal syntax", () => {
-      const config = (cssPropertiesConfig as any)(SUPPORTED_KEYWORDS, SYNTAX, {
-        "--custom": { syntax: "<length>", inherits: false },
+      const config = cssPropertiesConfig(SUPPORTED_KEYWORDS, SYNTAX, {
+        "--custom": {
+          syntax: "<length>",
+          inherits: false,
+          "initial-value": "1px",
+        },
       });
       assert.deepStrictEqual(config, {
-        "--custom": { syntax: "<length>", inherits: false },
+        "--custom": {
+          syntax: "<length>",
+          inherits: false,
+          "initial-value": "1px",
+        },
       });
     });
 
@@ -146,8 +159,12 @@ describe("cssPropertiesConfig", () => {
     test("invalid DSL syntax string throws at runtime", () => {
       assert.throws(
         () =>
-          (cssPropertiesConfig as any)(SUPPORTED_KEYWORDS, SYNTAX, {
-            "--a": { syntax: "xyz", inherits: true },
+          cssPropertiesConfig(SUPPORTED_KEYWORDS, SYNTAX, {
+            "--a": {
+              // @ts-expect-error
+              syntax: "xyz",
+              inherits: true,
+            },
           }),
         /Invalid DSL string/,
       );
@@ -156,8 +173,12 @@ describe("cssPropertiesConfig", () => {
     test("partially invalid syntax union throws at runtime", () => {
       assert.throws(
         () =>
-          (cssPropertiesConfig as any)(SUPPORTED_KEYWORDS, SYNTAX, {
-            "--a": { syntax: "<length> | xyz", inherits: false },
+          cssPropertiesConfig(SUPPORTED_KEYWORDS, SYNTAX, {
+            "--a": {
+              // @ts-expect-error
+              syntax: "<length> | xyz",
+              inherits: false,
+            },
           }),
         /Invalid DSL string/,
       );
@@ -166,10 +187,41 @@ describe("cssPropertiesConfig", () => {
     test("property name without -- prefix throws at runtime", () => {
       assert.throws(
         () =>
-          (cssPropertiesConfig as any)(SUPPORTED_KEYWORDS, SYNTAX, {
+          cssPropertiesConfig(SUPPORTED_KEYWORDS, SYNTAX, {
+            // @ts-expect-error
             a: { syntax: "<number>", inherits: false },
           }),
         /You must have the property start with --/,
+      );
+    });
+
+    test("initial-value mismatch with length syntax throws at runtime", () => {
+      assert.throws(
+        () =>
+          cssPropertiesConfig(SUPPORTED_KEYWORDS, SYNTAX, {
+            "--size": {
+              syntax: "<length>",
+              inherits: false,
+              // @ts-expect-error
+              "initial-value": "invalid",
+            },
+          }),
+        /does not match syntax/,
+      );
+    });
+
+    test("initial-value mismatch with color syntax throws at runtime", () => {
+      assert.throws(
+        () =>
+          cssPropertiesConfig(SUPPORTED_KEYWORDS, SYNTAX, {
+            "--bg": {
+              syntax: "<color>",
+              inherits: false,
+              // @ts-expect-error
+              "initial-value": "invalid-color",
+            },
+          }),
+        /does not match syntax/,
       );
     });
   });
