@@ -145,6 +145,33 @@ export type DSLInfer<
           ? SingleDSLInfer<Keywords, Trim<L>> | DSLInfer<Keywords, Trim<R>>
           : SingleDSLInfer<Keywords, Trim<Text>>;
 
+function validateDSLPart(
+  part: string,
+  supportedKeywords: Record<string, any>,
+  fullDSL: string,
+): void {
+  const isKeyword = part in supportedKeywords;
+  const isNumericLiteral = part !== "" && !Number.isNaN(+part);
+  const isQuotedString = /^'[^']*'$|^"[^"]*"$|^`[^`]*`$/.test(part);
+  const isTemplateLiteral = /^`.*`$/.test(part);
+
+  if (!isKeyword && !isNumericLiteral && !isQuotedString && !isTemplateLiteral) {
+    throw new Error(`Invalid DSL string: "${fullDSL}"`);
+  }
+
+  if (isTemplateLiteral && /\$\{/.test(part)) {
+    const content = part.slice(1, -1);
+    const interpolationRegex = /\$\{(.+?)\}/g;
+    for (let match = interpolationRegex.exec(content); match; match = interpolationRegex.exec(content)) {
+      const innerDSL = match[1]!;
+      const innerParts = splitOutsideQuotes(innerDSL).map((p) => p.trim());
+      for (const innerPart of innerParts) {
+        validateDSLPart(innerPart, supportedKeywords, fullDSL);
+      }
+    }
+  }
+}
+
 export function dslString<
   const Keywords extends Record<string, any>,
   const DSL extends DSLString,
@@ -156,20 +183,7 @@ export function dslString<
   }
 
   for (const part of parts) {
-    const isKeyword = part in supportedKeywords;
-    const isNumericLiteral = part !== "" && !Number.isNaN(+part);
-    const isQuotedString = /^'[^']*'$|^"[^"]*"$|^`[^`]*`$/.test(part);
-    // backtick with interpolations: `...${...}...`
-    const isTemplateLiteral = /^`.*`$/.test(part);
-
-    if (
-      !isKeyword &&
-      !isNumericLiteral &&
-      !isQuotedString &&
-      !isTemplateLiteral
-    ) {
-      throw new Error(`Invalid DSL string: "${dslString}"`);
-    }
+    validateDSLPart(part, supportedKeywords, dslString);
   }
 
   return dslString;
@@ -221,18 +235,7 @@ export function parseValueAgainstDSL<
     throw new Error(`Invalid DSL string: "${dslString}"`);
   }
   for (const part of rawParts) {
-    const isKeyword = part in supportedKeywords;
-    const isNumericLiteral = part !== "" && !Number.isNaN(+part);
-    const isQuotedString = /^'[^']*'$|^"[^"]*"$|^`[^`]*`$/.test(part);
-    const isTemplateLiteral = /^`.*`$/.test(part);
-    if (
-      !isKeyword &&
-      !isNumericLiteral &&
-      !isQuotedString &&
-      !isTemplateLiteral
-    ) {
-      throw new Error(`Invalid DSL string: "${dslString}"`);
-    }
+    validateDSLPart(part, supportedKeywords, dslString);
   }
 
   const parts = rawParts;
