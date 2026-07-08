@@ -96,8 +96,8 @@ type ValidateComponentInnerHTMLStructure<
                 CSSPseudoClassConfig,
                 CSSPropertiesConfig,
                 HTMLTagConfig[CurrentTag]["innerHTML"] extends any[]
-                // This is the check for when 
-                  ? "#text" extends HTMLTagConfig[CurrentTag]["innerHTML"][number]
+                  ? // This is the check for when
+                    "#text" extends HTMLTagConfig[CurrentTag]["innerHTML"][number]
                     ? AllowedTags &
                         HTMLTagConfig[CurrentTag]["innerHTML"][number]
                     : AllowedTags
