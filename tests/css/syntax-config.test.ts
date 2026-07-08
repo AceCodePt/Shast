@@ -5,7 +5,7 @@ import { cssSyntaxConfig } from "@/css/syntax-config/index.ts";
 import type {
   InferCSSSyntax,
   InferCSSSyntaxConfig,
-  ValidatedCSSSyntaxConfig,
+  ValidateCSSSyntaxConfig,
 } from "@/css/syntax-config/types.ts";
 import { assertType, type Equal } from "../type-utils.ts";
 
@@ -14,7 +14,7 @@ describe("cssSyntaxConfig", () => {
     test("accepts a valid syntax token", () => {
       assertType<
         Equal<
-          ValidatedCSSSyntaxConfig<
+          ValidateCSSSyntaxConfig<
             SupportedKeywords,
             { "<length>": "`${number}${'px' | 'rem'}`" }
           >,
@@ -26,7 +26,7 @@ describe("cssSyntaxConfig", () => {
     test("accepts multiple syntax tokens", () => {
       assertType<
         Equal<
-          ValidatedCSSSyntaxConfig<
+          ValidateCSSSyntaxConfig<
             SupportedKeywords,
             {
               "<integer>": "`${bigint}`";
@@ -46,7 +46,7 @@ describe("cssSyntaxConfig", () => {
     test("accepts token references (recursive keyword resolution)", () => {
       assertType<
         Equal<
-          ValidatedCSSSyntaxConfig<
+          ValidateCSSSyntaxConfig<
             SupportedKeywords,
             {
               "<length>": "`${number}${'px'}`";
@@ -66,7 +66,7 @@ describe("cssSyntaxConfig", () => {
     test("accepts complex chained token references", () => {
       assertType<
         Equal<
-          ValidatedCSSSyntaxConfig<
+          ValidateCSSSyntaxConfig<
             SupportedKeywords,
             {
               "<length>": "`${number}${'px'}`";

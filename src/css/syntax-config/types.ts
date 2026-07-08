@@ -2,7 +2,7 @@ import type { DSLInfer, DSLString, DSLValidate } from "@/dsl/index.ts";
 
 export type BaseCSSSyntaxConfig = Record<`<${string}>`, DSLString>;
 
-export type ValidatedCSSSyntaxConfig<
+export type ValidateCSSSyntaxConfig<
   Keywords extends Record<string, any>,
   T extends BaseCSSSyntaxConfig,
 > = {
