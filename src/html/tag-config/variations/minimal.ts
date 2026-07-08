@@ -4,10 +4,10 @@ import { htmlTagConfig } from "../index.ts";
 export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   a: {
     attributes: {
-      href: "string",
+      href: "string | undefined",
       target: "'_self' | '_blank' | undefined",
     },
-    innerHTML: ["#text", "img", "span"],
+    innerHTML: ["#text", "img", "div", "p", "ul", "h1", "h2", "h3", "span", "br"],
     cssPseudoClass: [":link", ":visited"],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -22,7 +22,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       type: "'submit' | 'reset' | 'button' | undefined",
       disabled: "boolean | undefined",
     },
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "span", "br", "img"],
     cssPseudoClass: [":disabled"],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -40,7 +40,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h1: {
     attributes: {},
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -52,7 +52,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h2: {
     attributes: {},
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -64,7 +64,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h3: {
     attributes: {},
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -86,7 +86,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   input: {
     attributes: {
       type: "'text' | 'number' | 'password' | 'checkbox' | 'radio' | 'submit' | 'hidden'",
-      value: "string",
+      value: "string | undefined",
       disabled: "boolean | undefined",
     },
     innerHTML: [],
@@ -108,7 +108,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   p: {
     attributes: {},
-    innerHTML: ["#text", "span", "a", "br"],
+    innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",

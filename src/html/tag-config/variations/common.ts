@@ -4,7 +4,7 @@ import { htmlTagConfig } from "../index.ts";
 export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   a: {
     attributes: {
-      href: "string",
+      href: "string | undefined",
       target: "'_self' | '_blank' | '_parent' | '_top' | undefined",
       download: "string | boolean | undefined",
       rel: "string | undefined",
@@ -24,6 +24,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       "h5",
       "h6",
       "span",
+      "br",
     ],
     cssPseudoClass: [":link", ":visited", ":any-link"],
     cssPseudoElement: ["::before", "::after", "::selection"],
@@ -54,7 +55,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       value: "string | undefined",
       form: "string | undefined",
     },
-    innerHTML: ["#text", "span", "img"],
+    innerHTML: ["#text", "span", "img", "br"],
     cssPseudoClass: [":disabled", ":enabled"],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -84,7 +85,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   form: {
     attributes: {
-      action: "string",
+      action: "string | undefined",
       method: "'get' | 'post' | 'dialog'",
       enctype: "string | undefined",
       novalidate: "boolean | undefined",
@@ -102,7 +103,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h1: {
     attributes: {},
-    innerHTML: ["#text", "span", "a"],
+      innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -114,7 +115,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h2: {
     attributes: {},
-    innerHTML: ["#text", "span", "a"],
+      innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -126,7 +127,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h3: {
     attributes: {},
-    innerHTML: ["#text", "span", "a"],
+      innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -138,7 +139,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h4: {
     attributes: {},
-    innerHTML: ["#text", "span", "a"],
+      innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -150,7 +151,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h5: {
     attributes: {},
-    innerHTML: ["#text", "span", "a"],
+      innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -162,7 +163,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h6: {
     attributes: {},
-    innerHTML: ["#text", "span", "a"],
+      innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -201,7 +202,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   input: {
     attributes: {
       type: "'text' | 'number' | 'password' | 'checkbox' | 'radio' | 'submit' | 'button' | 'email' | 'hidden'",
-      value: "string",
+      value: "string | undefined",
       checked: "boolean | undefined",
       name: "string | undefined",
       placeholder: "string | undefined",
@@ -234,7 +235,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       for: "string | undefined",
       form: "string | undefined",
     },
-    innerHTML: ["#text", "input", "span", "img"],
+    innerHTML: ["#text", "a", "input", "span", "img", "br"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -360,7 +361,6 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   textarea: {
     attributes: {
       name: "string | undefined",
-      value: "string",
       placeholder: "string | undefined",
       rows: "number | undefined",
       cols: "number | undefined",

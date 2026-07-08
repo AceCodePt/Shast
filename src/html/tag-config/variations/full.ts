@@ -2,7 +2,6 @@ import { SUPPORTED_KEYWORDS } from "@/dsl/index.ts";
 import { htmlTagConfig } from "../index.ts";
 
 export default htmlTagConfig(SUPPORTED_KEYWORDS, {
-  // ─── Text & Inline ─────────────────────────────────────────────────
   a: {
     attributes: {
       href: "string | undefined",
@@ -14,27 +13,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       referrerpolicy:
         "'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url' | undefined",
     },
-    innerHTML: [
-      "#text",
-      "img",
-      "div",
-      "section",
-      "p",
-      "ul",
-      "h1",
-      "h2",
-      "h3",
-      "h4",
-      "h5",
-      "h6",
-      "span",
-      "abbr",
-      "cite",
-      "code",
-      "em",
-      "strong",
-      "time",
-    ],
+    innerHTML: ["#text", "div", "section", "p", "ul", "h1", "h2", "h3", "h4", "h5", "h6", "abbr", "audio", "b", "bdi", "bdo", "br", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "img", "ins", "kbd", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "slot", "small", "span", "strong", "sub", "sup", "template", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [":link", ":visited", ":any-link", ":local-link"],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -42,7 +21,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     attributes: {
       title: "string | undefined",
     },
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -54,7 +33,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   b: {
     attributes: {},
-    innerHTML: ["#text", "span", "a", "em", "strong"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -62,7 +41,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     attributes: {
       dir: "'ltr' | 'rtl' | 'auto' | undefined",
     },
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -70,7 +49,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     attributes: {
       dir: "'ltr' | 'rtl'",
     },
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -90,13 +69,13 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   cite: {
     attributes: {},
-    innerHTML: ["#text", "a"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   code: {
     attributes: {},
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -104,7 +83,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     attributes: {
       value: "string",
     },
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -112,31 +91,31 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     attributes: {
       title: "string | undefined",
     },
-    innerHTML: ["#text", "abbr"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   em: {
     attributes: {},
-    innerHTML: ["#text", "span", "a", "strong"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   i: {
     attributes: {},
-    innerHTML: ["#text", "span"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   kbd: {
     attributes: {},
-    innerHTML: ["#text", "kbd"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   mark: {
     attributes: {},
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -144,7 +123,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     attributes: {
       cite: "string | undefined",
     },
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -156,31 +135,31 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   rt: {
     attributes: {},
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   ruby: {
     attributes: {},
-    innerHTML: ["#text", "rp", "rt"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr", "rp", "rt"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   s: {
     attributes: {},
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   samp: {
     attributes: {},
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   small: {
     attributes: {},
-    innerHTML: ["#text", "span"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -192,19 +171,19 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   strong: {
     attributes: {},
-    innerHTML: ["#text", "span", "a", "em"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   sub: {
     attributes: {},
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   sup: {
     attributes: {},
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -212,19 +191,19 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     attributes: {
       datetime: "string | undefined",
     },
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   u: {
     attributes: {},
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   var: {
     attributes: {},
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -235,40 +214,39 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     cssPseudoElement: [],
   },
 
-  // ─── Headings ──────────────────────────────────────────────────────
   h1: {
     attributes: {},
-    innerHTML: ["#text", "span", "a", "em", "strong", "small", "abbr"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
   },
   h2: {
     attributes: {},
-    innerHTML: ["#text", "span", "a", "em", "strong", "small", "abbr"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
   },
   h3: {
     attributes: {},
-    innerHTML: ["#text", "span", "a", "em", "strong", "small", "abbr"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
   },
   h4: {
     attributes: {},
-    innerHTML: ["#text", "span", "a", "em", "strong", "small", "abbr"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
   },
   h5: {
     attributes: {},
-    innerHTML: ["#text", "span", "a", "em", "strong", "small", "abbr"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
   },
   h6: {
     attributes: {},
-    innerHTML: ["#text", "span", "a", "em", "strong", "small", "abbr"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
   },
@@ -279,7 +257,6 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
   },
 
-  // ─── Sectioning & Layout ───────────────────────────────────────────
   article: {
     attributes: {},
     innerHTML: "*",
@@ -340,34 +317,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   p: {
     attributes: {},
-    innerHTML: [
-      "#text",
-      "span",
-      "a",
-      "img",
-      "input",
-      "br",
-      "label",
-      "abbr",
-      "b",
-      "cite",
-      "code",
-      "em",
-      "i",
-      "kbd",
-      "mark",
-      "q",
-      "s",
-      "samp",
-      "small",
-      "strong",
-      "sub",
-      "sup",
-      "time",
-      "u",
-      "var",
-      "wbr",
-    ],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
   },
@@ -385,12 +335,11 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   summary: {
     attributes: {},
-    innerHTML: ["#text", "span", "a", "em", "strong"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr", "h1", "h2", "h3", "h4", "h5", "h6", "hgroup"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection", "::marker"],
   },
 
-  // ─── Lists ─────────────────────────────────────────────────────────
   dd: {
     attributes: {},
     innerHTML: "*",
@@ -399,13 +348,13 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   dl: {
     attributes: {},
-    innerHTML: ["dt", "dd"],
+    innerHTML: ["dt", "dd", "div"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
   },
   dt: {
     attributes: {},
-    innerHTML: ["#text", "span", "a", "abbr", "em", "strong"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
   },
@@ -438,7 +387,6 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
   },
 
-  // ─── Media ─────────────────────────────────────────────────────────
   audio: {
     attributes: {
       src: "string | undefined",
@@ -579,7 +527,6 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     cssPseudoElement: ["::cue"],
   },
 
-  // ─── Forms ─────────────────────────────────────────────────────────
   button: {
     attributes: {
       type: "'submit' | 'reset' | 'button' | undefined",
@@ -596,7 +543,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       popovertarget: "string | undefined",
       popovertargetaction: "'show' | 'hide' | 'toggle' | undefined",
     },
-    innerHTML: ["#text", "span", "img", "em", "strong"],
+    innerHTML: ["#text", "abbr", "audio", "b", "bdi", "bdo", "br", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "img", "ins", "kbd", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "slot", "small", "span", "strong", "sub", "sup", "template", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [":disabled", ":enabled", ":default"],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -618,7 +565,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   form: {
     attributes: {
-      action: "string",
+      action: "string | undefined",
       method: "'get' | 'post' | 'dialog'",
       enctype:
         "'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain' | undefined",
@@ -635,7 +582,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   input: {
     attributes: {
       type: "'text' | 'number' | 'password' | 'checkbox' | 'radio' | 'submit' | 'button' | 'email' | 'hidden' | 'file' | 'date' | 'time' | 'datetime-local' | 'month' | 'week' | 'color' | 'range' | 'search' | 'tel' | 'url' | 'image' | 'reset'",
-      value: "string",
+      value: "string | undefined",
       checked: "boolean | undefined",
       name: "string | undefined",
       placeholder: "string | undefined",
@@ -695,13 +642,13 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       for: "string | undefined",
       form: "string | undefined",
     },
-    innerHTML: ["#text", "input", "span", "img", "abbr", "em", "strong"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
   legend: {
     attributes: {},
-    innerHTML: ["#text", "span", "a", "label"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr", "h1", "h2", "h3", "h4", "h5", "h6", "hgroup"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -715,7 +662,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       optimum: "number | undefined",
       form: "string | undefined",
     },
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [":valid", ":invalid", ":in-range", ":out-of-range"],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -745,7 +692,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       form: "string | undefined",
       name: "string | undefined",
     },
-    innerHTML: ["#text", "span"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -754,7 +701,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
       value: "number | undefined",
       max: "number | undefined",
     },
-    innerHTML: ["#text"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [":indeterminate"],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
@@ -783,7 +730,6 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   textarea: {
     attributes: {
       name: "string | undefined",
-      value: "string",
       placeholder: "string | undefined",
       rows: "number | undefined",
       cols: "number | undefined",
@@ -813,7 +759,6 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     cssPseudoElement: ["::placeholder"],
   },
 
-  // ─── Tables ─────────────────────────────────────────────────────────
   caption: {
     attributes: {},
     innerHTML: "*",
@@ -889,7 +834,6 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
   },
 
-  // ─── Interactive & Scripting ────────────────────────────────────────
   del: {
     attributes: {
       cite: "string | undefined",
@@ -910,7 +854,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   pre: {
     attributes: {},
-    innerHTML: ["#text", "code", "samp", "kbd"],
+    innerHTML: ["#text", "a", "abbr", "audio", "b", "bdi", "bdo", "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "i", "iframe", "img", "input", "ins", "kbd", "label", "mark", "meter", "output", "picture", "progress", "q", "ruby", "s", "samp", "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"],
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::first-letter", "::first-line", "::selection"],
   },
