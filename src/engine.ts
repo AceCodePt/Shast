@@ -81,9 +81,29 @@ export default function engine<
     return componentStructure as T;
   };
 
+  const renderComponentBound = <const T extends BaseComponentStructure>(
+    componentStructure: ValidateComponentStructure<
+      SupportedKeywords,
+      HTMLGlobalAttributesConfig,
+      HTMLTagConfig,
+      CSSSyntaxConfig,
+      CSSAttributesConfig,
+      CSSPseudoClassConfig,
+      CSSPropertiesConfig,
+      keyof HTMLTagConfig | "#text",
+      T,
+      keyof HTMLTagConfig | "#text"
+    >,
+  ) => {
+    return renderComponent(
+      config.htmlTagConfig,
+      componentStructure as BaseComponentStructure,
+    );
+  };
+
   return {
     createComponent: createComponent,
-    renderComponent: renderComponent,
+    renderComponent: renderComponentBound,
     cssProperties: renderCSSPropertiesConfig(config.cssPropertiesConfig),
   };
 }
