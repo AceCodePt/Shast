@@ -344,38 +344,38 @@
   - [x] Type Validation (via engine binding `ValidateComponentStructure`)
   - [x] Test
 
-- [ ] **HTML string output**
-  - [ ] Tag name rendered correctly
-  - [ ] Void elements (`br`, `hr`, `img`) self-close properly
-  - [ ] Non-void elements wrap children
+- [x] **HTML string output**
+  - [x] Tag name rendered correctly
+  - [x] Void elements (`br`, `hr`, `img`) self-close properly
+  - [x] Non-void elements wrap children
 
-- [ ] **Attribute rendering**
-  - [ ] Attributes serialized to HTML attribute syntax
-  - [ ] Boolean attributes (`true` renders without value, `false` omits attribute)
-  - [ ] Undefined/optional attributes omitted
+- [x] **Attribute rendering**
+  - [x] Attributes serialized to HTML attribute syntax
+  - [x] Boolean attributes (`true` renders without value, `false` omits attribute)
+  - [x] Undefined/optional attributes omitted
   - [ ] Global attributes applied to all components
   - [ ] Tag-specific attributes applied correctly
 
-- [ ] **Text & children rendering**
-  - [ ] Text nodes rendered as-is
-  - [ ] Child components rendered recursively
-  - [ ] Mixed text and component children in correct order
+- [x] **Text & children rendering**
+  - [x] Text nodes rendered as-is
+  - [x] Child components rendered recursively
+  - [x] Mixed text and component children in correct order
   - [ ] Void elements reject children (error or ignored)
 
-- [ ] **CSS string output**
-  - [ ] Each component receives unique CSS class for isolation
-  - [ ] Inline `css` block properties collected as scoped CSS rules
-  - [ ] Child CSS selectors (`> childName`) applied to corresponding children
-  - [ ] Pseudo-class blocks included in scoped styles
-  - [ ] Pseudo-element blocks included in scoped styles
+- [x] **CSS string output**
+  - [x] Styled components receive a `cid-<hash>` attribute; children receive a semantic `cid-<name>` attribute for targeting
+  - [x] Inline `css` block properties collected as scoped CSS rules
+  - [x] Child CSS selectors (`> childName`) applied to corresponding children
+  - [x] Pseudo-class blocks included in scoped styles
+  - [x] Pseudo-element blocks included in scoped styles
   - [ ] Variation CSS merged with inline CSS
   - [ ] Property values validated against CSS syntax at runtime
-  - [ ] CSS output separate from HTML string (user handles integration)
+  - [x] CSS output separate from HTML string (user handles integration)
 
 - [ ] **Edge Cases**
-  - [ ] Empty component (no children, no CSS)
-  - [ ] Deeply nested components
-  - [ ] Components with all optional attributes omitted
+  - [x] Empty component (no children, no CSS)
+  - [x] Deeply nested components
+  - [x] Components with all optional attributes omitted
   - [ ] Components with variations applied
 
 ---
