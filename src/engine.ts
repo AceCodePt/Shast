@@ -12,6 +12,7 @@ import type {
   ValidateCSSPropertiesConfig,
 } from "./css/properties-config/types.ts";
 import type { BaseCSSPseudoClassConfig } from "./css/pseudo-class-config/types.ts";
+import type { SupportedKeywordsConfig } from "./dsl/index.ts";
 import type {
   BaseCSSSyntaxConfig,
   ValidateCSSSyntaxConfig,
@@ -26,9 +27,10 @@ import type {
   ValidateHTMLTagConfig,
 } from "./html/tag-config/types.ts";
 import { renderCSSPropertiesConfig } from "./render/properties-config.ts";
+import { renderComponent } from "./render/render-component.ts";
 
 export default function engine<
-  const SupportedKeywords extends Record<string, any>,
+  const SupportedKeywords extends SupportedKeywordsConfig,
   const HTMLGlobalAttributesConfig extends BaseHTMLAttributesConfig,
   const HTMLTagConfig extends BaseHTMLTagConfig,
   const CSSSyntaxConfig extends BaseCSSSyntaxConfig,
@@ -76,11 +78,12 @@ export default function engine<
       config.htmlTagConfig,
       null,
     );
+    return componentStructure as T;
   };
 
   return {
     createComponent: createComponent,
-    renderComponent: () => {},
+    renderComponent: renderComponent,
     cssProperties: renderCSSPropertiesConfig(config.cssPropertiesConfig),
   };
 }

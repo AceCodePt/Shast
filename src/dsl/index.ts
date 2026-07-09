@@ -27,12 +27,14 @@ export const SUPPORTED_KEYWORDS = Object.assign(
 
 export type SupportedKeywords = typeof SUPPORTED_KEYWORDS;
 
+export type SupportedKeywordsConfig = Record<string, any>;
+
 export type DSLString = string;
 
 // Small note: the never for R is critical
 // See example: dslString("string |") and auto complete after the pipe
 type PipeWhenExists<
-  S extends Record<string, any>,
+  S extends SupportedKeywordsConfig,
   L extends string | number,
   R extends string | never = never,
 > = [R] extends [never]
@@ -40,14 +42,14 @@ type PipeWhenExists<
   : `${Trim<`${L}`>} | ${DSLValidate<S, R>}`;
 
 type ValidateRestOfBackTick<
-  S extends Record<string, any>,
+  S extends SupportedKeywordsConfig,
   Str extends string | never,
 > = Str extends `\$\{${infer innerDSL extends string}\}${infer Maybe extends string}`
   ? `\${${Trim<DSLValidate<S, innerDSL>>}}${ValidateRestOfBackTick<S, Maybe>}`
   : `${Str}`;
 
 type SingleDSLValidate<
-  Keywords extends Record<string, any>,
+  Keywords extends SupportedKeywordsConfig,
   L extends string,
   R extends string | never,
 > =
@@ -70,7 +72,7 @@ type SingleDSLValidate<
           : `'${Trim<L>}' is not supported`;
 
 type DSLStringDelimiter<
-  S extends Record<string, any>,
+  S extends SupportedKeywordsConfig,
   T extends string,
   D extends string,
 > =
@@ -86,7 +88,7 @@ type DSLStringDelimiter<
       : SingleDSLValidate<S, T, never>;
 
 export type DSLValidate<
-  Keywords extends Record<string, any>,
+  Keywords extends SupportedKeywordsConfig,
   T extends DSLString,
 > = [T] extends [never]
   ? string
@@ -101,14 +103,14 @@ export type DSLValidate<
           : SingleDSLValidate<Keywords, T, never>;
 
 type InferRestOfBackTick<
-  Keywords extends Record<string, any>,
+  Keywords extends SupportedKeywordsConfig,
   Str extends string,
 > = Str extends `${infer Before extends string}\$\{${infer innerDSL extends string}\}${infer Rest extends string}`
   ? `${Before}${DSLInfer<Keywords, innerDSL>}${InferRestOfBackTick<Keywords, Rest>}`
   : `${Str}`;
 
 type SingleDSLInfer<
-  Keywords extends Record<string, any>,
+  Keywords extends SupportedKeywordsConfig,
   Text extends string,
 > = Text extends keyof Keywords
   ? Keywords[Text] extends string
@@ -125,7 +127,7 @@ type SingleDSLInfer<
         : never;
 
 export type DSLInfer<
-  Keywords extends Record<string, any>,
+  Keywords extends SupportedKeywordsConfig,
   Text extends DSLString,
 > = [Text] extends [never]
   ? string
@@ -147,7 +149,7 @@ export type DSLInfer<
 
 function validateDSLPart(
   part: string,
-  supportedKeywords: Record<string, any>,
+  supportedKeywords: SupportedKeywordsConfig,
   fullDSL: string,
 ): void {
   const isKeyword = part in supportedKeywords;
@@ -173,7 +175,7 @@ function validateDSLPart(
 }
 
 export function dslString<
-  const Keywords extends Record<string, any>,
+  const Keywords extends SupportedKeywordsConfig,
   const DSL extends DSLString,
 >(supportedKeywords: Keywords, dslString: DSLValidate<Keywords, DSL>) {
   const parts = splitOutsideQuotes(dslString).map((p) => p.trim());
@@ -292,7 +294,7 @@ function splitOutsideQuotes(dslString: string) {
 }
 
 export function parseValueAgainstDSL<
-  const Keywords extends Record<string, any>,
+  const Keywords extends SupportedKeywordsConfig,
   const DSL extends DSLString,
 >(
   supportedKeywords: Keywords, // { boolean: true, number: 0, true: true }

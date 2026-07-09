@@ -5,7 +5,11 @@ import type {
 import type { BaseCSSPropertiesConfig } from "./css/properties-config/types.ts";
 import type { BaseCSSPseudoClassConfig } from "./css/pseudo-class-config/types.ts";
 import type { BaseCSSSyntaxConfig } from "./css/syntax-config/types.ts";
-import { parseValueAgainstDSL, type DSLInfer } from "./dsl/index.ts";
+import {
+  parseValueAgainstDSL,
+  type DSLInfer,
+  type SupportedKeywordsConfig,
+} from "./dsl/index.ts";
 import type {
   BaseHTMLAttributesConfig,
   InferHTMLAttributesConfig,
@@ -56,7 +60,7 @@ type GetAllowedTags<
     : never;
 
 type MaybeAttributes<
-  Keywords extends Record<string, any>,
+  Keywords extends SupportedKeywordsConfig,
   HTMLAttributesConfig extends BaseHTMLAttributesConfig | undefined,
 > = HTMLAttributesConfig extends BaseComponentInnerHTMLStructure
   ? {
@@ -69,7 +73,7 @@ type MaybeAttributes<
   : never;
 
 type ValidateComponentInnerHTMLStructure<
-  Keywords extends Record<string, any>,
+  Keywords extends SupportedKeywordsConfig,
   HTMLAttributesConfig extends BaseHTMLAttributesConfig,
   HTMLTagConfig extends BaseHTMLTagConfig,
   CSSSyntaxConfig extends BaseCSSSyntaxConfig,
@@ -114,7 +118,7 @@ type ValidateComponentInnerHTMLStructure<
       : never;
 
 type ValidateComponentCSSStructure<
-  Keywords extends Record<string, any>,
+  Keywords extends SupportedKeywordsConfig,
   HTMLTagConfig extends BaseHTMLTagConfig,
   CSSSyntaxConfig extends BaseCSSSyntaxConfig,
   CSSAttributesConfig extends BaseCSSAttributesConfig,
@@ -182,7 +186,7 @@ type ValidateComponentCSSStructure<
     : {});
 
 export type ValidateComponentStructure<
-  Keywords extends Record<string, any>,
+  Keywords extends SupportedKeywordsConfig,
   HTMLAttributesConfig extends BaseHTMLAttributesConfig,
   HTMLTagConfig extends BaseHTMLTagConfig,
   CSSSyntaxConfig extends BaseCSSSyntaxConfig,
@@ -270,7 +274,7 @@ function intersectAllowed(
 
 export function validateComponentNode(
   node: unknown,
-  keywords: Record<string, any>,
+  keywords: SupportedKeywordsConfig,
   globalAttributes: BaseHTMLAttributesConfig,
   tagConfig: BaseHTMLTagConfig,
   inheritedAllowed: AllowedTagSet,
@@ -391,7 +395,7 @@ export function validateComponentNode(
 }
 
 export function createComponent<
-  const Keywords extends Record<string, any>,
+  const Keywords extends SupportedKeywordsConfig,
   const HTMLAttributesConfig extends BaseHTMLAttributesConfig,
   const HTMLTagConfig extends BaseHTMLTagConfig,
   const CSSSyntaxConfig extends BaseCSSSyntaxConfig,

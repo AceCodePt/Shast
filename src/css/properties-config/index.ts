@@ -1,4 +1,4 @@
-import { dslString } from "@/dsl/index.ts";
+import { dslString, type SupportedKeywordsConfig } from "@/dsl/index.ts";
 import type { BaseCSSSyntaxConfig } from "../syntax-config/types.ts";
 import type {
   BaseCSSPropertiesConfig,
@@ -122,7 +122,7 @@ function validateInitialValueAgainstSyntax(
 }
 
 export const cssPropertiesConfig = <
-  const K extends Record<string, any>,
+  const K extends SupportedKeywordsConfig,
   const S extends BaseCSSSyntaxConfig,
   const P extends BaseCSSPropertiesConfig,
 >(

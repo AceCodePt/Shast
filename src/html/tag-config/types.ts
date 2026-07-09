@@ -1,3 +1,4 @@
+import type { SupportedKeywordsConfig } from "@/dsl/index.ts";
 import type { Keyof } from "@/types.ts";
 import type {
   BaseHTMLAttributesConfig,
@@ -19,7 +20,7 @@ export type BaseHTMLTagConfig = {
 };
 
 export type ValidateHTMLTagConfig<
-  Keywords extends Record<string, any>,
+  Keywords extends SupportedKeywordsConfig,
   TagDefinition extends BaseHTMLTagConfig,
 > = {
   [Tag in keyof TagDefinition]: Tag extends string

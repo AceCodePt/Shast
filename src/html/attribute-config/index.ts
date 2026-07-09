@@ -1,11 +1,11 @@
-import { dslString } from "@/dsl/index.ts";
+import { dslString, type SupportedKeywordsConfig } from "@/dsl/index.ts";
 import type {
   BaseHTMLAttributesConfig,
   ValidateHTMLAttributesConfig,
 } from "./types.ts";
 
 export const htmlAttributeConfig = <
-  const Keywords extends Record<string, any>,
+  const Keywords extends SupportedKeywordsConfig,
   const A extends BaseHTMLAttributesConfig,
 >(
   supportedKeywords: Keywords,

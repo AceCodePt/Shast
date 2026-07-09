@@ -1,11 +1,15 @@
-import type { DSLInfer, DSLValidate } from "@/dsl/index.ts";
+import type {
+  DSLInfer,
+  DSLValidate,
+  SupportedKeywordsConfig,
+} from "@/dsl/index.ts";
 import type { BaseCSSSyntaxConfig } from "../syntax-config/types.ts";
 
 export type BaseCSSAttributeValue = string;
 export type BaseCSSAttributesConfig = Record<string, BaseCSSAttributeValue>;
 
 export type ValidateCSSAttributesConfig<
-  Keywords extends Record<string, any>,
+  Keywords extends SupportedKeywordsConfig,
   S extends BaseCSSSyntaxConfig,
   A extends BaseCSSAttributesConfig,
 > = {
@@ -13,7 +17,7 @@ export type ValidateCSSAttributesConfig<
 };
 
 export type InferCSSAttributesConfig<
-  Keywords extends Record<string, any>,
+  Keywords extends SupportedKeywordsConfig,
   S extends BaseCSSSyntaxConfig,
   A extends BaseCSSAttributesConfig,
 > = {

@@ -1,8 +1,12 @@
-import { dslString, detectCircularReferences } from "@/dsl/index.ts";
+import {
+  dslString,
+  detectCircularReferences,
+  type SupportedKeywordsConfig,
+} from "@/dsl/index.ts";
 import type { BaseCSSSyntaxConfig, ValidateCSSSyntaxConfig } from "./types.ts";
 
 export function cssSyntaxConfig<
-  const Keywords extends Record<string, any>,
+  const Keywords extends SupportedKeywordsConfig,
   const T extends BaseCSSSyntaxConfig,
 >(supportedKeywords: Keywords, config: ValidateCSSSyntaxConfig<Keywords, T>) {
   for (const key in config) {

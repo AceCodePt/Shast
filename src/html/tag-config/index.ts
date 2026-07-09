@@ -1,8 +1,8 @@
 import type { BaseHTMLTagConfig, ValidateHTMLTagConfig } from "./types.ts";
-import { dslString } from "@/dsl/index.ts";
+import { dslString, type SupportedKeywordsConfig } from "@/dsl/index.ts";
 
 export const htmlTagConfig = <
-  const Keywords extends Record<string, any>,
+  const Keywords extends SupportedKeywordsConfig,
   const T extends BaseHTMLTagConfig,
 >(
   supportedKeywords: Keywords,

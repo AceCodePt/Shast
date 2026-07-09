@@ -1,4 +1,4 @@
-import type { DSLValidate } from "@/dsl/index.ts";
+import type { DSLValidate, SupportedKeywordsConfig } from "@/dsl/index.ts";
 import type {
   BaseCSSSyntaxConfig,
   InferCSSSyntax,
@@ -15,7 +15,7 @@ export type BaseCSSPropertiesConfig = Record<
 >;
 
 export type ValidateCSSPropertiesConfig<
-  Keywords extends Record<string, any>,
+  Keywords extends SupportedKeywordsConfig,
   S extends BaseCSSSyntaxConfig,
   P extends BaseCSSPropertiesConfig,
 > = {
