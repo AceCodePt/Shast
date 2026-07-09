@@ -31,7 +31,7 @@ export const CSS_GLOBAL_PROPERTIES = cssPropertiesConfig(
   },
 );
 
-const { createComponent } = engine({
+const { createComponent, renderComponent } = engine({
   supportedKeywords: SUPPORTED_KEYWORDS,
   htmlAttributesConfig: HTML_GLOBAL_ATTRIBUTES_CONFIG,
   htmlTagConfig: HTML_TAGS_CONFIG,
@@ -41,14 +41,47 @@ const { createComponent } = engine({
   cssPropertiesConfig: CSS_GLOBAL_PROPERTIES,
 });
 
-createComponent({
+const card = createComponent({
   tag: "a",
+  attributes: { href: "" },
+  innerHTML: {
+    someImage: {
+      tag: "img",
+      attributes: {
+        alt: "",
+        src: "",
+      },
+    },
+    content: {
+      tag: "div",
+      innerHTML: {
+        title: {
+          tag: "h1",
+          innerHTML: "someTitle",
+        },
+        subtitle: {
+          tag: "h3",
+          innerHTML: "subtitle",
+        },
+      },
+    },
+  },
   css: {
-    width: "100px",
+    width: "100%",
+    ":link": {},
+    "> content": {
+      "> title": {
+        color: "transparent",
+        ":hover": {
+          color: "currentColor",
+        },
+      },
+    },
   },
 });
 
-// const card =
+console.log(renderComponent(card));
+
 createComponent({
   tag: "a",
   attributes: { dir: "ltr", href: "" },
