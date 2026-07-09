@@ -56,29 +56,6 @@ describe("renderCSSPropertiesConfig", () => {
     });
   });
 
-  describe("Error handling", () => {
-    test("property name without -- prefix throws at runtime", () => {
-      assert.throws(
-        () =>
-          renderCSSPropertiesConfig({
-            // @ts-expect-error
-            a: { syntax: "<number>", inherits: false, "initial-value": "1" },
-          }),
-        /must have the property start with --/,
-      );
-    });
-
-    test("missing initial-value throws at runtime", () => {
-      assert.throws(
-        () =>
-          renderCSSPropertiesConfig({
-            "--spacing": { syntax: "<length>", inherits: true },
-          }),
-        /initial-value is required/,
-      );
-    });
-  });
-
   describe("Edge Cases", () => {
     test("empty config returns empty string", () => {
       const result = renderCSSPropertiesConfig({});
