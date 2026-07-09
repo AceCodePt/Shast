@@ -626,22 +626,22 @@ describe("Template literal with pipe - `${ }`", () => {
   });
 });
 
-describe("Recursive DSL - '<length>' as `${number}{'%' | 'px'}` ", () => {
+describe("Recursive DSL - '<length>' as `${number}${'%' | 'px'}` ", () => {
   test("Type Inference", () => {
     assertType<
       Equal<
         DSLInfer<
-          SupportedKeywords & { "<length>": "`${number}{'%' | 'px'}`" },
+          SupportedKeywords & { "<length>": "`${number}${'%' | 'px'}`" },
           "<length>"
         >,
-        `${number}{'%' | 'px'}`
+        `${number}%` | `${number}px`
       >
     >();
   });
   test("Runtime Validation", () => {
     dslString(
       Object.assign({}, SUPPORTED_KEYWORDS, {
-        "<length>": "`${number}{'%' | 'px'}`",
+        "<length>": "`${number}${'%' | 'px'}`",
       }),
       "<length>",
     );
@@ -650,7 +650,7 @@ describe("Recursive DSL - '<length>' as `${number}{'%' | 'px'}` ", () => {
     assert.strictEqual(
       parseValueAgainstDSL(
         Object.assign({}, SUPPORTED_KEYWORDS, {
-          "<length>": "`${number}{'%' | 'px'}`",
+          "<length>": "`${number}${'%' | 'px'}`",
         }),
         "<length>",
         "1%",
@@ -703,6 +703,29 @@ describe("Error handling", () => {
       assert.throws(() =>
         // @ts-expect-error
         parseValueAgainstDSL(SUPPORTED_KEYWORDS, "boolean", ""),
+      );
+    });
+  });
+
+  describe("literal/template value mismatches", () => {
+    test("string-literal union throws for a non-member value", () => {
+      assert.throws(() =>
+        // @ts-expect-error
+        parseValueAgainstDSL(SUPPORTED_KEYWORDS, "'foo' | 'bar'", "baz"),
+      );
+    });
+
+    test("double-quoted literal throws for a non-member value", () => {
+      assert.throws(() =>
+        // @ts-expect-error
+        parseValueAgainstDSL(SUPPORTED_KEYWORDS, '"foo"', "baz"),
+      );
+    });
+
+    test("template literal throws for a non-matching value", () => {
+      assert.throws(() =>
+        // @ts-expect-error
+        parseValueAgainstDSL(SUPPORTED_KEYWORDS, "`a`", "zzz"),
       );
     });
   });
