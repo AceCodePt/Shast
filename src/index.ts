@@ -7,7 +7,7 @@ import {
   HTML_TAGS_CONFIG,
 } from "./consts.ts";
 import { SUPPORTED_KEYWORDS } from "./dsl/index.ts";
-import engine from "./engine.ts";
+import engine from "./engine/index.ts";
 
 export const CSS_GLOBAL_PROPERTIES = cssPropertiesConfig(
   SUPPORTED_KEYWORDS,
