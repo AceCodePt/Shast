@@ -293,6 +293,122 @@ function splitOutsideQuotes(dslString: string) {
   return parts;
 }
 
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function dslTokenToRegExp(token: string): string | null {
+  const trimmed = token.trim();
+  if (trimmed === "string") return ".*";
+  if (trimmed === "number") return "\\d+(?:\\.\\d+)?";
+  if (trimmed === "bigint") return "\\d+";
+  if (trimmed === "boolean") return "(?:true|false)";
+  if (trimmed === "true") return "true";
+  if (trimmed === "false") return "false";
+  if (trimmed === "undefined") return "undefined";
+  if (
+    (trimmed.startsWith("'") && trimmed.endsWith("'")) ||
+    (trimmed.startsWith('"') && trimmed.endsWith('"'))
+  ) {
+    return escapeRegExp(trimmed.slice(1, -1));
+  }
+  if (trimmed !== "" && !Number.isNaN(+trimmed)) return escapeRegExp(trimmed);
+  return null;
+}
+
+function interpolationToRegExp(content: string): string | null {
+  const alternatives: string[] = [];
+  for (const token of splitOutsideQuotes(content)) {
+    const regExp = dslTokenToRegExp(token);
+    if (regExp === null) return null;
+    alternatives.push(regExp);
+  }
+  return alternatives.length > 0 ? `(?:${alternatives.join("|")})` : null;
+}
+
+function templateLiteralToRegExp(template: string): RegExp | null {
+  let pattern = "^";
+  let index = 0;
+
+  while (index < template.length) {
+    if (template.charAt(index) === "$" && template.charAt(index + 1) === "{") {
+      const end = template.indexOf("}", index + 2);
+      if (end === -1) return null;
+      const replacement = interpolationToRegExp(template.slice(index + 2, end));
+      if (replacement === null) return null;
+      pattern += replacement;
+      index = end + 1;
+    } else {
+      pattern += escapeRegExp(template.charAt(index));
+      index += 1;
+    }
+  }
+
+  return new RegExp(`${pattern}$`);
+}
+
+function matchValueAgainstPart(
+  part: string,
+  supportedKeywords: SupportedKeywordsConfig,
+  checkAgainst: unknown,
+): boolean {
+  // Token reference / nested DSL: a keyword whose value is a non-empty DSL string
+  if (
+    part in supportedKeywords &&
+    typeof supportedKeywords[part] === "string" &&
+    supportedKeywords[part] !== ""
+  ) {
+    try {
+      parseValueAgainstDSL(
+        supportedKeywords,
+        supportedKeywords[part],
+        checkAgainst as never,
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Primitive keyword (string/number/bigint/boolean/undefined): match by typeof
+  if (
+    part in supportedKeywords &&
+    typeof checkAgainst === typeof supportedKeywords[part]
+  ) {
+    return true;
+  }
+
+  // Literal keyword such as true/false
+  if (
+    part in supportedKeywords &&
+    `${checkAgainst}` === part &&
+    checkAgainst === supportedKeywords[part]
+  ) {
+    return true;
+  }
+
+  // Numeric literal
+  if (part !== "" && !Number.isNaN(+part) && +part === checkAgainst) {
+    return true;
+  }
+
+  // String literal: 'value' or "value"
+  if (
+    (part.startsWith("'") && part.endsWith("'")) ||
+    (part.startsWith('"') && part.endsWith('"'))
+  ) {
+    return checkAgainst === part.slice(1, -1);
+  }
+
+  // Template literal: compile to a regex and match the stringified value
+  if (part.startsWith("`") && part.endsWith("`")) {
+    const regExp = templateLiteralToRegExp(part.slice(1, -1));
+    return regExp !== null && regExp.test(String(checkAgainst));
+  }
+
+  return false;
+}
+
 export function parseValueAgainstDSL<
   const Keywords extends SupportedKeywordsConfig,
   const DSL extends DSLString,
@@ -302,29 +418,16 @@ export function parseValueAgainstDSL<
   checkAgainst: DSLInfer<Keywords, DSL>, // 'true'
 ): DSLInfer<Keywords, DSL> {
   // Validate the DSL string itself first (mirrors dslString() runtime check)
-  const rawParts = splitOutsideQuotes(dslString).map((p) => p.trim());
-  if (rawParts.length === 0 || (rawParts.length === 1 && rawParts[0] === "")) {
+  const parts = splitOutsideQuotes(dslString).map((p) => p.trim());
+  if (parts.length === 0 || (parts.length === 1 && parts[0] === "")) {
     throw new Error(`Invalid DSL string: "${dslString}"`);
   }
-  for (const part of rawParts) {
+  for (const part of parts) {
     validateDSLPart(part, supportedKeywords, dslString);
   }
 
-  const parts = rawParts;
-
-  const matches = parts.some(
-    (part) =>
-      // This checkes the actual typeof
-      (part in supportedKeywords &&
-        typeof checkAgainst === typeof supportedKeywords[part]) ||
-      // This for literals like true, false
-      (`${checkAgainst}` === part &&
-        part in supportedKeywords &&
-        checkAgainst === supportedKeywords[part]) ||
-      // This is for numbers
-      (!Number.isNaN(+part) && +part === checkAgainst) ||
-      // This is for string / backticks / whatever
-      /^(('[^']*'))$|^(("[^"]*"))$|^((`[^`]*`))$/.test(part),
+  const matches = parts.some((part) =>
+    matchValueAgainstPart(part, supportedKeywords, checkAgainst),
   );
 
   if (!matches) {
