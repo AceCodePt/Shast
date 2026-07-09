@@ -3,7 +3,7 @@ import type {
   BaseCSSAttributesConfig,
   ValidateCSSAttributesConfig,
 } from "./types.ts";
-import type { BaseCSSSyntaxConfig } from "../syntax-config/types.ts";
+import type { BaseCSSSyntaxConfig } from "@/css/syntax-config/types.ts";
 
 export const cssAttributeConfig = <
   const Keywords extends SupportedKeywordsConfig,

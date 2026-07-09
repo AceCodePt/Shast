@@ -1,6 +1,6 @@
 import test, { describe } from "node:test";
 import assert from "node:assert";
-import { renderCSSPropertiesConfig } from "@/render/properties-config.ts";
+import { renderCSSPropertiesConfig } from "@/engine/render/properties-config.ts";
 
 describe("renderCSSPropertiesConfig", () => {
   describe("Custom property rendering", () => {

@@ -1,5 +1,5 @@
 import { SUPPORTED_KEYWORDS } from "@/dsl/index.ts";
-import { cssSyntaxConfig } from "../index.ts";
+import { cssSyntaxConfig } from "@/css/syntax-config/index.ts";
 
 export default cssSyntaxConfig(SUPPORTED_KEYWORDS, {
   // ── Numeric / dimension types ──────────────────────────────────────────────

@@ -1,8 +1,8 @@
 import test, { describe } from "node:test";
 import assert from "node:assert";
-import { renderComponent } from "@/render/render-component.ts";
+import { renderComponent } from "@/engine/render/render-component.ts";
 import type { BaseHTMLTagConfig } from "@/html/tag-config/types.ts";
-import type { BaseComponentStructure } from "@/create-component.ts";
+import type { BaseComponentStructure } from "@/engine/create-component.ts";
 
 const tagConfig: BaseHTMLTagConfig = {
   a: { attributes: {}, innerHTML: "*", cssPseudoClass: [":hover"] },

@@ -1,21 +1,21 @@
 import type {
   BaseCSSAttributesConfig,
   InferCSSAttributesConfig,
-} from "./css/attribute-config/types.ts";
-import type { BaseCSSPropertiesConfig } from "./css/properties-config/types.ts";
-import type { BaseCSSPseudoClassConfig } from "./css/pseudo-class-config/types.ts";
-import type { BaseCSSSyntaxConfig } from "./css/syntax-config/types.ts";
+} from "@/css/attribute-config/types.ts";
+import type { BaseCSSPropertiesConfig } from "@/css/properties-config/types.ts";
+import type { BaseCSSPseudoClassConfig } from "@/css/pseudo-class-config/types.ts";
+import type { BaseCSSSyntaxConfig } from "@/css/syntax-config/types.ts";
 import {
   parseValueAgainstDSL,
   type DSLInfer,
   type SupportedKeywordsConfig,
-} from "./dsl/index.ts";
+} from "@/dsl/index.ts";
 import type {
   BaseHTMLAttributesConfig,
   InferHTMLAttributesConfig,
-} from "./html/attribute-config/types.ts";
-import type { BaseHTMLTagConfig } from "./html/tag-config/types.ts";
-import type { MakeUndefinedOptional } from "./types.ts";
+} from "@/html/attribute-config/types.ts";
+import type { BaseHTMLTagConfig } from "@/html/tag-config/types.ts";
+import type { MakeUndefinedOptional } from "@/types.ts";
 
 type BaseComponentInnerHTMLStructure =
   | string

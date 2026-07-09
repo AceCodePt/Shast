@@ -6,28 +6,28 @@ import {
 import type {
   BaseCSSAttributesConfig,
   ValidateCSSAttributesConfig,
-} from "./css/attribute-config/types.ts";
+} from "@/css/attribute-config/types.ts";
 import type {
   BaseCSSPropertiesConfig,
   ValidateCSSPropertiesConfig,
-} from "./css/properties-config/types.ts";
-import type { BaseCSSPseudoClassConfig } from "./css/pseudo-class-config/types.ts";
-import type { SupportedKeywordsConfig } from "./dsl/index.ts";
+} from "@/css/properties-config/types.ts";
+import type { BaseCSSPseudoClassConfig } from "@/css/pseudo-class-config/types.ts";
+import type { SupportedKeywordsConfig } from "@/dsl/index.ts";
 import type {
   BaseCSSSyntaxConfig,
   ValidateCSSSyntaxConfig,
-} from "./css/syntax-config/types.ts";
+} from "@/css/syntax-config/types.ts";
 
 import type {
   BaseHTMLAttributesConfig,
   ValidateHTMLAttributesConfig,
-} from "./html/attribute-config/types.ts";
+} from "@/html/attribute-config/types.ts";
 import type {
   BaseHTMLTagConfig,
   ValidateHTMLTagConfig,
-} from "./html/tag-config/types.ts";
-import { renderCSSPropertiesConfig } from "./render/properties-config.ts";
-import { renderComponent } from "./render/render-component.ts";
+} from "@/html/tag-config/types.ts";
+import { renderCSSPropertiesConfig } from "@/engine/render/properties-config.ts";
+import { renderComponent } from "@/engine/render/render-component.ts";
 
 export default function engine<
   const SupportedKeywords extends SupportedKeywordsConfig,

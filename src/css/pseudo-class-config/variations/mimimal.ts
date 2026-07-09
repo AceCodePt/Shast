@@ -1,4 +1,4 @@
-import { cssPseudoClassConfig } from "../index.ts";
+import { cssPseudoClassConfig } from "@/css/pseudo-class-config/index.ts";
 
 export default cssPseudoClassConfig([
   ":hover",
@@ -11,4 +11,3 @@ export default cssPseudoClassConfig([
   // ":is()",
   // ":empty",
 ]);
-

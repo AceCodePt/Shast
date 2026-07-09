@@ -1,5 +1,5 @@
 import { SUPPORTED_KEYWORDS } from "@/dsl/index.ts";
-import { htmlAttributeConfig } from "../index.ts";
+import { htmlAttributeConfig } from "@/html/attribute-config/index.ts";
 
 export default htmlAttributeConfig(SUPPORTED_KEYWORDS, {
   // ─── Core / Identity ───────────────────────────────────────────────

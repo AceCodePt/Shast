@@ -1,12 +1,12 @@
 import { test, describe } from "node:test";
 import assert from "node:assert";
-import { cssSyntaxConfig } from "../src/css/syntax-config/index.ts";
-import { cssAttributeConfig } from "../src/css/attribute-config/index.ts";
-import { cssPropertiesConfig } from "../src/css/properties-config/index.ts";
-import { createComponent } from "../src/create-component.ts";
-import { htmlAttributeConfig } from "../src/html/attribute-config/index.ts";
-import { htmlTagConfig } from "../src/html/tag-config/index.ts";
-import { SUPPORTED_KEYWORDS } from "../src/dsl/index.ts";
+import { cssSyntaxConfig } from "@/css/syntax-config/index.ts";
+import { cssAttributeConfig } from "@/css/attribute-config/index.ts";
+import { cssPropertiesConfig } from "@/css/properties-config/index.ts";
+import { createComponent } from "@/engine/create-component.ts";
+import { htmlAttributeConfig } from "@/html/attribute-config/index.ts";
+import { htmlTagConfig } from "@/html/tag-config/index.ts";
+import { SUPPORTED_KEYWORDS } from "@/dsl/index.ts";
 
 const EMPTY_PSEUDO_CLASSES = [] as const;
 

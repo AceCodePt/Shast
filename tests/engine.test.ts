@@ -1,15 +1,13 @@
 import test, { describe } from "node:test";
 import assert from "node:assert";
-import engine from "@/engine.ts";
-import { renderComponent } from "@/render/render-component.ts";
+import engine from "@/engine/index.ts";
+import { renderComponent } from "@/engine/render/render-component.ts";
 import { cssPropertiesConfig } from "@/css/properties-config/index.ts";
-import {
-  CSS_ATTRIBUTES_CONFIG,
-  CSS_GLOBAL_PSEUDO_CLASSES_CONFIG,
-  CSS_SYNTAX_CONFIG,
-  HTML_GLOBAL_ATTRIBUTES_CONFIG,
-  HTML_TAGS_CONFIG,
-} from "@/consts.ts";
+import HTML_GLOBAL_ATTRIBUTES_CONFIG from "@/html/attribute-config/variations/common.ts";
+import HTML_TAGS_CONFIG from "@/html/tag-config/variations/common.ts";
+import CSS_SYNTAX_CONFIG from "@/css/syntax-config/variations/common.ts";
+import CSS_ATTRIBUTES_CONFIG from "@/css/attribute-config/variations/common.ts";
+import CSS_GLOBAL_PSEUDO_CLASSES_CONFIG from "@/css/pseudo-class-config/variations/common.ts";
 import { SUPPORTED_KEYWORDS } from "@/dsl/index.ts";
 
 const CSS_GLOBAL_PROPERTIES = cssPropertiesConfig(
@@ -24,7 +22,11 @@ const CSS_GLOBAL_PROPERTIES = cssPropertiesConfig(
   },
 );
 
-const { createComponent, renderComponent: renderBound, cssProperties } = engine({
+const {
+  createComponent,
+  renderComponent: renderBound,
+  cssProperties,
+} = engine({
   supportedKeywords: SUPPORTED_KEYWORDS,
   htmlAttributesConfig: HTML_GLOBAL_ATTRIBUTES_CONFIG,
   htmlTagConfig: HTML_TAGS_CONFIG,

@@ -3,7 +3,7 @@ import type {
   DSLValidate,
   SupportedKeywordsConfig,
 } from "@/dsl/index.ts";
-import type { BaseCSSSyntaxConfig } from "../syntax-config/types.ts";
+import type { BaseCSSSyntaxConfig } from "@/css/syntax-config/types.ts";
 
 export type BaseCSSAttributeValue = string;
 export type BaseCSSAttributesConfig = Record<string, BaseCSSAttributeValue>;

@@ -1,13 +1,11 @@
-import { cssPropertiesConfig } from "./css/properties-config/index.ts";
-import {
-  CSS_ATTRIBUTES_CONFIG,
-  CSS_GLOBAL_PSEUDO_CLASSES_CONFIG,
-  CSS_SYNTAX_CONFIG,
-  HTML_GLOBAL_ATTRIBUTES_CONFIG,
-  HTML_TAGS_CONFIG,
-} from "./consts.ts";
-import { SUPPORTED_KEYWORDS } from "./dsl/index.ts";
-import engine from "./engine/index.ts";
+import { cssPropertiesConfig } from "@/css/properties-config/index.ts";
+import HTML_GLOBAL_ATTRIBUTES_CONFIG from "@/html/attribute-config/variations/common.ts";
+import HTML_TAGS_CONFIG from "@/html/tag-config/variations/common.ts";
+import CSS_SYNTAX_CONFIG from "@/css/syntax-config/variations/common.ts";
+import CSS_ATTRIBUTES_CONFIG from "@/css/attribute-config/variations/common.ts";
+import CSS_GLOBAL_PSEUDO_CLASSES_CONFIG from "@/css/pseudo-class-config/variations/common.ts";
+import { SUPPORTED_KEYWORDS } from "@/dsl/index.ts";
+import engine from "@/engine/index.ts";
 
 export const CSS_GLOBAL_PROPERTIES = cssPropertiesConfig(
   SUPPORTED_KEYWORDS,

@@ -1,5 +1,5 @@
 import { SUPPORTED_KEYWORDS } from "@/dsl/index.ts";
-import { htmlTagConfig } from "../index.ts";
+import { htmlTagConfig } from "@/html/tag-config/index.ts";
 
 export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   a: {

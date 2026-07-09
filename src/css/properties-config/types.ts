@@ -2,7 +2,7 @@ import type { DSLValidate, SupportedKeywordsConfig } from "@/dsl/index.ts";
 import type {
   BaseCSSSyntaxConfig,
   InferCSSSyntax,
-} from "../syntax-config/types.ts";
+} from "@/css/syntax-config/types.ts";
 
 export type BaseCSSPropertyValue = {
   syntax?: string | undefined;

@@ -1,5 +1,5 @@
-import { cssAttributeConfig } from "../index.ts";
-import fullCSSSyntax from "../../syntax-config/variations/full.ts";
+import { cssAttributeConfig } from "@/css/attribute-config/index.ts";
+import fullCSSSyntax from "@/css/syntax-config/variations/full.ts";
 import { SUPPORTED_KEYWORDS } from "@/dsl/index.ts";
 
 export default cssAttributeConfig(SUPPORTED_KEYWORDS, fullCSSSyntax, {

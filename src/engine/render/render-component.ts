@@ -1,5 +1,5 @@
-import type { BaseComponentStructure } from "../create-component.ts";
-import type { BaseHTMLTagConfig } from "../html/tag-config/types.ts";
+import type { BaseComponentStructure } from "@/engine/create-component.ts";
+import type { BaseHTMLTagConfig } from "@/html/tag-config/types.ts";
 
 const INDENT_UNIT = "  ";
 

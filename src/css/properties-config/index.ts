@@ -3,7 +3,7 @@ import {
   parseValueAgainstDSL,
   type SupportedKeywordsConfig,
 } from "@/dsl/index.ts";
-import type { BaseCSSSyntaxConfig } from "../syntax-config/types.ts";
+import type { BaseCSSSyntaxConfig } from "@/css/syntax-config/types.ts";
 import type {
   BaseCSSPropertiesConfig,
   ValidateCSSPropertiesConfig,
@@ -32,9 +32,7 @@ export const cssPropertiesConfig = <
       dslString(mergedConfig, entry.syntax);
 
       if (entry["initial-value"] === undefined) {
-        throw new Error(
-          `initial-value is required for property "${key}"`,
-        );
+        throw new Error(`initial-value is required for property "${key}"`);
       }
 
       parseValueAgainstDSL(mergedConfig, entry.syntax, entry["initial-value"]);

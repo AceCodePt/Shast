@@ -3,7 +3,7 @@ import type { Keyof } from "@/types.ts";
 import type {
   BaseHTMLAttributesConfig,
   ValidateHTMLAttributesConfig,
-} from "../attribute-config/types.ts";
+} from "@/html/attribute-config/types.ts";
 
 type BaseInnerHTMLTagConfig<PossibleTags extends string> =
   | "*"
