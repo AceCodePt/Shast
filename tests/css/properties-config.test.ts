@@ -206,7 +206,7 @@ describe("cssPropertiesConfig", () => {
               "initial-value": "invalid",
             },
           }),
-        /does not match syntax/,
+        /does not match/,
       );
     });
 
@@ -221,7 +221,7 @@ describe("cssPropertiesConfig", () => {
               "initial-value": "invalid-color",
             },
           }),
-        /does not match syntax/,
+        /does not match/,
       );
     });
   });
@@ -276,6 +276,45 @@ describe("cssPropertiesConfig", () => {
           "initial-value": "1",
         },
       });
+    });
+  });
+
+  describe("DSL composite template patterns", () => {
+    const COLOR_SYNTAX = {
+      "<color>":
+        "`#${string}` | `hsl(${number} ${number}% ${number}%)` | 'transparent' | 'currentColor'",
+    } as const;
+
+    test("accepts a valid hsl() value for <color> syntax", () => {
+      const config = cssPropertiesConfig(SUPPORTED_KEYWORDS, COLOR_SYNTAX, {
+        "--background-color": {
+          syntax: "<color>",
+          inherits: false,
+          "initial-value": "hsl(1 1% 1%)",
+        },
+      });
+      assert.deepStrictEqual(config, {
+        "--background-color": {
+          syntax: "<color>",
+          inherits: false,
+          "initial-value": "hsl(1 1% 1%)",
+        },
+      });
+    });
+
+    test("rejects an invalid hsl() value for <color> syntax", () => {
+      assert.throws(
+        () =>
+          cssPropertiesConfig(SUPPORTED_KEYWORDS, COLOR_SYNTAX, {
+            "--background-color": {
+              syntax: "<color>",
+              inherits: false,
+              // @ts-expect-error - not a valid hsl() value
+              "initial-value": "hsl(nope)",
+            },
+          }),
+        /does not match/,
+      );
     });
   });
 });
