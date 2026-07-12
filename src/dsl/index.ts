@@ -25,8 +25,6 @@ export interface SupportedKeywordsConfig {
   [attribute: string]: any;
 }
 
-export type DSLString = string;
-
 // Small note: the never for R is critical
 // See example: dslString("string |") and auto complete after the pipe
 type PipeWhenExists<
@@ -85,7 +83,7 @@ type DSLStringDelimiter<
 
 export type DSLValidate<
   Keywords extends SupportedKeywordsConfig,
-  T extends DSLString,
+  T extends string,
 > = [T] extends [never]
   ? string
   : Trim<T> extends `"${string}"${string}`
@@ -124,7 +122,7 @@ type SingleDSLInfer<
 
 export type DSLInfer<
   Keywords extends SupportedKeywordsConfig,
-  Text extends DSLString,
+  Text extends string,
 > = [Text] extends [never]
   ? string
   : string extends Text
@@ -181,7 +179,7 @@ function validateDSLPart(
 
 export function dslString<
   const Keywords extends SupportedKeywordsConfig,
-  const DSL extends DSLString,
+  const DSL extends string,
 >(supportedKeywords: Keywords, dslString: DSLValidate<Keywords, DSL>) {
   const parts = splitOutsideQuotes(dslString).map((p) => p.trim());
 
@@ -414,7 +412,7 @@ function matchValueAgainstPart(
 
 export function parseValueAgainstDSL<
   const Keywords extends SupportedKeywordsConfig,
-  const DSL extends DSLString,
+  const DSL extends string,
 >(
   supportedKeywords: Keywords, // { boolean: true, number: 0, true: true }
   dslString: DSLValidate<Keywords, DSL>, // 'true'

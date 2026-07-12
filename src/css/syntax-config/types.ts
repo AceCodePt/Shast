@@ -1,11 +1,10 @@
 import type {
   DSLInfer,
-  DSLString,
   DSLValidate,
   SupportedKeywordsConfig,
 } from "@/dsl/index.ts";
 
-export type BaseCSSSyntaxConfig = Record<`<${string}>`, DSLString>;
+export type BaseCSSSyntaxConfig = Record<`<${string}>`, string>;
 
 export type ValidateCSSSyntaxConfig<
   Keywords extends SupportedKeywordsConfig,
