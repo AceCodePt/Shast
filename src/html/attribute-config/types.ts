@@ -4,8 +4,9 @@ import type {
   SupportedKeywordsConfig,
 } from "@/dsl/index.ts";
 
-export type BaseHTMLAttributeValue = string;
-export type BaseHTMLAttributesConfig = Record<string, BaseHTMLAttributeValue>;
+export interface BaseHTMLAttributesConfig {
+  [attribute: string]: string;
+}
 
 export type ValidateHTMLAttributesConfig<
   Keywords extends SupportedKeywordsConfig,
