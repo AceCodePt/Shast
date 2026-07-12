@@ -1,11 +1,5 @@
 import type { Trim } from "@/types.ts";
 
-// [ ] - Discuss: When should the code throw on invalid DSLString
-// [ ] - Prevent meaningless end pipe "string |"
-// [ ] - Prevent misuse of spaces "string|number" or "   string   "
-// [ ] - TODO: the type infer should receive the supported keywords as a <SK ext...>
-// [ ] - TODO: some tests allow "'|\''" weird case to exists (LOW Priority)
-
 const SUPPORTED_PRIMITIVES = {
   string: "" as string,
   number: 0 as number,
@@ -27,7 +21,9 @@ export const SUPPORTED_KEYWORDS = Object.assign(
 
 export type SupportedKeywords = typeof SUPPORTED_KEYWORDS;
 
-export type SupportedKeywordsConfig = Record<string, any>;
+export interface SupportedKeywordsConfig {
+  [attribute: string]: any;
+}
 
 export type DSLString = string;
 
@@ -157,14 +153,23 @@ function validateDSLPart(
   const isQuotedString = /^'[^']*'$|^"[^"]*"$|^`[^`]*`$/.test(part);
   const isTemplateLiteral = /^`.*`$/.test(part);
 
-  if (!isKeyword && !isNumericLiteral && !isQuotedString && !isTemplateLiteral) {
+  if (
+    !isKeyword &&
+    !isNumericLiteral &&
+    !isQuotedString &&
+    !isTemplateLiteral
+  ) {
     throw new Error(`Invalid DSL string: "${fullDSL}"`);
   }
 
   if (isTemplateLiteral && /\$\{/.test(part)) {
     const content = part.slice(1, -1);
     const interpolationRegex = /\$\{(.+?)\}/g;
-    for (let match = interpolationRegex.exec(content); match; match = interpolationRegex.exec(content)) {
+    for (
+      let match = interpolationRegex.exec(content);
+      match;
+      match = interpolationRegex.exec(content)
+    ) {
       const innerDSL = match[1]!;
       const innerParts = splitOutsideQuotes(innerDSL).map((p) => p.trim());
       for (const innerPart of innerParts) {
@@ -214,9 +219,7 @@ export function extractTokenReferences(dsl: string): string[] {
   return tokens;
 }
 
-export function detectCircularReferences(
-  config: Record<string, string>,
-): void {
+export function detectCircularReferences(config: Record<string, string>): void {
   for (const key in config) {
     const refs = extractTokenReferences(config[key]!);
     if (refs.includes(key)) {
