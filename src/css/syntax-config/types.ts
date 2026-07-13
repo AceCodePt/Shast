@@ -4,7 +4,9 @@ import type {
   SupportedKeywordsConfig,
 } from "@/dsl/index.ts";
 
-export type BaseCSSSyntaxConfig = Record<`<${string}>`, string>;
+export interface BaseCSSSyntaxConfig {
+  [attribute: `<${string}>`]: string;
+}
 
 export type ValidateCSSSyntaxConfig<
   Keywords extends SupportedKeywordsConfig,

@@ -9,7 +9,7 @@ type BaseInnerHTMLTagConfig<PossibleTags extends string> =
   | "*"
   | (PossibleTags | "#text")[];
 
-export type BaseHTMLTagConfig = {
+export interface BaseHTMLTagConfig {
   [tag: string]: {
     attributes?: BaseHTMLAttributesConfig | undefined;
     innerHTML?: BaseInnerHTMLTagConfig<string> | undefined;
@@ -17,7 +17,7 @@ export type BaseHTMLTagConfig = {
     cssPseudoElement?: string[] | undefined;
     [rest: string]: unknown;
   };
-};
+}
 
 export type ValidateHTMLTagConfig<
   Keywords extends SupportedKeywordsConfig,

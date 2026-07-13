@@ -4,15 +4,13 @@ import type {
   InferCSSSyntax,
 } from "@/css/syntax-config/types.ts";
 
-export type BaseCSSPropertyValue = {
-  syntax?: string | undefined;
-  inherits?: boolean | undefined;
-  "initial-value"?: string | undefined;
-};
-export type BaseCSSPropertiesConfig = Record<
-  `--${string}`,
-  BaseCSSPropertyValue
->;
+export interface BaseCSSPropertiesConfig {
+  [attribute: `--${string}`]: {
+    syntax?: string | undefined;
+    inherits?: boolean | undefined;
+    "initial-value"?: string | undefined;
+  };
+}
 
 export type ValidateCSSPropertiesConfig<
   Keywords extends SupportedKeywordsConfig,
