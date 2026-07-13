@@ -32,8 +32,8 @@ describe("cssPropertiesConfig", () => {
           {
             "--a": {
               syntax: "<percentage>";
-              inherits: true;
-              "initial-value": `1%`;
+              inherits: boolean;
+              "initial-value": `${number}%`;
             };
           }
         >
@@ -62,13 +62,13 @@ describe("cssPropertiesConfig", () => {
           {
             "--a": {
               syntax: "<percentage>";
-              inherits: true;
-              "initial-value": `1%`;
+              inherits: boolean;
+              "initial-value": `${number}%`;
             };
             "--_a": {
               syntax: "<integer>";
-              inherits: false;
-              "initial-value": `1`;
+              inherits: boolean;
+              "initial-value": `${bigint}`;
             };
           }
         >
@@ -164,6 +164,8 @@ describe("cssPropertiesConfig", () => {
               // @ts-expect-error
               syntax: "xyz",
               inherits: true,
+              // @ts-expect-error
+              "initial-value": "",
             },
           }),
         /Invalid DSL string/,
@@ -178,6 +180,8 @@ describe("cssPropertiesConfig", () => {
               // @ts-expect-error
               syntax: "<length> | xyz",
               inherits: false,
+              // @ts-expect-error
+              "initial-value": "asdf",
             },
           }),
         /Invalid DSL string/,

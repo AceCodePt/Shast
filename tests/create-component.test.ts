@@ -995,6 +995,7 @@ describe("validateComponent & createComponent", () => {
       createComponent(
         SUPPORTED_KEYWORDS,
         MOCK_SHARED_ATTRIBUTES,
+        // @ts-expect-error
         NO_PSEUDO_TAG_CONFIG,
         MOCK_CSS_SYNTAX,
         PSEUDO_CSS_ATTRIBUTES,
@@ -1004,7 +1005,6 @@ describe("validateComponent & createComponent", () => {
           tag: "widget",
           innerHTML: "text",
           css: {
-            // @ts-expect-error
             ":hover": { color: "red" },
           },
         },
@@ -1259,6 +1259,7 @@ describe("validateComponent & createComponent", () => {
       createComponent(
         SUPPORTED_KEYWORDS,
         MOCK_SHARED_ATTRIBUTES,
+        // @ts-expect-error
         NO_PE_TAG_CONFIG,
         MOCK_CSS_SYNTAX,
         PE_CSS_ATTRIBUTES,
@@ -1268,7 +1269,6 @@ describe("validateComponent & createComponent", () => {
           tag: "plain",
           innerHTML: "x",
           css: {
-            // @ts-expect-error
             "::placeholder": { color: "red" },
           },
         },

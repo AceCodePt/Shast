@@ -5,11 +5,36 @@ import type { BaseHTMLTagConfig } from "@/html/tag-config/types.ts";
 import type { BaseComponentStructure } from "@/engine/create-component.ts";
 
 const tagConfig: BaseHTMLTagConfig = {
-  a: { attributes: {}, innerHTML: "*", cssPseudoClass: [":hover"] },
-  div: { attributes: {}, innerHTML: "*", cssPseudoElement: ["::before"] },
-  span: { attributes: {}, innerHTML: "*" },
-  h1: { attributes: {}, innerHTML: ["#text"] },
-  img: { attributes: {}, innerHTML: [] },
+  a: {
+    attributes: {},
+    innerHTML: "*",
+    cssPseudoClass: [":hover"],
+    cssPseudoElement: [],
+  },
+  div: {
+    attributes: {},
+    innerHTML: "*",
+    cssPseudoElement: ["::before"],
+    cssPseudoClass: [],
+  },
+  span: {
+    attributes: {},
+    innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  h1: {
+    attributes: {},
+    innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  img: {
+    attributes: {},
+    innerHTML: [],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
 };
 
 function render(node: BaseComponentStructure) {

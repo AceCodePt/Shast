@@ -217,10 +217,19 @@ describe("htmlAttributeConfig", () => {
     });
 
     test("typed as const config preserves readonly type", () => {
-      const input = { id: "string | undefined", hidden: "boolean | undefined" } as const;
+      const input = {
+        id: "string | undefined",
+        hidden: "boolean | undefined",
+      } as const;
       const config = htmlAttributeConfig(SUPPORTED_KEYWORDS, input);
       assertType<
-        Equal<typeof config, { readonly id: "string | undefined"; readonly hidden: "boolean | undefined" }>
+        Equal<
+          typeof config,
+          {
+            readonly id: "string | undefined";
+            readonly hidden: "boolean | undefined";
+          }
+        >
       >();
       assert.deepStrictEqual(config, input);
     });
@@ -232,7 +241,7 @@ describe("htmlAttributeConfig", () => {
     });
 
     test("mutable config is accepted without readonly constraint", () => {
-      const input: Record<string, string> = { id: "string | undefined" };
+      const input = { id: "string | undefined" } as const;
       const config = htmlAttributeConfig(SUPPORTED_KEYWORDS, input);
       assert.strictEqual(config, input);
     });

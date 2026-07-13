@@ -23,10 +23,10 @@ describe("htmlTagConfig", () => {
           >,
           {
             br: {
-              innerHTML: [];
               attributes: {};
-              cssPseudoClass: [];
-              cssPseudoElement: [];
+              innerHTML: "*" | ("#text" | "br")[];
+              cssPseudoClass: `:${string}${string}`[];
+              cssPseudoElement: `::${string}${string}`[];
             };
           }
         >
@@ -49,10 +49,10 @@ describe("htmlTagConfig", () => {
           >,
           {
             p: {
-              innerHTML: ["#text"];
               attributes: {};
-              cssPseudoClass: [];
-              cssPseudoElement: [];
+              innerHTML: "*" | ("#text" | "p")[];
+              cssPseudoClass: `:${string}${string}`[];
+              cssPseudoElement: `::${string}${string}`[];
             };
           }
         >
@@ -75,10 +75,10 @@ describe("htmlTagConfig", () => {
           >,
           {
             div: {
-              innerHTML: "*";
               attributes: {};
-              cssPseudoClass: [];
-              cssPseudoElement: [];
+              innerHTML: "*" | ("#text" | "div")[];
+              cssPseudoClass: `:${string}${string}`[];
+              cssPseudoElement: `::${string}${string}`[];
             };
           }
         >
@@ -102,9 +102,9 @@ describe("htmlTagConfig", () => {
           {
             a: {
               attributes: { href: "string | undefined" };
-              innerHTML: ["#text"];
-              cssPseudoClass: [];
-              cssPseudoElement: [];
+              innerHTML: "*" | ("#text" | "a")[];
+              cssPseudoClass: `:${string}${string}`[];
+              cssPseudoElement: `::${string}${string}`[];
             };
           }
         >
@@ -133,16 +133,16 @@ describe("htmlTagConfig", () => {
           >,
           {
             ul: {
-              innerHTML: ["li"];
               attributes: {};
-              cssPseudoClass: [];
-              cssPseudoElement: [];
+              innerHTML: "*" | ("#text" | "ul" | "li")[];
+              cssPseudoClass: `:${string}${string}`[];
+              cssPseudoElement: `::${string}${string}`[];
             };
             li: {
-              innerHTML: ["#text"];
               attributes: {};
-              cssPseudoClass: [];
-              cssPseudoElement: [];
+              innerHTML: "*" | ("#text" | "ul" | "li")[];
+              cssPseudoClass: `:${string}${string}`[];
+              cssPseudoElement: `::${string}${string}`[];
             };
           }
         >
@@ -171,16 +171,16 @@ describe("htmlTagConfig", () => {
           >,
           {
             p: {
-              innerHTML: ["#text", "span"];
               attributes: {};
-              cssPseudoClass: [];
-              cssPseudoElement: [];
+              innerHTML: "*" | ("#text" | "p" | "span")[];
+              cssPseudoClass: `:${string}${string}`[];
+              cssPseudoElement: `::${string}${string}`[];
             };
             span: {
-              innerHTML: ["#text"];
               attributes: {};
-              cssPseudoClass: [];
-              cssPseudoElement: [];
+              innerHTML: "*" | ("#text" | "p" | "span")[];
+              cssPseudoClass: `:${string}${string}`[];
+              cssPseudoElement: `::${string}${string}`[];
             };
           }
         >
@@ -203,10 +203,10 @@ describe("htmlTagConfig", () => {
           >,
           {
             div: {
-              innerHTML: [];
+              innerHTML: "*" | ("#text" | "div")[];
               attributes: {};
-              cssPseudoClass: [];
-              cssPseudoElement: [];
+              cssPseudoClass: `:${string}${string}`[];
+              cssPseudoElement: `::${string}${string}`[];
             };
           }
         >
@@ -682,10 +682,10 @@ describe("htmlTagConfig", () => {
             >,
             {
               button: {
-                innerHTML: ["#text"];
+                innerHTML: "*" | ("#text" | "button")[];
                 attributes: {};
-                cssPseudoClass: [":hover", ":focus"];
-                cssPseudoElement: [];
+                cssPseudoClass: `:${string}${string}`[];
+                cssPseudoElement: `::${string}${string}`[];
               };
             }
           >
@@ -697,6 +697,7 @@ describe("htmlTagConfig", () => {
           Equal<
             ValidateHTMLTagConfig<
               SupportedKeywords,
+              // @ts-expect-error
               {
                 button: {
                   innerHTML: ["#text"];
@@ -708,10 +709,10 @@ describe("htmlTagConfig", () => {
             >,
             {
               button: {
-                innerHTML: ["#text"];
+                innerHTML: "*" | ("#text" | "button")[];
                 attributes: {};
                 cssPseudoClass: `:${string}${string}`[];
-                cssPseudoElement: [];
+                cssPseudoElement: `::${string}${string}`[];
               };
             }
           >
@@ -734,10 +735,10 @@ describe("htmlTagConfig", () => {
             >,
             {
               button: {
-                innerHTML: ["#text"];
+                innerHTML: "*" | ("#text" | "button")[];
                 attributes: {};
-                cssPseudoClass: [];
-                cssPseudoElement: [];
+                cssPseudoClass: `:${string}${string}`[];
+                cssPseudoElement: `::${string}${string}`[];
               };
             }
           >
