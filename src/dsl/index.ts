@@ -65,15 +65,11 @@ type SingleDSLValidate<
             >
           : `'${Trim<L>}' is not supported`;
 
-type DSLStringDelimiter<
-  S extends SupportedKeywordsConfig,
-  T extends string,
-  D extends string,
-> =
-  Trim<T> extends `${D}${infer Piped extends `${string}|${string}`}${D}${infer Maybe extends string}`
+type DSLTemplateDelimiter<S extends SupportedKeywordsConfig, T extends string> =
+  Trim<T> extends `\`${infer Piped extends `${string}|${string}`}\`${infer Maybe extends string}`
     ? SingleDSLValidate<
         S,
-        `${D}${Piped}${D}`,
+        `\`${Piped}\``,
         // We only pass the right side of the pipe so we get autocomplete
         Maybe extends `${string}|${infer Other extends string}` ? Other : never
       >
@@ -87,7 +83,7 @@ export type DSLValidate<
 > = [T] extends [never]
   ? string
   : Trim<T> extends `\`${string}\`${string}`
-    ? DSLStringDelimiter<Keywords, T, "`">
+    ? DSLTemplateDelimiter<Keywords, T>
     : T extends `${infer L extends string}|${infer R extends string}`
       ? SingleDSLValidate<Keywords, L, R>
       : SingleDSLValidate<Keywords, T, never>;
@@ -129,13 +125,9 @@ export type DSLInfer<
             | `${Before}${DSLInfer<Keywords, Trim<innerDSL>>}${InferRestOfBackTick<Keywords, After>}`
             | DSLInfer<Keywords, Trim<Maybe>>
         : `${Piped}`
-      : Text extends
-            | `"${infer Piped extends `${string}|${string}`}"${infer Maybe extends string}`
-            | `'${infer Piped extends `${string}|${string}`}'${infer Maybe extends string}`
-        ? `${Piped}` | DSLInfer<Keywords, Maybe>
-        : Text extends `${infer L}|${infer R}`
-          ? SingleDSLInfer<Keywords, Trim<L>> | DSLInfer<Keywords, Trim<R>>
-          : SingleDSLInfer<Keywords, Trim<Text>>;
+      : Text extends `${infer L}|${infer R}`
+        ? SingleDSLInfer<Keywords, Trim<L>> | DSLInfer<Keywords, Trim<R>>
+        : SingleDSLInfer<Keywords, Trim<Text>>;
 
 function validateDSLPart(
   part: string,
