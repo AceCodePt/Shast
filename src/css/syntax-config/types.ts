@@ -5,19 +5,21 @@ import type {
 } from "@/dsl/index.ts";
 
 export interface BaseCSSSyntaxConfig {
-  [attribute: `<${string}>`]: string;
+  [attribute: string]: string;
 }
 
 export type ValidateCSSSyntaxConfig<
   Keywords extends SupportedKeywordsConfig,
   T extends BaseCSSSyntaxConfig,
-> = {
-  [K in keyof T]: K extends string
-    ? K extends `<${string}>`
-      ? DSLValidate<Keywords & T, T[K]>
-      : `Should be wrapped with <>`
-    : T[K];
-};
+> = keyof T extends string
+  ? {
+      [K in keyof T]: K extends string
+        ? K extends `<${string}>`
+          ? DSLValidate<Keywords & T, T[K]>
+          : `Should be wrapped with <>`
+        : T[K];
+    }
+  : T;
 
 export type InferCSSSyntaxConfig<
   Keywords extends SupportedKeywordsConfig,

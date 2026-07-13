@@ -1,50 +1,31 @@
 import type { SupportedKeywordsConfig } from "@/dsl/index.ts";
-import type { Keyof } from "@/types.ts";
 import type {
   BaseHTMLAttributesConfig,
   ValidateHTMLAttributesConfig,
 } from "@/html/attribute-config/types.ts";
 
-type BaseInnerHTMLTagConfig<PossibleTags extends string> =
-  | "*"
-  | (PossibleTags | "#text")[];
-
 export interface BaseHTMLTagConfig {
   [tag: string]: {
-    attributes?: BaseHTMLAttributesConfig | undefined;
-    innerHTML?: BaseInnerHTMLTagConfig<string> | undefined;
-    cssPseudoClass?: string[] | undefined;
-    cssPseudoElement?: string[] | undefined;
-    [rest: string]: unknown;
+    attributes: BaseHTMLAttributesConfig;
+    innerHTML: "*" | string[];
+    cssPseudoClass: `:${string}${string}`[];
+    cssPseudoElement: `::${string}${string}`[];
   };
 }
 
 export type ValidateHTMLTagConfig<
   Keywords extends SupportedKeywordsConfig,
   TagDefinition extends BaseHTMLTagConfig,
-> = {
-  [Tag in keyof TagDefinition]: Tag extends string
-    ? {
-        attributes: TagDefinition[Tag]["attributes"] extends ValidateHTMLAttributesConfig<
+> = keyof TagDefinition extends string
+  ? {
+      [Tag in keyof TagDefinition]: {
+        attributes: ValidateHTMLAttributesConfig<
           Keywords,
-          Exclude<TagDefinition[Tag]["attributes"], undefined>
-        >
-          ? TagDefinition[Tag]["attributes"]
-          : ValidateHTMLAttributesConfig<
-              Keywords,
-              Exclude<TagDefinition[Tag]["attributes"], undefined>
-            >;
-        innerHTML: TagDefinition[Tag]["innerHTML"] extends BaseInnerHTMLTagConfig<
-          Keyof<TagDefinition>
-        >
-          ? TagDefinition[Tag]["innerHTML"]
-          : BaseInnerHTMLTagConfig<Keyof<TagDefinition>>;
-        cssPseudoClass: TagDefinition[Tag]["cssPseudoClass"] extends `:${string}${string}`[]
-          ? TagDefinition[Tag]["cssPseudoClass"]
-          : `:${string}${string}`[];
-        cssPseudoElement: TagDefinition[Tag]["cssPseudoElement"] extends `::${string}${string}`[]
-          ? TagDefinition[Tag]["cssPseudoElement"]
-          : `::${string}${string}`[];
-      }
-    : TagDefinition[Tag];
-};
+          TagDefinition[Tag]["attributes"]
+        >;
+        innerHTML: "*" | (keyof TagDefinition | "#text")[];
+        cssPseudoClass: `:${string}${string}`[];
+        cssPseudoElement: `::${string}${string}`[];
+      };
+    }
+  : TagDefinition;

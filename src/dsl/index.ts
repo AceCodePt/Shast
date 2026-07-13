@@ -86,15 +86,11 @@ export type DSLValidate<
   T extends string,
 > = [T] extends [never]
   ? string
-  : Trim<T> extends `"${string}"${string}`
-    ? DSLStringDelimiter<Keywords, T, '"'>
-    : Trim<T> extends `'${string}'${string}`
-      ? DSLStringDelimiter<Keywords, T, "'">
-      : Trim<T> extends `\`${string}\`${string}`
-        ? DSLStringDelimiter<Keywords, T, "`">
-        : T extends `${infer L extends string}|${infer R extends string}`
-          ? SingleDSLValidate<Keywords, L, R>
-          : SingleDSLValidate<Keywords, T, never>;
+  : Trim<T> extends `\`${string}\`${string}`
+    ? DSLStringDelimiter<Keywords, T, "`">
+    : T extends `${infer L extends string}|${infer R extends string}`
+      ? SingleDSLValidate<Keywords, L, R>
+      : SingleDSLValidate<Keywords, T, never>;
 
 type InferRestOfBackTick<
   Keywords extends SupportedKeywordsConfig,

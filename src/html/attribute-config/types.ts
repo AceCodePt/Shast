@@ -10,10 +10,12 @@ export interface BaseHTMLAttributesConfig {
 
 export type ValidateHTMLAttributesConfig<
   Keywords extends SupportedKeywordsConfig,
-  A extends BaseHTMLAttributesConfig,
-> = {
-  [K in keyof A]: K extends string ? DSLValidate<Keywords, A[K]> : A[K];
-};
+  T extends BaseHTMLAttributesConfig,
+> = keyof T extends string
+  ? {
+      [K in keyof T]: DSLValidate<Keywords, T[K]>;
+    }
+  : T;
 
 export type InferHTMLAttributesConfig<
   Keywords extends SupportedKeywordsConfig,

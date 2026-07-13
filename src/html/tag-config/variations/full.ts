@@ -3079,10 +3079,4 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
     cssPseudoClass: [],
     cssPseudoElement: ["::before", "::after", "::selection"],
   },
-  asdf: {
-    attributes: {},
-    cssPseudoClass: [],
-    cssPseudoElement: [],
-    innerHTML: "*",
-  },
 });

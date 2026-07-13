@@ -14,7 +14,9 @@ export const htmlTagConfig = <
     const attributes = config[tag].attributes;
     for (const attributeKey in attributes) {
       const attribute = attributes[attributeKey];
-      dslString(supportedKeywords, attribute);
+      if (attribute) {
+        dslString(supportedKeywords, attribute);
+      }
     }
 
     const innerHTML = config[tag].innerHTML;

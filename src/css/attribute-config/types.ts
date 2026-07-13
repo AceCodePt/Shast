@@ -12,9 +12,11 @@ export type ValidateCSSAttributesConfig<
   Keywords extends SupportedKeywordsConfig,
   S extends BaseCSSSyntaxConfig,
   A extends BaseCSSAttributesConfig,
-> = {
-  [K in keyof A]: K extends string ? DSLValidate<S & Keywords, A[K]> : A[K];
-};
+> = keyof A extends string
+  ? {
+      [K in keyof A]: DSLValidate<S & Keywords, A[K]>;
+    }
+  : A;
 
 export type InferCSSAttributesConfig<
   Keywords extends SupportedKeywordsConfig,

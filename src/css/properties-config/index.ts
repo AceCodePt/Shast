@@ -28,7 +28,7 @@ export const cssPropertiesConfig = <
       );
     }
     const entry = entries[key];
-    if (typeof entry === "object" && entry.syntax) {
+    if (typeof entry === "object" && typeof entry.syntax === "string") {
       dslString(mergedConfig, entry.syntax);
 
       if (entry["initial-value"] === undefined) {
@@ -38,5 +38,6 @@ export const cssPropertiesConfig = <
       parseValueAgainstDSL(mergedConfig, entry.syntax, entry["initial-value"]);
     }
   }
+
   return config as P;
 };

@@ -103,7 +103,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h1: {
     attributes: {},
-      innerHTML: ["#text", "span", "a", "br", "img"],
+    innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -115,7 +115,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h2: {
     attributes: {},
-      innerHTML: ["#text", "span", "a", "br", "img"],
+    innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -127,7 +127,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h3: {
     attributes: {},
-      innerHTML: ["#text", "span", "a", "br", "img"],
+    innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -139,7 +139,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h4: {
     attributes: {},
-      innerHTML: ["#text", "span", "a", "br", "img"],
+    innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -151,7 +151,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h5: {
     attributes: {},
-      innerHTML: ["#text", "span", "a", "br", "img"],
+    innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",
@@ -163,7 +163,7 @@ export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   },
   h6: {
     attributes: {},
-      innerHTML: ["#text", "span", "a", "br", "img"],
+    innerHTML: ["#text", "span", "a", "br", "img"],
     cssPseudoClass: [],
     cssPseudoElement: [
       "::before",

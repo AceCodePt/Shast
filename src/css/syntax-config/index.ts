@@ -17,7 +17,7 @@ export function cssSyntaxConfig<
     dslString(Object.assign({}, supportedKeywords, config), item);
   }
 
-  detectCircularReferences(config as Record<string, string>);
+  detectCircularReferences(config);
 
   return config as T;
 }
