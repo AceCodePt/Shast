@@ -227,14 +227,15 @@ describe("Literal String with pipe - '|' \"|\" `|` [EDGE CASE]", () => {
       assertType<Equal<DSLInfer<SupportedKeywords, "'|'">, never>>();
     });
     test("Runtime Validation", () => {
-      // @ts-expect-error
-      dslString(SUPPORTED_KEYWORDS, "'|'");
+      assert.throws(() =>
+        // @ts-expect-error
+        dslString(SUPPORTED_KEYWORDS, "'|'"),
+      );
     });
     test("Parse", () => {
-      assert.strictEqual(
+      assert.throws(() =>
         // @ts-expect-error
         parseValueAgainstDSL(SUPPORTED_KEYWORDS, "'|'", "|"),
-        "|",
       );
     });
   });
@@ -244,14 +245,15 @@ describe("Literal String with pipe - '|' \"|\" `|` [EDGE CASE]", () => {
       assertType<Equal<DSLInfer<SupportedKeywords, '"|"'>, never>>();
     });
     test("Runtime Validation", () => {
-      // @ts-expect-error
-      dslString(SUPPORTED_KEYWORDS, '"|"');
+      assert.throws(() =>
+        // @ts-expect-error
+        dslString(SUPPORTED_KEYWORDS, '"|"'),
+      );
     });
     test("Parse", () => {
-      assert.strictEqual(
+      assert.throws(() =>
         // @ts-expect-error
         parseValueAgainstDSL(SUPPORTED_KEYWORDS, '"|"', "|"),
-        "|",
       );
     });
   });

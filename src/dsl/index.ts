@@ -148,6 +148,15 @@ function validateDSLPart(
     throw new Error(`Invalid DSL string: "${fullDSL}"`);
   }
 
+  // Pipe inside single/double quoted strings is not supported — the type-level
+  // parser splits on | before checking quote boundaries, so '|' would be
+  // misinterpreted as a union. Template literals (`|`) are exempt because they
+  // go through a separate type-level path that handles | correctly.
+  const isSingleOrDoubleQuoted = /^'[^']*'$|^"[^"]*"$/.test(part);
+  if (isSingleOrDoubleQuoted && part.slice(1, -1).includes("|")) {
+    throw new Error(`Invalid DSL string: "${fullDSL}"`);
+  }
+
   if (isTemplateLiteral && /\$\{/.test(part)) {
     const content = part.slice(1, -1);
     const interpolationRegex = /\$\{(.+?)\}/g;
