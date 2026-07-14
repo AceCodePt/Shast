@@ -20,3 +20,12 @@ Template literals (backtick strings) **do** support `|` inside `${...}` interpol
 ```
 
 Template literals are handled by `DSLTemplateDelimiter` before the general pipe-splitting logic, so the `|` inside `${...}` is correctly parsed as a DSL union rather than a string literal.
+
+### Nested template literals are unsupported
+
+A nested template literal like `` `\`${number | string}\`` `` (a backtick-literal backtick containing an interpolation) is **not supported**. Parsing this correctly at the type level would require:
+- Tracking escape depth across multiple quote contexts
+- Distinguishing between DSL-delimiting backticks and escaped literal backticks
+- Resolving ambiguity when a backtick could be either a closing delimiter or an escaped character
+
+The complexity added to `DSLValidate` and `DSLInfer` for this edge case is substantial, with negligible practical benefit — values that contain literal backticks inside template-like strings are exceptionally rare in CSS or HTML attribute contexts.

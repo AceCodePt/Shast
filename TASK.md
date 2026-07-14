@@ -90,12 +90,6 @@
     - [x] Runtime Validation
     - [x] Parse
     - [x] Test
-  - [ ] Nested template literal - `` `\`${number | string}\`` `` *(edge case)*
-    - [ ] Type Validation
-    - [ ] Type Inference
-    - [ ] Runtime Validation
-    - [ ] Parse
-    - [ ] Test
 
 - [x] Recursive DSL - `<length>` as `${number}{'%' | 'px'}` 
   - [x] Type Validation
@@ -535,3 +529,61 @@
   - [ ] Variation CSS merged with inline `css` (inline overrides)
   - [ ] Pseudo blocks in component css work after variant merge
   - [ ] Pseudo block can override variation's CSS properties
+
+---
+
+## Complex CSS Calc
+
+- [ ] **`calc()` expression support in CSS values** - `calc()` parsed, validated, and rendered as a CSS value
+  - [ ] Type Validation
+  - [ ] Type Inference
+  - [ ] Runtime Validation
+  - [ ] Test
+
+- [ ] **Calc expressions**
+  - [ ] Nested calc expressions `calc(calc(...))`
+  - [ ] Calc with mixed units `calc(100% - 20px)`, `calc(50vw + 2rem)`
+  - [ ] Calc with CSS variables `calc(var(--spacing) * 2)`
+
+- [ ] **Calc in CSS context**
+  - [ ] Inline `css: { width: "calc(100% - 40px)" }` validated against CSS syntax
+  - [ ] Syntax token defined as `calc(...)` in CSS attribute config
+
+- [ ] **Edge Cases**
+  - [ ] Malformed calc expressions rejected
+  - [ ] Unclosed parentheses in calc
+  - [ ] Calc with unsupported operators
+  - [ ] Empty calc `calc()`
+
+---
+
+## Array innerHTML Children
+
+- [ ] **Support array of child components** - `innerHTML: { child: [{ tag: "div" }, { tag: "div" }] }` for multiple semantically identical children
+  - [ ] Type Validation
+  - [ ] Type Inference
+  - [ ] Runtime Validation
+  - [ ] Test
+
+- [ ] **Validation rules**
+  - [ ] Array children validated individually against tag's innerHTML rules
+  - [ ] Mixed single child and array child syntax distinguished
+  - [ ] Empty array `[]` accepted where `innerHTML` allows it
+  - [ ] Array of text nodes `["a", "b"]`
+  - [ ] Mixed text nodes and component children in array
+
+- [ ] **Render array children**
+  - [ ] Array children rendered in correct order
+  - [ ] Multiple `<div>` siblings rendered correctly
+  - [ ] Array of text nodes concatenated/rendered in order
+
+- [ ] **Nesting**
+  - [ ] Arrays nested inside arrays
+  - [ ] Array with single element equivalent to bare child
+  - [ ] Deeply nested arrays in complex hierarchies
+
+- [ ] **Edge Cases**
+  - [ ] Empty array of children
+  - [ ] Array with one element
+  - [ ] Very large arrays
+  - [ ] Arrays with mixed types (text + components)
