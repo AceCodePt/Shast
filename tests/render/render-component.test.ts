@@ -2,7 +2,7 @@ import test, { describe } from "node:test";
 import assert from "node:assert";
 import { renderComponent } from "@/engine/render/render-component.ts";
 import type { BaseHTMLTagConfig } from "@/html/tag-config/types.ts";
-import type { BaseComponentStructure } from "@/engine/create-component.ts";
+import type { BaseComponentStructure } from "@/engine/types.ts";
 
 const tagConfig: BaseHTMLTagConfig = {
   a: {

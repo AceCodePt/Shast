@@ -40,8 +40,7 @@ const { createComponent, renderComponent } = engine({
 });
 
 const card = createComponent({
-  tag: "a",
-  attributes: { href: "" },
+  tag: "div",
   innerHTML: {
     someImage: {
       tag: "img",
@@ -63,17 +62,14 @@ const card = createComponent({
         },
       },
     },
+    asdf: {
+      tag: "div",
+    },
   },
   css: {
-    width: "100%",
-    ":link": {},
+    width: "100px",
     "> content": {
-      "> title": {
-        color: "transparent",
-        ":hover": {
-          color: "currentColor",
-        },
-      },
+      "> title": {},
     },
   },
 });

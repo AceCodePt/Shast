@@ -3,6 +3,10 @@ import assert from "node:assert";
 import engine from "@/engine/index.ts";
 import { renderComponent } from "@/engine/render/render-component.ts";
 import { cssPropertiesConfig } from "@/css/properties-config/index.ts";
+import { cssSyntaxConfig } from "@/css/syntax-config/index.ts";
+import { cssAttributeConfig } from "@/css/attribute-config/index.ts";
+import { htmlAttributeConfig } from "@/html/attribute-config/index.ts";
+import { htmlTagConfig } from "@/html/tag-config/index.ts";
 import HTML_GLOBAL_ATTRIBUTES_CONFIG from "@/html/attribute-config/variations/common.ts";
 import HTML_TAGS_CONFIG from "@/html/tag-config/variations/common.ts";
 import CSS_SYNTAX_CONFIG from "@/css/syntax-config/variations/common.ts";
@@ -68,5 +72,994 @@ describe("engine", () => {
 
   test("cssProperties renders the @property config", () => {
     assert.ok(cssProperties.includes("@property --_a"));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Component validation, exercised through engine().createComponent.
+// (Ported from the former create-component.test.ts.)
+// ---------------------------------------------------------------------------
+
+const EMPTY_PSEUDO_CLASSES = [] as const;
+
+const MOCK_SHARED_ATTRIBUTES = htmlAttributeConfig(SUPPORTED_KEYWORDS, {
+  id: "string | undefined",
+  class: "string | undefined",
+});
+
+const MOCK_TAG_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
+  div: {
+    attributes: {},
+    innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  p: {
+    attributes: {},
+    innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  img: {
+    attributes: { src: "string", alt: "string" },
+    innerHTML: [],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  ul: {
+    attributes: {},
+    innerHTML: ["li"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  li: {
+    attributes: {},
+    innerHTML: ["#text", "div"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+});
+
+const MOCK_INHERIT_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
+  a: {
+    attributes: {},
+    innerHTML: ["#text", "h1", "span", "ul", "div"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  h1: {
+    attributes: {},
+    innerHTML: ["#text", "span", "b"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  span: {
+    attributes: {},
+    innerHTML: ["#text", "b"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  b: {
+    attributes: {},
+    innerHTML: ["#text"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  ul: {
+    attributes: {},
+    innerHTML: ["li"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  li: {
+    attributes: {},
+    innerHTML: ["#text", "div", "span", "b"],
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+  div: {
+    attributes: {},
+    innerHTML: "*",
+    cssPseudoClass: [],
+    cssPseudoElement: [],
+  },
+});
+
+const MOCK_CSS_SYNTAX = cssSyntaxConfig(SUPPORTED_KEYWORDS, {});
+const MOCK_CSS_ATTRIBUTES = cssAttributeConfig(
+  SUPPORTED_KEYWORDS,
+  MOCK_CSS_SYNTAX,
+  {},
+);
+const MOCK_CSS_PROPERTIES = cssPropertiesConfig(
+  SUPPORTED_KEYWORDS,
+  MOCK_CSS_SYNTAX,
+  {},
+);
+
+const { createComponent: createMockComponent } = engine({
+  supportedKeywords: SUPPORTED_KEYWORDS,
+  htmlAttributesConfig: MOCK_SHARED_ATTRIBUTES,
+  htmlTagConfig: MOCK_TAG_CONFIG,
+  cssSyntaxConfig: MOCK_CSS_SYNTAX,
+  cssAttributesConfig: MOCK_CSS_ATTRIBUTES,
+  cssPseudoClassConfig: EMPTY_PSEUDO_CLASSES,
+  cssPropertiesConfig: MOCK_CSS_PROPERTIES,
+});
+
+const { createComponent: createInheritComponent } = engine({
+  supportedKeywords: SUPPORTED_KEYWORDS,
+  htmlAttributesConfig: MOCK_SHARED_ATTRIBUTES,
+  htmlTagConfig: MOCK_INHERIT_CONFIG,
+  cssSyntaxConfig: MOCK_CSS_SYNTAX,
+  cssAttributesConfig: MOCK_CSS_ATTRIBUTES,
+  cssPseudoClassConfig: EMPTY_PSEUDO_CLASSES,
+  cssPropertiesConfig: MOCK_CSS_PROPERTIES,
+});
+
+describe("createComponent (engine)", () => {
+  describe("Baseline Structural Checks", () => {
+    test("should fail if node is null or not an object", () => {
+      assert.throws(
+        () =>
+          createMockComponent(
+            //@ts-expect-error
+            null,
+          ),
+        /Validation Error: Provided node is not a valid component object/,
+      );
+    });
+
+    test("should fail if tag is missing or is not a string", () => {
+      assert.throws(
+        () =>
+          createMockComponent({
+            // @ts-expect-error
+            innerHTML: "text",
+          }),
+        /Validation Error: Component node is missing a valid string 'tag' property/,
+      );
+      assert.throws(
+        () =>
+          createMockComponent({
+            // @ts-expect-error
+            tag: 123,
+          }),
+        /Validation Error: Component node is missing a valid string 'tag' property/,
+      );
+    });
+
+    test("should fail if tag is not recognized in the registry", () => {
+      assert.throws(
+        () =>
+          createMockComponent({
+            // @ts-expect-error
+            tag: "section",
+          }),
+        /Structural Error: '<section>' is not a recognized configuration tag in your registry/,
+      );
+    });
+  });
+
+  describe("Attribute Validation Firewall", () => {
+    test("accepts valid explicit tag attributes and optional global attributes", () => {
+      const config = createMockComponent({
+        tag: "img",
+        attributes: {
+          src: "logo.jpg",
+          alt: "My Logo",
+          id: "main-logo",
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "img",
+        attributes: {
+          src: "logo.jpg",
+          alt: "My Logo",
+          id: "main-logo",
+        },
+      });
+    });
+
+    test("should fail when encountering undocumented attributes", () => {
+      assert.throws(
+        () =>
+          createMockComponent({
+            tag: "p",
+            attributes: {
+              //@ts-expect-error
+              href: "https://google.com",
+            },
+          }),
+        /Attribute Error: Property 'href' is not a valid attribute for <p> or the Global configuration registry/,
+      );
+    });
+  });
+
+  describe("Void Element Controls", () => {
+    test("accepts void elements when innerHTML is absent", () => {
+      const config = createMockComponent({
+        tag: "img",
+        attributes: {
+          src: "pic.png",
+          alt: "Image text",
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "img",
+        attributes: {
+          src: "pic.png",
+          alt: "Image text",
+        },
+      });
+    });
+
+    test("should fail void elements if string content is passed", () => {
+      assert.throws(
+        () =>
+          createMockComponent({
+            tag: "img",
+            attributes: {
+              src: "pic.png",
+              alt: "Image text",
+            },
+            //@ts-expect-error
+            innerHTML: {
+              text: "Illegal Text Inside Void Element",
+            },
+          }),
+        /Validation Error: Tag '<img>' is configured as a void element and must not contain any innerHTML or children/,
+      );
+    });
+  });
+
+  describe("Text Content Controls", () => {
+    test("accepts string content when the element accepts text nodes", () => {
+      const config = createMockComponent({
+        tag: "p",
+        innerHTML: "Clean inline content",
+      });
+      assert.deepStrictEqual(config, {
+        tag: "p",
+        innerHTML: "Clean inline content",
+      });
+    });
+
+    test("should fail element with string content if it explicitly bars text nodes", () => {
+      assert.throws(
+        () =>
+          createMockComponent({
+            tag: "ul",
+            // @ts-expect-error
+            innerHTML: { text: "Illegal Direct Text Node Element" },
+          }),
+        /Validation Error: Tag '<ul>' innerHTML cannot contain a string without the #text/,
+      );
+    });
+  });
+
+  describe("Structural Hierarchy Arrays", () => {
+    test("accepts valid nested configurations matching allowed child arrays", () => {
+      const config = createMockComponent({
+        tag: "ul",
+        innerHTML: {
+          child1: {
+            tag: "li",
+            innerHTML: "text",
+          },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "ul",
+        innerHTML: {
+          child1: {
+            tag: "li",
+            innerHTML: "text",
+          },
+        },
+      });
+    });
+
+    test("rejects a direct child whose tag is not in the parent's innerHTML whitelist", () => {
+      assert.throws(
+        () =>
+          createMockComponent({
+            tag: "ul",
+            innerHTML: {
+              badChild: {
+                // @ts-expect-error
+                tag: "p",
+                innerHTML: "Bad nested block",
+              },
+            },
+          }),
+        /Structural Error: '<p>' is not a permitted child of <ul>/,
+      );
+    });
+
+    test("gates a grandchild by its immediate parent, not the outer ancestor", () => {
+      assert.throws(
+        () =>
+          createMockComponent({
+            tag: "ul",
+            innerHTML: {
+              item: {
+                tag: "li",
+                innerHTML: {
+                  invalidGrandchild: {
+                    // @ts-expect-error
+                    tag: "p",
+                  },
+                },
+              },
+            },
+          }),
+        /Structural Error: '<p>' is not a permitted child of <li>/,
+      );
+    });
+  });
+
+  describe("innerHTML Structural Inheritance", () => {
+    test("conjunctive intersection: a > h1 > span is accepted", () => {
+      const config = createInheritComponent({
+        tag: "a",
+        innerHTML: {
+          heading: {
+            tag: "h1",
+            innerHTML: {
+              label: {
+                tag: "span",
+                innerHTML: "hi",
+              },
+            },
+          },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "a",
+        innerHTML: {
+          heading: {
+            tag: "h1",
+            innerHTML: {
+              label: {
+                tag: "span",
+                innerHTML: "hi",
+              },
+            },
+          },
+        },
+      });
+    });
+
+    test("conjunctive intersection rejects a tag the outer ancestor forbids: a > h1 > b", () => {
+      assert.throws(
+        () =>
+          createInheritComponent({
+            tag: "a",
+            innerHTML: {
+              heading: {
+                tag: "h1",
+                innerHTML: {
+                  label: {
+                    // @ts-expect-error
+                    tag: "b",
+                  },
+                },
+              },
+            },
+          }),
+        /Structural Error/,
+      );
+    });
+
+    test("nested `*` accepts a tag in the inherited ancestral set: a > div > span", () => {
+      const config = createInheritComponent({
+        tag: "a",
+        innerHTML: {
+          wrapper: {
+            tag: "div",
+            innerHTML: {
+              label: {
+                tag: "span",
+                innerHTML: "hi",
+              },
+            },
+          },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "a",
+        innerHTML: {
+          wrapper: {
+            tag: "div",
+            innerHTML: {
+              label: {
+                tag: "span",
+                innerHTML: "hi",
+              },
+            },
+          },
+        },
+      });
+    });
+
+    test("nested `*` is restricted to the inherited set: a > div > b is rejected", () => {
+      assert.throws(
+        () =>
+          createInheritComponent({
+            tag: "a",
+            innerHTML: {
+              wrapper: {
+                tag: "div",
+                innerHTML: {
+                  label: {
+                    // @ts-expect-error
+                    tag: "b",
+                  },
+                },
+              },
+            },
+          }),
+        /Structural Error/,
+      );
+    });
+
+    test("reset structural tag: a > ul > li is accepted", () => {
+      const config = createInheritComponent({
+        tag: "a",
+        innerHTML: {
+          list: {
+            tag: "ul",
+            innerHTML: {
+              item: {
+                tag: "li",
+                innerHTML: "hi",
+              },
+            },
+          },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "a",
+        innerHTML: {
+          list: {
+            tag: "ul",
+            innerHTML: {
+              item: {
+                tag: "li",
+                innerHTML: "hi",
+              },
+            },
+          },
+        },
+      });
+    });
+
+    test("reset structural tag ignores the ancestral set: a > ul > span is rejected", () => {
+      assert.throws(
+        () =>
+          createInheritComponent({
+            tag: "a",
+            innerHTML: {
+              list: {
+                tag: "ul",
+                innerHTML: {
+                  item: {
+                    // @ts-expect-error
+                    tag: "span",
+                  },
+                },
+              },
+            },
+          }),
+        /Structural Error/,
+      );
+    });
+
+    test("ancestral set re-emerges below a reset tag: a > ul > li > div is accepted", () => {
+      const config = createInheritComponent({
+        tag: "a",
+        innerHTML: {
+          list: {
+            tag: "ul",
+            innerHTML: {
+              item: {
+                tag: "li",
+                innerHTML: {
+                  box: {
+                    tag: "div",
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "a",
+        innerHTML: {
+          list: {
+            tag: "ul",
+            innerHTML: {
+              item: {
+                tag: "li",
+                innerHTML: {
+                  box: {
+                    tag: "div",
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+    });
+
+    test("re-emerged ancestral set rejects a tag only the immediate parent allows: a > ul > li > b", () => {
+      assert.throws(
+        () =>
+          createInheritComponent({
+            tag: "a",
+            innerHTML: {
+              list: {
+                tag: "ul",
+                innerHTML: {
+                  item: {
+                    tag: "li",
+                    innerHTML: {
+                      emphasis: {
+                        // @ts-expect-error
+                        tag: "b",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          }),
+        /Structural Error/,
+      );
+    });
+
+    test("root `*` accepts any tag: div > b is accepted", () => {
+      const config = createInheritComponent({
+        tag: "div",
+        innerHTML: {
+          emphasis: {
+            tag: "b",
+            innerHTML: "hi",
+          },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "div",
+        innerHTML: {
+          emphasis: {
+            tag: "b",
+            innerHTML: "hi",
+          },
+        },
+      });
+    });
+  });
+
+  describe("Component CSS: Pseudo-Class Block Validation", () => {
+    const PSEUDO_CSS_ATTRIBUTES = cssAttributeConfig(
+      SUPPORTED_KEYWORDS,
+      MOCK_CSS_SYNTAX,
+      {
+        color: "string",
+        display: "'block' | 'inline' | 'none'",
+      },
+    );
+    const PSEUDO_CSS_PROPERTIES = cssPropertiesConfig(
+      SUPPORTED_KEYWORDS,
+      MOCK_CSS_SYNTAX,
+      {},
+    );
+    const GLOBAL_PSEUDO = [":active"] as const;
+
+    const PSEUDO_TAG_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
+      button: {
+        attributes: {},
+        innerHTML: ["#text"],
+        cssPseudoClass: [":hover", ":focus"],
+        cssPseudoElement: [],
+      },
+      span: {
+        attributes: {},
+        innerHTML: ["#text"],
+        cssPseudoClass: [],
+        cssPseudoElement: [],
+      },
+      div: {
+        attributes: {},
+        innerHTML: "*",
+        cssPseudoClass: [],
+        cssPseudoElement: [],
+      },
+    });
+
+    const { createComponent: createPseudoComponent } = engine({
+      supportedKeywords: SUPPORTED_KEYWORDS,
+      htmlAttributesConfig: MOCK_SHARED_ATTRIBUTES,
+      htmlTagConfig: PSEUDO_TAG_CONFIG,
+      cssSyntaxConfig: MOCK_CSS_SYNTAX,
+      cssAttributesConfig: PSEUDO_CSS_ATTRIBUTES,
+      cssPseudoClassConfig: GLOBAL_PSEUDO,
+      cssPropertiesConfig: PSEUDO_CSS_PROPERTIES,
+    });
+
+    test("accepts a declared pseudo-class block containing CSS properties", () => {
+      const config = createPseudoComponent({
+        tag: "button",
+        innerHTML: "Click",
+        css: {
+          color: "black",
+          ":hover": { color: "red", display: "block" },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "button",
+        innerHTML: "Click",
+        css: {
+          color: "black",
+          ":hover": { color: "red", display: "block" },
+        },
+      });
+    });
+
+    test("accepts multiple declared pseudo-classes in the same css block", () => {
+      const config = createPseudoComponent({
+        tag: "button",
+        innerHTML: "Click",
+        css: {
+          ":hover": { color: "red" },
+          ":focus": { color: "blue" },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "button",
+        innerHTML: "Click",
+        css: {
+          ":hover": { color: "red" },
+          ":focus": { color: "blue" },
+        },
+      });
+    });
+
+    test("accepts a globally-configured pseudo-class on any tag", () => {
+      const config = createPseudoComponent({
+        tag: "span",
+        innerHTML: "text",
+        css: {
+          ":active": { color: "red" },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "span",
+        innerHTML: "text",
+        css: {
+          ":active": { color: "red" },
+        },
+      });
+    });
+
+    test("accepts a pseudo-class inside a child selector, scoped to the child's tag", () => {
+      const config = createPseudoComponent({
+        tag: "div",
+        innerHTML: { label: { tag: "button", innerHTML: "Hi" } },
+        css: {
+          "> label": { ":hover": { color: "red" } },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "div",
+        innerHTML: { label: { tag: "button", innerHTML: "Hi" } },
+        css: {
+          "> label": { ":hover": { color: "red" } },
+        },
+      });
+    });
+
+    test("accepts a child selector inside a pseudo-class block", () => {
+      const config = createPseudoComponent({
+        tag: "div",
+        innerHTML: { label: { tag: "button", innerHTML: "Hi" } },
+        css: {
+          ":active": { "> label": { color: "red" } },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "div",
+        innerHTML: { label: { tag: "button", innerHTML: "Hi" } },
+        css: {
+          ":active": { "> label": { color: "red" } },
+        },
+      });
+    });
+
+    test("accepts a pseudo-class nested inside another pseudo-class", () => {
+      const config = createPseudoComponent({
+        tag: "button",
+        innerHTML: "Click",
+        css: {
+          ":hover": { ":focus": { color: "red" } },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "button",
+        innerHTML: "Click",
+        css: {
+          ":hover": { ":focus": { color: "red" } },
+        },
+      });
+    });
+
+    test("rejects a pseudo-class the tag does not declare and is not global", () => {
+      createPseudoComponent({
+        tag: "button",
+        innerHTML: "Click",
+        css: {
+          // @ts-expect-error
+          ":disabled": { color: "red" },
+        },
+      });
+    });
+
+    test("rejects a pseudo-class on a tag with an empty cssPseudoClass list", () => {
+      createPseudoComponent({
+        tag: "span",
+        innerHTML: "text",
+        css: {
+          // @ts-expect-error
+          ":hover": { color: "red" },
+        },
+      });
+    });
+
+    test("rejects a pseudo-class on a tag with no cssPseudoClass key", () => {
+      const NO_PSEUDO_TAG_CONFIG = {
+        widget: {
+          attributes: {},
+          innerHTML: ["#text"],
+          cssPseudoElement: [],
+        },
+      };
+      const { createComponent: createNoPseudoComponent } = engine({
+        supportedKeywords: SUPPORTED_KEYWORDS,
+        htmlAttributesConfig: MOCK_SHARED_ATTRIBUTES,
+        // @ts-expect-error
+        htmlTagConfig: NO_PSEUDO_TAG_CONFIG,
+        cssSyntaxConfig: MOCK_CSS_SYNTAX,
+        cssAttributesConfig: PSEUDO_CSS_ATTRIBUTES,
+        cssPseudoClassConfig: GLOBAL_PSEUDO,
+        cssPropertiesConfig: PSEUDO_CSS_PROPERTIES,
+      });
+      createNoPseudoComponent({
+        tag: "widget",
+        attributes: {},
+        innerHTML: "text",
+        css: {
+          ":hover": { color: "red" },
+        },
+      });
+    });
+  });
+
+  describe("Component CSS: Pseudo-Element Block Validation", () => {
+    const PE_CSS_ATTRIBUTES = cssAttributeConfig(
+      SUPPORTED_KEYWORDS,
+      MOCK_CSS_SYNTAX,
+      {
+        color: "string",
+        display: "'block' | 'inline' | 'none'",
+      },
+    );
+    const PE_CSS_PROPERTIES = cssPropertiesConfig(
+      SUPPORTED_KEYWORDS,
+      MOCK_CSS_SYNTAX,
+      {},
+    );
+
+    const PE_TAG_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
+      field: {
+        attributes: {},
+        innerHTML: ["#text"],
+        cssPseudoClass: [":hover"],
+        cssPseudoElement: ["::placeholder"],
+      },
+      box: {
+        attributes: {},
+        innerHTML: "*",
+        cssPseudoClass: [],
+        cssPseudoElement: ["::before", "::after"],
+      },
+      span: {
+        attributes: {},
+        innerHTML: ["#text"],
+        cssPseudoClass: [],
+        cssPseudoElement: [],
+      },
+    });
+
+    const { createComponent: createPEComponent } = engine({
+      supportedKeywords: SUPPORTED_KEYWORDS,
+      htmlAttributesConfig: MOCK_SHARED_ATTRIBUTES,
+      htmlTagConfig: PE_TAG_CONFIG,
+      cssSyntaxConfig: MOCK_CSS_SYNTAX,
+      cssAttributesConfig: PE_CSS_ATTRIBUTES,
+      cssPseudoClassConfig: EMPTY_PSEUDO_CLASSES,
+      cssPropertiesConfig: PE_CSS_PROPERTIES,
+    });
+
+    test("accepts a declared pseudo-element block containing CSS properties", () => {
+      const config = createPEComponent({
+        tag: "field",
+        innerHTML: "x",
+        css: {
+          color: "black",
+          "::placeholder": { color: "gray", display: "block" },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "field",
+        innerHTML: "x",
+        css: {
+          color: "black",
+          "::placeholder": { color: "gray", display: "block" },
+        },
+      });
+    });
+
+    test("accepts multiple declared pseudo-elements in the same css block", () => {
+      const config = createPEComponent({
+        tag: "box",
+        innerHTML: "x",
+        css: {
+          "::before": { color: "red" },
+          "::after": { color: "blue" },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "box",
+        innerHTML: "x",
+        css: {
+          "::before": { color: "red" },
+          "::after": { color: "blue" },
+        },
+      });
+    });
+
+    test("accepts a pseudo-element inside a child selector, scoped to the child's tag", () => {
+      const config = createPEComponent({
+        tag: "box",
+        innerHTML: { fld: { tag: "field", innerHTML: "x" } },
+        css: {
+          "> fld": { "::placeholder": { color: "gray" } },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "box",
+        innerHTML: { fld: { tag: "field", innerHTML: "x" } },
+        css: {
+          "> fld": { "::placeholder": { color: "gray" } },
+        },
+      });
+    });
+
+    test("accepts a child selector inside a pseudo-element block", () => {
+      const config = createPEComponent({
+        tag: "box",
+        innerHTML: { item: { tag: "span", innerHTML: "x" } },
+        css: {
+          "::before": { "> item": { color: "red" } },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "box",
+        innerHTML: { item: { tag: "span", innerHTML: "x" } },
+        css: {
+          "::before": { "> item": { color: "red" } },
+        },
+      });
+    });
+
+    test("accepts a pseudo-element inside a pseudo-class block", () => {
+      const config = createPEComponent({
+        tag: "field",
+        innerHTML: "x",
+        css: {
+          ":hover": { "::placeholder": { color: "gray" } },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "field",
+        innerHTML: "x",
+        css: {
+          ":hover": { "::placeholder": { color: "gray" } },
+        },
+      });
+    });
+
+    test("accepts a pseudo-class inside a pseudo-element block", () => {
+      const config = createPEComponent({
+        tag: "field",
+        innerHTML: "x",
+        css: {
+          "::placeholder": { ":hover": { color: "gray" } },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "field",
+        innerHTML: "x",
+        css: {
+          "::placeholder": { ":hover": { color: "gray" } },
+        },
+      });
+    });
+
+    test("rejects a pseudo-element the tag does not declare", () => {
+      createPEComponent({
+        tag: "field",
+        innerHTML: "x",
+        css: {
+          // @ts-expect-error
+          "::before": { color: "red" },
+        },
+      });
+    });
+
+    test("rejects a pseudo-element on a tag with an empty cssPseudoElement list", () => {
+      createPEComponent({
+        tag: "span",
+        innerHTML: "x",
+        css: {
+          // @ts-expect-error
+          "::placeholder": { color: "red" },
+        },
+      });
+    });
+
+    test("rejects a pseudo-element on a tag with no cssPseudoElement key", () => {
+      const NO_PE_TAG_CONFIG = {
+        plain: {
+          attributes: {},
+          innerHTML: ["#text"],
+          cssPseudoClass: [],
+        },
+      };
+      const { createComponent: createNoPEComponent } = engine({
+        supportedKeywords: SUPPORTED_KEYWORDS,
+        htmlAttributesConfig: MOCK_SHARED_ATTRIBUTES,
+        // @ts-expect-error
+        htmlTagConfig: NO_PE_TAG_CONFIG,
+        cssSyntaxConfig: MOCK_CSS_SYNTAX,
+        cssAttributesConfig: PE_CSS_ATTRIBUTES,
+        cssPseudoClassConfig: EMPTY_PSEUDO_CLASSES,
+        cssPropertiesConfig: PE_CSS_PROPERTIES,
+      });
+      createNoPEComponent({
+        tag: "plain",
+        attributes: {},
+        innerHTML: "x",
+        css: {
+          "::placeholder": { color: "red" },
+        },
+      });
+    });
+
+    test("rejects a pseudo-element nested inside another pseudo-element", () => {
+      createPEComponent({
+        tag: "box",
+        innerHTML: "x",
+        css: {
+          "::before": {
+            // @ts-expect-error
+            "::after": { color: "red" },
+          },
+        },
+      });
+    });
   });
 });

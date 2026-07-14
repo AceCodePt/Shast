@@ -1,4 +1,4 @@
-import type { BaseComponentStructure } from "@/engine/create-component.ts";
+import type { BaseComponentStructure } from "@/engine/types.ts";
 import type { BaseHTMLTagConfig } from "@/html/tag-config/types.ts";
 
 const INDENT_UNIT = "  ";
@@ -98,7 +98,8 @@ function renderHTMLNode(
     return `<${tag}${attributesHTML}>`;
   }
 
-  const innerHTML = node.innerHTML;
+  const innerHTML =
+    "innerHTML" in node && node["innerHTML"] ? node["innerHTML"] : undefined;
   let childrenHTML = "";
 
   if (typeof innerHTML === "string") {
@@ -124,7 +125,8 @@ function resolveChild(
   node: BaseComponentStructure,
   childName: string,
 ): BaseComponentStructure | undefined {
-  const innerHTML = node.innerHTML;
+  const innerHTML =
+    "innerHTML" in node && node["innerHTML"] ? node["innerHTML"] : undefined;
   if (!isRecordInnerHTML(innerHTML)) return undefined;
   const child = innerHTML[childName];
   return child !== null && typeof child === "object"
@@ -201,7 +203,8 @@ function collectCSS(node: BaseComponentStructure): string[] {
     if (rule !== null) rules.push(rule);
   }
 
-  const innerHTML = node.innerHTML;
+  const innerHTML =
+    "innerHTML" in node && node["innerHTML"] ? node["innerHTML"] : undefined;
   if (isRecordInnerHTML(innerHTML)) {
     for (const child of Object.values(innerHTML)) {
       if (child !== null && typeof child === "object") {
