@@ -512,6 +512,38 @@
 
 ---
 
+## CSS Variable Usage from Property Registry
+
+- [ ] **`var()` reference support in CSS values** - `var(--my-color)` referencing a property defined in CSS Properties config
+  - [ ] Type Validation
+  - [ ] Type Inference
+  - [ ] Runtime Validation
+  - [ ] Test
+
+- [ ] **Variable resolution rules**
+  - [ ] `var(--name)` resolves to the syntax type of the registered property
+  - [ ] Unknown `--name` (not in CSS Properties config) is rejected
+  - [ ] Property without a `--` prefix is rejected
+  - [ ] `var()` used in a context where the resolved type is compatible with the expected CSS value syntax
+
+- [ ] **Fallback values**
+  - [ ] `var(--name, <fallback>)` — fallback validated against the property's syntax type
+  - [ ] Fallback can be a literal value, another `var()`, or a `calc()`
+  - [ ] Fallback type-checked to match the expected context type
+
+- [ ] **Nesting and composition**
+  - [ ] `var()` inside `calc()` — `calc(var(--spacing) * 2)`
+  - [ ] Multiple `var()` references in a single CSS value
+  - [ ] `var()` in CSS shorthand properties
+
+- [ ] **Edge Cases**
+  - [ ] `var()` without arguments (malformed)
+  - [ ] `var()` with extra arguments beyond fallback
+  - [ ] Circular `var()` references (runtime detection)
+  - [ ] Missing fallback for unknown property at runtime
+
+---
+
 ## Array innerHTML Children
 
 - [ ] **Support array of child components** - `innerHTML: { child: [{ tag: "div" }, { tag: "div" }] }` for multiple semantically identical children
@@ -542,3 +574,45 @@
   - [ ] Array with one element
   - [ ] Very large arrays
   - [ ] Arrays with mixed types (text + components)
+
+---
+
+## Media Queries
+
+- [ ] **`@media` rule support in component CSS** - scoped `@media` blocks inside component CSS with responsive breakpoints
+  - [ ] Type Validation
+  - [ ] Type Inference
+  - [ ] Runtime Validation
+  - [ ] Test
+
+- [ ] **Media query features**
+  - [ ] Width breakpoints with comparison operators (`>`, `<`, `>=`, `<=`) — `(width > 768px)`
+  - [ ] Height breakpoints with comparison operators (`>`, `<`, `>=`, `<=`) — `(height <= 600px)`
+  - [ ] `prefers-color-scheme` (light / dark)
+  - [ ] `prefers-reduced-motion`
+  - [ ] `orientation` (portrait / landscape)
+  - [ ] Compound conditions with `and` / `,` (or)
+  - [ ] `not` negation
+  - [ ] `only` keyword
+
+- [ ] **Nesting**
+  - [ ] `@media` at top level of component CSS
+  - [ ] `@media` inside pseudo-class blocks (`:hover`)
+  - [ ] `@media` inside pseudo-element blocks (`::placeholder`)
+  - [ ] Nested `@media` inside `@media`
+  - [ ] Properties, pseudo-classes, and child selectors inside `@media` block
+
+- [ ] **CSS variable interaction**
+  - [ ] `var()` references inside `@media` block properties
+  - [ ] `calc()` expressions inside `@media` block properties
+
+- [ ] **Rendering**
+  - [ ] `@media` blocks rendered as scoped CSS rules with correct syntax
+  - [ ] Multiple `@media` blocks rendered in order
+  - [ ] CID scoping preserved inside `@media` blocks
+
+- [ ] **Edge Cases**
+  - [ ] Empty `@media` block (no properties)
+  - [ ] `@media` with unsupported media feature rejected
+  - [ ] Invalid media query syntax rejected
+  - [ ] `@media` with only a type (`@media screen`)
