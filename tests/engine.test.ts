@@ -45,7 +45,7 @@ describe("engine", () => {
     const component = createComponent({
       tag: "div",
       innerHTML: { title: { tag: "h1", innerHTML: "hello" } },
-      css: { width: "100%" },
+      css: { width: "100%", "> title": { color: "inherit" } },
     });
 
     // Bound call (node only) must equal the unbound call with explicit config.
@@ -54,7 +54,7 @@ describe("engine", () => {
     assert.deepStrictEqual(bound, direct);
 
     assert.match(bound.html, /^<div cid-[a-z0-9]+>/);
-    assert.ok(bound.html.includes("<h1 cid-"));
+    assert.ok(bound.html.includes("<h1 cid-title"));
     assert.ok(bound.html.includes("hello"));
     assert.ok(bound.css.includes("width: 100%;"));
   });

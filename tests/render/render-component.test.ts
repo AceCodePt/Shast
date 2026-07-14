@@ -69,7 +69,7 @@ describe("renderComponent", () => {
         tag: "div",
         innerHTML: { title: { tag: "h1", innerHTML: "hello" } },
       });
-      assert.strictEqual(html, `<div><h1 cid-title>hello</h1></div>`);
+      assert.strictEqual(html, `<div><h1>hello</h1></div>`);
     });
   });
 
@@ -108,26 +108,61 @@ describe("renderComponent", () => {
   });
 
   describe("Semantic naming", () => {
-    test("children carry a semantic cid attribute from their key", () => {
+    test("a child targeted by a direct child selector carries a semantic cid attribute", () => {
       const { html } = render({
         tag: "div",
         innerHTML: {
           someImage: { tag: "img", attributes: { src: "", alt: "" } },
           title: { tag: "h1", innerHTML: "t" },
         },
+        css: { "> title": { color: "red" } },
       });
-      assert.ok(html.includes("<img cid-someImage "));
+      // `title` is targeted, `someImage` is not.
       assert.ok(html.includes("<h1 cid-title>"));
+      assert.ok(!html.includes("cid-someImage"));
+      assert.ok(html.includes("<img "));
     });
 
-    test("a child with its own css carries both semantic and hash", () => {
+    test("an untargeted child gets no semantic cid attribute", () => {
+      const { html } = render({
+        tag: "div",
+        innerHTML: {
+          title: { tag: "h1", innerHTML: "t" },
+        },
+      });
+      assert.ok(!html.includes("cid-title"));
+      assert.strictEqual(html, `<div><h1>t</h1></div>`);
+    });
+
+    test("a targeted child with its own css carries both semantic and hash", () => {
+      const { html } = render({
+        tag: "div",
+        innerHTML: {
+          inner: { tag: "span", innerHTML: "hi", css: { color: "green" } },
+        },
+        css: { "> inner": { display: "block" } },
+      });
+      assert.match(html, /<span cid-inner cid-[a-z0-9]+>hi<\/span>/);
+    });
+
+    test("an untargeted child with its own css carries only its hash", () => {
       const { html } = render({
         tag: "div",
         innerHTML: {
           inner: { tag: "span", innerHTML: "hi", css: { color: "green" } },
         },
       });
-      assert.match(html, /<span cid-inner cid-[a-z0-9]+>hi<\/span>/);
+      assert.match(html, /<span cid-[a-z0-9]+>hi<\/span>/);
+      assert.ok(!html.includes("cid-inner"));
+    });
+
+    test("child selectors nested via pseudo blocks still target the child", () => {
+      const { html } = render({
+        tag: "div",
+        innerHTML: { inner: { tag: "span", innerHTML: "hi" } },
+        css: { ":hover": { "> inner": { color: "green" } } },
+      });
+      assert.ok(html.includes("<span cid-inner>"));
     });
   });
 
@@ -147,7 +182,7 @@ describe("renderComponent", () => {
       });
       assert.strictEqual(
         html,
-        `<div><span cid-first>1</span><span cid-second>2</span></div>`,
+        `<div><span>1</span><span>2</span></div>`,
       );
     });
   });
@@ -310,7 +345,7 @@ describe("renderComponent", () => {
       });
       assert.strictEqual(
         html,
-        `<div><div cid-a><span cid-b>deep</span></div></div>`,
+        `<div><div><span>deep</span></div></div>`,
       );
     });
 

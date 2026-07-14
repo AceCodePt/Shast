@@ -73,11 +73,12 @@ function renderHTMLNode(
   tagConfig: BaseHTMLTagConfig,
   node: BaseComponentStructure,
   semanticName: string | undefined,
+  targeted: ReadonlySet<BaseComponentStructure>,
 ): string {
   const tag = node.tag as string;
 
   const identifiers: string[] = [];
-  if (semanticName !== undefined) {
+  if (semanticName !== undefined && targeted.has(node)) {
     identifiers.push(semanticAttribute(semanticName));
   }
   if (hasCSS(node)) {
@@ -113,6 +114,7 @@ function renderHTMLNode(
           tagConfig,
           child as BaseComponentStructure,
           key,
+          targeted,
         );
       }
     }
@@ -132,6 +134,66 @@ function resolveChild(
   return child !== null && typeof child === "object"
     ? (child as BaseComponentStructure)
     : undefined;
+}
+
+/**
+ * Walks a css block exactly as {@link renderRule} does, recording every child
+ * node reached through a `> childName` direct child selector. Pseudo blocks are
+ * traversed without changing the node they resolve against.
+ */
+function markTargetedChildren(
+  cssBlock: Record<string, unknown>,
+  node: BaseComponentStructure,
+  targeted: Set<BaseComponentStructure>,
+): void {
+  for (const [key, value] of Object.entries(cssBlock)) {
+    if (value === null || typeof value !== "object") continue;
+    const block = value as Record<string, unknown>;
+    if (key.startsWith("> ")) {
+      const childNode = resolveChild(node, key.slice(2));
+      if (childNode !== undefined) {
+        targeted.add(childNode);
+        markTargetedChildren(block, childNode, targeted);
+      }
+    } else if (key.startsWith(":")) {
+      markTargetedChildren(block, node, targeted);
+    }
+  }
+}
+
+/**
+ * Collects the child nodes that are targeted by a direct child selector
+ * anywhere in the tree. Only these children need a semantic `cid-<name>`
+ * attribute; untargeted children are rendered without one.
+ */
+function collectTargetedChildren(
+  node: BaseComponentStructure,
+): Set<BaseComponentStructure> {
+  const targeted = new Set<BaseComponentStructure>();
+
+  const visit = (current: BaseComponentStructure): void => {
+    if (hasCSS(current)) {
+      markTargetedChildren(
+        current.css as Record<string, unknown>,
+        current,
+        targeted,
+      );
+    }
+    const innerHTML =
+      "innerHTML" in current && current["innerHTML"]
+        ? current["innerHTML"]
+        : undefined;
+    if (isRecordInnerHTML(innerHTML)) {
+      for (const child of Object.values(innerHTML)) {
+        if (child !== null && typeof child === "object") {
+          visit(child as BaseComponentStructure);
+        }
+      }
+    }
+  };
+
+  visit(node);
+  return targeted;
 }
 
 function renderRule(
@@ -220,8 +282,9 @@ export function renderComponent(
   tagConfig: BaseHTMLTagConfig,
   node: BaseComponentStructure,
 ): { html: string; css: string } {
+  const targeted = collectTargetedChildren(node);
   return {
-    html: renderHTMLNode(tagConfig, node, undefined),
+    html: renderHTMLNode(tagConfig, node, undefined, targeted),
     css: collectCSS(node).join("\n\n"),
   };
 }

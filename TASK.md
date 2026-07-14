@@ -363,7 +363,7 @@
   - [ ] Void elements reject children (error or ignored)
 
 - [x] **CSS string output**
-  - [x] Styled components receive a `cid-<hash>` attribute; children receive a semantic `cid-<name>` attribute for targeting
+  - [x] Styled components receive a `cid-<hash>` attribute; children receive a semantic `cid-<name>` attribute only when targeted by a `> childName` direct child selector
   - [x] Inline `css` block properties collected as scoped CSS rules
   - [x] Child CSS selectors (`> childName`) applied to corresponding children
   - [x] Pseudo-class blocks included in scoped styles
