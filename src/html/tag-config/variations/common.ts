@@ -4,7 +4,7 @@ import { htmlTagConfig } from "@/html/tag-config/index.ts";
 export default htmlTagConfig(SUPPORTED_KEYWORDS, {
   a: {
     attributes: {
-      href: "string | undefined",
+      href: "string",
       target: "'_self' | '_blank' | '_parent' | '_top' | undefined",
       download: "string | boolean | undefined",
       rel: "string | undefined",
