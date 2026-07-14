@@ -36,10 +36,10 @@ type PipeWhenExists<
   : `${Trim<`${L}`>} | ${DSLValidate<S, R>}`;
 
 type ValidateRestOfBackTick<
-  S extends SupportedKeywordsConfig,
+  Keywords extends SupportedKeywordsConfig,
   Str extends string | never,
 > = Str extends `\$\{${infer innerDSL extends string}\}${infer Maybe extends string}`
-  ? `\${${Trim<DSLValidate<S, innerDSL>>}}${ValidateRestOfBackTick<S, Maybe>}`
+  ? `\${${Trim<DSLValidate<Keywords, innerDSL>>}}${ValidateRestOfBackTick<Keywords, Maybe>}`
   : `${Str}`;
 
 type SingleDSLValidate<
