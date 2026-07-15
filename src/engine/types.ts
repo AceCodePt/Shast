@@ -15,16 +15,19 @@ import type { MakeUndefinedOptional } from "@/types.ts";
 
 export type BaseComponentInnerHTMLStructure =
   | string
-  | Record<string, BaseComponentStructure | string>;
+  | Record<
+      string,
+      BaseComponentStructure | string | (BaseComponentStructure | string)[]
+    >;
 
 export type BaseComponentStructure = {
   tag?: string;
   attributes?: Record<string, any>;
   css?: Record<string, unknown>;
-  // Partially declared -> *** innerHTML?: Record<string, any> ***///
+  innerHTML?: BaseComponentInnerHTMLStructure;
   // This is to make the stuff extra premissible so types won't
   // get screwed over
-  [att: string]: unknown;
+  // [att: string]: unknown;
 };
 
 type IsTagAllowText<
@@ -58,6 +61,41 @@ type MaybeAttributes<HTMLAttributesConfig extends Record<string, any>> = {
     : never;
 }[keyof HTMLAttributesConfig];
 
+type ValidateComponentInnerHTMLItemStructure<
+  Keywords extends SupportedKeywordsConfig,
+  HTMLInferedAttributesConfig extends Record<string, any>,
+  HTMLTagConfig extends BaseHTMLTagConfig,
+  CSSSyntaxConfig extends BaseCSSSyntaxConfig,
+  CSSAttributesConfig extends BaseCSSAttributesConfig,
+  CSSPseudoClassConfig extends BaseCSSPseudoClassConfig,
+  CSSPropertiesConfig extends BaseCSSPropertiesConfig,
+  AllowedTags extends keyof HTMLTagConfig | "#text",
+  T extends BaseComponentStructure | string,
+  CurrentTag extends keyof HTMLTagConfig,
+> = T extends string
+  ? true extends IsTagAllowText<HTMLTagConfig, CurrentTag>
+    ? T
+    : `This element cannot contain a string`
+  : T extends BaseComponentStructure
+    ? ValidateComponentStructure<
+        Keywords,
+        HTMLInferedAttributesConfig,
+        HTMLTagConfig,
+        CSSSyntaxConfig,
+        CSSAttributesConfig,
+        CSSPseudoClassConfig,
+        CSSPropertiesConfig,
+        HTMLTagConfig[CurrentTag]["innerHTML"] extends any[]
+          ? // This is the check for when
+            "#text" extends HTMLTagConfig[CurrentTag]["innerHTML"][number]
+            ? AllowedTags & HTMLTagConfig[CurrentTag]["innerHTML"][number]
+            : AllowedTags
+          : AllowedTags,
+        T,
+        GetAllowedTags<HTMLTagConfig, AllowedTags, CurrentTag>
+      >
+    : never;
+
 type ValidateComponentInnerHTMLStructure<
   Keywords extends SupportedKeywordsConfig,
   HTMLInferedAttributesConfig extends Record<string, any>,
@@ -73,11 +111,8 @@ type ValidateComponentInnerHTMLStructure<
   T extends Record<string, any>
     ? {
         [K in keyof T]: K extends string
-          ? T[K] extends string
-            ? true extends IsTagAllowText<HTMLTagConfig, CurrentTag>
-              ? T[K]
-              : `This element cannot contain a string`
-            : ValidateComponentStructure<
+          ? T[K] extends string | BaseComponentStructure
+            ? ValidateComponentInnerHTMLItemStructure<
                 Keywords,
                 HTMLInferedAttributesConfig,
                 HTMLTagConfig,
@@ -85,16 +120,24 @@ type ValidateComponentInnerHTMLStructure<
                 CSSAttributesConfig,
                 CSSPseudoClassConfig,
                 CSSPropertiesConfig,
-                HTMLTagConfig[CurrentTag]["innerHTML"] extends any[]
-                  ? // This is the check for when
-                    "#text" extends HTMLTagConfig[CurrentTag]["innerHTML"][number]
-                    ? AllowedTags &
-                        HTMLTagConfig[CurrentTag]["innerHTML"][number]
-                    : AllowedTags
-                  : AllowedTags,
+                AllowedTags,
                 T[K],
-                GetAllowedTags<HTMLTagConfig, AllowedTags, CurrentTag>
+                CurrentTag
               >
+            : T[K] extends (string | BaseComponentStructure)[]
+              ? ValidateComponentInnerHTMLItemStructure<
+                  Keywords,
+                  HTMLInferedAttributesConfig,
+                  HTMLTagConfig,
+                  CSSSyntaxConfig,
+                  CSSAttributesConfig,
+                  CSSPseudoClassConfig,
+                  CSSPropertiesConfig,
+                  AllowedTags,
+                  T[K][number],
+                  CurrentTag
+                >[]
+              : never
           : T[K];
       }
     : T extends string
@@ -114,18 +157,33 @@ type ValidateComponentCSSStructure<
   IsInPseudoElement extends boolean,
 > = {
   [K in keyof T["innerHTML"] as `> ${K & string}`]?: K extends string
-    ? T["innerHTML"][K] extends Record<string, any>
-      ? ValidateComponentCSSStructure<
-          Keywords,
-          HTMLTagConfig,
-          CSSSyntaxConfig,
-          CSSAttributesConfig,
-          CSSPseudoClassConfig,
-          CSSPropertiesConfig,
-          T["innerHTML"][K],
-          IsInPseudoElement
-        >
-      : never
+    ? T["innerHTML"][K] extends string[]
+      ? never
+      : T["innerHTML"][K] extends
+            | (string | Record<string, any>)[]
+            | Record<string, any>[]
+        ? ValidateComponentCSSStructure<
+            Keywords,
+            HTMLTagConfig,
+            CSSSyntaxConfig,
+            CSSAttributesConfig,
+            CSSPseudoClassConfig,
+            CSSPropertiesConfig,
+            Exclude<T["innerHTML"][K][number], string>,
+            IsInPseudoElement
+          >
+        : T["innerHTML"][K] extends Record<string, any>
+          ? ValidateComponentCSSStructure<
+              Keywords,
+              HTMLTagConfig,
+              CSSSyntaxConfig,
+              CSSAttributesConfig,
+              CSSPseudoClassConfig,
+              CSSPropertiesConfig,
+              T["innerHTML"][K],
+              IsInPseudoElement
+            >
+          : never
     : T["innerHTML"][K];
 } & Partial<
   InferCSSAttributesConfig<Keywords, CSSSyntaxConfig, CSSAttributesConfig>
@@ -227,11 +285,11 @@ export type ValidateComponentStructure<
                     : never
                 : never
         : never;
-    } & (HTMLTagConfig[T["tag"]]["innerHTML"] extends []
-      ? {}
-      : {
-          innerHTML?: {};
-        }) &
+    } & { css?: {} } & (HTMLTagConfig[T["tag"]]["innerHTML"] extends []
+        ? {}
+        : {
+            innerHTML?: {};
+          }) &
       ("attributes" extends MaybeAttributes<
         HTMLTagConfig[T["tag"]]["attributes"]
       >
