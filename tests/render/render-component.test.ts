@@ -193,6 +193,11 @@ describe("renderComponent", () => {
       assert.strictEqual(css, "");
     });
 
+    test("explicitly empty css object elides output", () => {
+      const { css } = render({ tag: "div", css: {} });
+      assert.strictEqual(css, "");
+    });
+
     test("empty css blocks are elided", () => {
       const { css } = render({ tag: "div", css: { ":visited": {} } });
       assert.strictEqual(css, "");
