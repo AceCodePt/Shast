@@ -1,14 +1,24 @@
 {
-	"name": "css-ts-syntax",
+	"name": "shast",
 	"version": "1.0.0",
-	"description": "",
+	"description": "Semantic HTML abstract syntax tree with structurally coupled, scoped CSS — validated at compile time and runtime",
 	"main": "index.ts",
 	"type": "module",
 	"scripts": {
     "test": "tsc --noEmit && node --import=tsx/esm --test",
 		"test:watch": "node --import=tsx/esm --test --watch"
 	},
-	"keywords": [],
+	"keywords": [
+		"html",
+		"css",
+		"ast",
+		"semantic",
+		"typescript",
+		"type-safe",
+		"scoped-css",
+		"components",
+		"validation"
+	],
 	"author": "Sagi Carmel (https://github.com/AceCodePt)",
 	"license": "ISC",
 	"packageManager": "pnpm@10.33.3",
