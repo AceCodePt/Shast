@@ -1,6 +1,9 @@
 {
-	"name": "shast",
+	"name": "@ace-code/shast",
 	"version": "0.1.0",
+	"publishConfig": {
+		"access": "public"
+	},
 	"description": "Semantic HTML abstract syntax tree with structurally coupled, scoped CSS — validated at compile time and runtime",
 	"main": "index.ts",
 	"type": "module",
