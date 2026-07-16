@@ -1,6 +1,10 @@
-# css-ts-syntax
+# shast
 
-**Structurally typed HTML + CSS: styles cannot outlive the markup they target.**
+**shast** — the **s**emantic **H**TML **a**bstract **s**yntax **t**ree whose
+CSS can't go stale.
+
+> Not affiliated with (or node-compatible with) [hast](https://github.com/syntax-tree/hast)
+> from the unified ecosystem — the name is a nod, not an implementation.
 
 The bug this library kills is not *writing* CSS — it's *refactoring* HTML.
 You rename a wrapper, move a child, delete a node… and somewhere a selector
