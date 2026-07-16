@@ -1,6 +1,6 @@
 {
 	"name": "shast",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"description": "Semantic HTML abstract syntax tree with structurally coupled, scoped CSS — validated at compile time and runtime",
 	"main": "index.ts",
 	"type": "module",
