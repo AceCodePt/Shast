@@ -349,6 +349,107 @@ describe("renderComponent", () => {
       );
     });
 
+    test("class selectors render as &,className", () => {
+      const { html, css } = render({
+        tag: "div",
+        css: { "&.active": { color: "red" } },
+      });
+      const scope = hashScope(html, "div");
+      assert.strictEqual(
+        css,
+        [
+          `[${scope}] {`,
+          `  &.active {`,
+          `    color: red;`,
+          `  }`,
+          `}`,
+        ].join("\n"),
+      );
+    });
+
+    test("class selectors nest inside pseudo-class blocks", () => {
+      const { html, css } = render({
+        tag: "a",
+        css: {
+          ":hover": {
+            "&.active": { color: "blue" },
+          },
+        },
+      });
+      const scope = hashScope(html, "a");
+      assert.strictEqual(
+        css,
+        [
+          `[${scope}] {`,
+          `  &:hover {`,
+          `    &.active {`,
+          `      color: blue;`,
+          `    }`,
+          `  }`,
+          `}`,
+        ].join("\n"),
+      );
+    });
+
+    test("class selectors render alongside pseudo-class and declarations", () => {
+      const { html, css } = render({
+        tag: "div",
+        css: {
+          color: "black",
+          "&.active": { color: "red" },
+          ":hover": { color: "blue" },
+        },
+      });
+      const scope = hashScope(html, "div");
+      assert.strictEqual(
+        css,
+        [
+          `[${scope}] {`,
+          `  color: black;`,
+          `  &.active {`,
+          `    color: red;`,
+          `  }`,
+          `  &:hover {`,
+          `    color: blue;`,
+          `  }`,
+          `}`,
+        ].join("\n"),
+      );
+    });
+
+    test("class attribute is rendered as space-separated string in HTML output", () => {
+      const { html } = render({
+        tag: "div",
+        attributes: { class: "foo bar" },
+      });
+      assert.ok(html.includes('class="foo bar"'));
+    });
+
+    test("class selectors inside child selector blocks", () => {
+      const { html, css } = render({
+        tag: "div",
+        innerHTML: { inner: { tag: "span", innerHTML: "hi" } },
+        css: {
+          "> inner": {
+            "&.highlight": { color: "yellow" },
+          },
+        },
+      });
+      const scope = hashScope(html, "div");
+      assert.strictEqual(
+        css,
+        [
+          `[${scope}] {`,
+          `  & > [cid-inner] {`,
+          `    &.highlight {`,
+          `      color: yellow;`,
+          `    }`,
+          `  }`,
+          `}`,
+        ].join("\n"),
+      );
+    });
+
     test("produces identical output across repeated calls", () => {
       const node: BaseComponentStructure = {
         tag: "div",

@@ -87,14 +87,121 @@ export function validateComponentNode(
     }
   }
 
-  const innerHTMLConfig = tagDefinition.innerHTML;
-  const isVoidElement =
-    Array.isArray(innerHTMLConfig) && innerHTMLConfig.length === 0;
+  const providedAttributes = attributes ?? {};
+  const allAttributeDefs = {
+    ...globalAttributes,
+    ...(tagDefinition.attributes ?? {}),
+  };
+  for (const [attrKey, dsl] of Object.entries(allAttributeDefs)) {
+    if (typeof dsl !== "string") continue;
+    const isOptional = dsl
+      .split("|")
+      .some((part) => part.trim() === "undefined");
+    if (!isOptional && !(attrKey in providedAttributes)) {
+      throw new Error(
+        `Attribute Error: Required attribute '${attrKey}' is missing on <${tag}>`,
+      );
+    }
+  }
 
   const innerHTML =
     "innerHTML" in record && record["innerHTML"]
       ? record["innerHTML"]
       : undefined;
+
+  const css = record.css;
+  if (css !== undefined && css !== null) {
+    const classesOf = (node: unknown): string[] => {
+      const attrs =
+        node !== null && typeof node === "object"
+          ? (node as Record<string, unknown>)["attributes"]
+          : undefined;
+      const classValue =
+        attrs !== null && typeof attrs === "object"
+          ? (attrs as Record<string, unknown>)["class"]
+          : undefined;
+      return typeof classValue === "string" && classValue.length > 0
+        ? classValue.split(/\s+/)
+        : [];
+    };
+    const validateCSS = (
+      block: Record<string, unknown>,
+      contextInnerHTML: typeof innerHTML,
+      contextClasses: string[],
+    ): void => {
+      for (const key of Object.keys(block)) {
+        if (key.startsWith("&.")) {
+          const className = key.slice(2);
+          if (!contextClasses.includes(className)) {
+            throw new Error(
+              `CSS Error: Class selector '${key}' references class '${className}' which is not declared in the element's 'class' attribute`,
+            );
+          }
+        }
+        if (key.startsWith("> ")) {
+          const childName = key.slice(2);
+          if (
+            !contextInnerHTML ||
+            typeof contextInnerHTML === "string" ||
+            !(childName in contextInnerHTML)
+          ) {
+            throw new Error(
+              `CSS Error: Child selector '${key}' references child '${childName}' which is not declared in the element's innerHTML`,
+            );
+          }
+        }
+        const value = block[key];
+        if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+          let nextContext = contextInnerHTML;
+          let nextClasses = contextClasses;
+          if (key.startsWith("> ")) {
+            const childName = key.slice(2);
+            if (contextInnerHTML && typeof contextInnerHTML === "object" && childName in contextInnerHTML) {
+              const rawChild = (contextInnerHTML as Record<string, unknown>)[childName];
+              if (Array.isArray(rawChild)) {
+                const merged: Record<string, unknown> = {};
+                const mergedClasses = new Set<string>();
+                for (const item of rawChild) {
+                  if (item && typeof item === "object" && !Array.isArray(item)) {
+                    for (const cls of classesOf(item)) {
+                      mergedClasses.add(cls);
+                    }
+                    const childInner = (item as Record<string, unknown>)["innerHTML"];
+                    if (childInner && typeof childInner === "object" && !Array.isArray(childInner)) {
+                      for (const [k, v] of Object.entries(childInner as Record<string, unknown>)) {
+                        if (Array.isArray(v)) {
+                          const existing = merged[k];
+                          merged[k] = existing && Array.isArray(existing) ? [...existing, ...v] : [...v];
+                        } else {
+                          merged[k] = v;
+                        }
+                      }
+                    }
+                  }
+                }
+                nextContext = Object.keys(merged).length > 0 ? merged as typeof innerHTML : undefined;
+                nextClasses = [...mergedClasses];
+              } else if (rawChild && typeof rawChild === "object" && !Array.isArray(rawChild)) {
+                nextContext = "innerHTML" in (rawChild as Record<string, unknown>)
+                  ? (rawChild as Record<string, unknown>)["innerHTML"] as typeof innerHTML
+                  : undefined;
+                nextClasses = classesOf(rawChild);
+              } else {
+                nextContext = undefined;
+                nextClasses = [];
+              }
+            }
+          }
+          validateCSS(value as Record<string, unknown>, nextContext, nextClasses);
+        }
+      }
+    };
+    validateCSS(css as Record<string, unknown>, innerHTML, classesOf(record));
+  }
+
+  const innerHTMLConfig = tagDefinition.innerHTML;
+  const isVoidElement =
+    Array.isArray(innerHTMLConfig) && innerHTMLConfig.length === 0;
 
   if (isVoidElement) {
     if (innerHTML !== undefined) {
@@ -137,14 +244,20 @@ export function validateComponentNode(
     return;
   }
 
-  for (const child of Object.values(innerHTML)) {
+  const processChild = (child: unknown): void => {
     if (typeof child === "string") {
       if (!allowsText) {
         throw new Error(
           `Validation Error: Tag '<${tag}>' innerHTML cannot contain a string without the #text`,
         );
       }
-      continue;
+      return;
+    }
+    if (Array.isArray(child)) {
+      for (const item of child) {
+        processChild(item);
+      }
+      return;
     }
     const childTag =
       child !== null && typeof child === "object"
@@ -166,6 +279,10 @@ export function validateComponentNode(
       tagConfig,
       forwardAllowed,
     );
+  };
+
+  for (const child of Object.values(innerHTML)) {
+    processChild(child);
   }
 }
 

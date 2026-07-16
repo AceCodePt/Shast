@@ -11,7 +11,11 @@ import type {
   InferHTMLAttributesConfig,
 } from "@/html/attribute-config/types.ts";
 import type { BaseHTMLTagConfig } from "@/html/tag-config/types.ts";
-import type { MakeUndefinedOptional, UnionToIntersection } from "@/types.ts";
+import type {
+  MakeUndefinedOptional,
+  Trim,
+  UnionToIntersection,
+} from "@/types.ts";
 
 export type BaseComponentInnerHTMLStructure =
   | string
@@ -146,6 +150,13 @@ type ValidateComponentInnerHTMLStructure<
         : `This element cannot contain a string`
       : never;
 
+type SplitSpace<S extends string> =
+  Trim<S> extends `${infer Head} ${infer Tail}`
+    ? Trim<Head> | SplitSpace<Tail>
+    : Trim<S> extends ""
+      ? never
+      : Trim<S>;
+
 type ValidateComponentCSSStructure<
   Keywords extends SupportedKeywordsConfig,
   HTMLTagConfig extends BaseHTMLTagConfig,
@@ -229,6 +240,24 @@ type ValidateComponentCSSStructure<
           true
         >;
       }
+    : {}) &
+  ("class" extends keyof T["attributes"]
+    ? T["attributes"]["class"] extends string
+      ? {
+          [K in SplitSpace<
+            T["attributes"]["class"]
+          > as `&.${K}`]?: ValidateComponentCSSStructure<
+            Keywords,
+            HTMLTagConfig,
+            CSSSyntaxConfig,
+            CSSAttributesConfig,
+            CSSPseudoClassConfig,
+            CSSPropertiesConfig,
+            T,
+            false
+          >;
+        }
+      : {}
     : {});
 
 export type ValidateComponentStructure<

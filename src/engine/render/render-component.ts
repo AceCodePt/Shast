@@ -52,6 +52,35 @@ function isRecordInnerHTML(
   );
 }
 
+/**
+ * Merges innerHTML records from multiple components so that CSS traversal can
+ * resolve `> childKey` selectors against any key present in any element.
+ * Array values are **concatenated** (not overwritten) so deeper selectors
+ * (e.g. `> inner2 > inner5`) continue to work across heterogeneous siblings.
+ */
+function mergeInnerHTML(
+  components: BaseComponentStructure[],
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+  for (const comp of components) {
+    const innerHTML = comp.innerHTML;
+    if (!innerHTML || typeof innerHTML !== "object" || Array.isArray(innerHTML))
+      continue;
+    for (const [key, value] of Object.entries(innerHTML)) {
+      if (Array.isArray(value)) {
+        const existing = result[key];
+        result[key] =
+          existing && Array.isArray(existing)
+            ? [...existing, ...value]
+            : [...value];
+      } else {
+        result[key] = value;
+      }
+    }
+  }
+  return result;
+}
+
 function hasCSS(node: BaseComponentStructure): boolean {
   return node.css !== undefined && node.css !== null;
 }
@@ -109,6 +138,19 @@ function renderHTMLNode(
     for (const [key, child] of Object.entries(innerHTML)) {
       if (typeof child === "string") {
         childrenHTML += child;
+      } else if (Array.isArray(child)) {
+        for (const item of child) {
+          if (typeof item === "string") {
+            childrenHTML += item;
+          } else if (item !== null && typeof item === "object") {
+            childrenHTML += renderHTMLNode(
+              tagConfig,
+              item as BaseComponentStructure,
+              key,
+              targeted,
+            );
+          }
+        }
       } else if (child !== null && typeof child === "object") {
         childrenHTML += renderHTMLNode(
           tagConfig,
@@ -131,7 +173,14 @@ function resolveChild(
     "innerHTML" in node && node["innerHTML"] ? node["innerHTML"] : undefined;
   if (!isRecordInnerHTML(innerHTML)) return undefined;
   const child = innerHTML[childName];
-  return child !== null && typeof child === "object"
+  if (Array.isArray(child)) {
+    const first = (child as unknown[]).find(
+      (c): c is BaseComponentStructure =>
+        c !== null && typeof c === "object" && !Array.isArray(c),
+    );
+    return first;
+  }
+  return child !== null && typeof child === "object" && !Array.isArray(child)
     ? (child as BaseComponentStructure)
     : undefined;
 }
@@ -150,12 +199,41 @@ function markTargetedChildren(
     if (value === null || typeof value !== "object") continue;
     const block = value as Record<string, unknown>;
     if (key.startsWith("> ")) {
-      const childNode = resolveChild(node, key.slice(2));
+      const childName = key.slice(2);
+      const innerHTML =
+        "innerHTML" in node && node["innerHTML"]
+          ? node["innerHTML"]
+          : undefined;
+      if (isRecordInnerHTML(innerHTML)) {
+        const rawChild = innerHTML[childName];
+        if (Array.isArray(rawChild)) {
+          for (const item of rawChild) {
+            if (item !== null && typeof item === "object" && !Array.isArray(item)) {
+              targeted.add(item as BaseComponentStructure);
+            }
+          }
+          const components = (rawChild as unknown[]).filter(
+            (c): c is BaseComponentStructure =>
+              c !== null && typeof c === "object" && !Array.isArray(c),
+          );
+          if (components.length > 0) {
+            const mergedNode = {
+              tag: components[0]!.tag,
+              innerHTML: mergeInnerHTML(components),
+            } as BaseComponentStructure;
+            markTargetedChildren(block, mergedNode, targeted);
+          }
+          continue;
+        }
+      }
+      const childNode = resolveChild(node, childName);
       if (childNode !== undefined) {
         targeted.add(childNode);
         markTargetedChildren(block, childNode, targeted);
       }
     } else if (key.startsWith(":")) {
+      markTargetedChildren(block, node, targeted);
+    } else if (key.startsWith("&.")) {
       markTargetedChildren(block, node, targeted);
     }
   }
@@ -185,7 +263,13 @@ function collectTargetedChildren(
         : undefined;
     if (isRecordInnerHTML(innerHTML)) {
       for (const child of Object.values(innerHTML)) {
-        if (child !== null && typeof child === "object") {
+        if (Array.isArray(child)) {
+          for (const item of child) {
+            if (item !== null && typeof item === "object") {
+              visit(item as BaseComponentStructure);
+            }
+          }
+        } else if (child !== null && typeof child === "object") {
           visit(child as BaseComponentStructure);
         }
       }
@@ -208,7 +292,29 @@ function renderRule(
   for (const [key, value] of Object.entries(cssBlock)) {
     if (key.startsWith("> ")) {
       const childName = key.slice(2);
-      const childNode = resolveChild(node, childName);
+      const innerHTML =
+        "innerHTML" in node && node["innerHTML"]
+          ? node["innerHTML"]
+          : undefined;
+      let childNode: BaseComponentStructure | undefined;
+      if (isRecordInnerHTML(innerHTML)) {
+        const rawChild = innerHTML[childName];
+        if (Array.isArray(rawChild)) {
+          const components = (rawChild as unknown[]).filter(
+            (c): c is BaseComponentStructure =>
+              c !== null && typeof c === "object" && !Array.isArray(c),
+          );
+          if (components.length > 0) {
+            childNode = {
+              tag: components[0]!.tag,
+              innerHTML: mergeInnerHTML(components),
+            } as BaseComponentStructure;
+          }
+        }
+      }
+      if (childNode === undefined) {
+        childNode = resolveChild(node, childName);
+      }
       if (
         childNode !== undefined &&
         value !== null &&
@@ -227,6 +333,17 @@ function renderRule(
       if (value !== null && typeof value === "object") {
         const rule = renderRule(
           `&${key}`,
+          value as Record<string, unknown>,
+          node,
+          indent + 1,
+        );
+        if (rule !== null) nestedRules.push(rule);
+      }
+    } else if (key.startsWith("&.")) {
+      // Class selector (`&.active`).
+      if (value !== null && typeof value === "object") {
+        const rule = renderRule(
+          key,
           value as Record<string, unknown>,
           node,
           indent + 1,
@@ -269,7 +386,13 @@ function collectCSS(node: BaseComponentStructure): string[] {
     "innerHTML" in node && node["innerHTML"] ? node["innerHTML"] : undefined;
   if (isRecordInnerHTML(innerHTML)) {
     for (const child of Object.values(innerHTML)) {
-      if (child !== null && typeof child === "object") {
+      if (Array.isArray(child)) {
+        for (const item of child) {
+          if (item !== null && typeof item === "object") {
+            rules.push(...collectCSS(item as BaseComponentStructure));
+          }
+        }
+      } else if (child !== null && typeof child === "object") {
         rules.push(...collectCSS(child as BaseComponentStructure));
       }
     }
