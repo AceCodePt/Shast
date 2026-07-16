@@ -329,6 +329,9 @@
   - [x] CSS custom properties (`--*`) resolved against CSS properties config
   - [x] Child CSS selectors (`> childName`) allow per-child CSS blocks
   - [x] Nested CSS selectors validated recursively
+  - [x] Runtime validates `> childName` selector keys against the component's `innerHTML` keys — the type level rejects a typo'd selector (e.g. `> headnig`), but `validateComponentNode` currently accepts it, so the runtime wall has a hole when types are bypassed (found via cross-component composition testing, see `docs/structural-coupling.md`)
+    - [x] Runtime Validation
+    - [x] Test
 
 ---
 
@@ -546,73 +549,136 @@
 
 ## Array innerHTML Children
 
-- [ ] **Support array of child components** - `innerHTML: { child: [{ tag: "div" }, { tag: "div" }] }` for multiple semantically identical children
-  - [ ] Type Validation
-  - [ ] Type Inference
-  - [ ] Runtime Validation
-  - [ ] Test
+- [x] **Support array of child components** - `innerHTML: { child: [{ tag: "div" }, { tag: "div" }] }` for multiple semantically identical children
+  - [x] Type Validation
+  - [x] Type Inference
+  - [x] Runtime Validation
+  - [x] Test
 
-- [ ] **Validation rules**
-  - [ ] Array children validated individually against tag's innerHTML rules
-  - [ ] Mixed single child and array child syntax distinguished
-  - [ ] Empty array `[]` accepted where `innerHTML` allows it
-  - [ ] Array of text nodes `["a", "b"]`
-  - [ ] Mixed text nodes and component children in array
+- [x] **Validation rules**
+  - [x] Array children validated individually against tag's innerHTML rules
+  - [x] Mixed single child and array child syntax distinguished
+  - [x] Empty array `[]` accepted where `innerHTML` allows it
+  - [x] Array of text nodes `["a", "b"]`
+  - [x] Mixed text nodes and component children in array
 
-- [ ] **Render array children**
-  - [ ] Array children rendered in correct order
-  - [ ] Multiple `<div>` siblings rendered correctly
-  - [ ] Array of text nodes concatenated/rendered in order
+- [x] **Render array children**
+  - [x] Array children rendered in correct order
+  - [x] Multiple `<div>` siblings rendered correctly
+  - [x] Array of text nodes concatenated/rendered in order
 
-- [ ] **Nesting**
-  - [ ] Arrays nested inside arrays
-  - [ ] Array with single element equivalent to bare child
-  - [ ] Deeply nested arrays in complex hierarchies
+- [x] **Nesting**
+  - [x] Arrays nested inside arrays
+  - [x] Array with single element equivalent to bare child
+  - [x] Deeply nested arrays in complex hierarchies
 
-- [ ] **Edge Cases**
-  - [ ] Empty array of children
-  - [ ] Array with one element
-  - [ ] Very large arrays
-  - [ ] Arrays with mixed types (text + components)
+- [x] **Edge Cases**
+  - [x] Empty array of children
+  - [x] Array with one element
+  - [x] Very large arrays
+  - [x] Arrays with mixed types (text + components)
 
 ---
 
-## Media Queries
+## CSS Queries Config
 
-- [ ] **`@media` rule support in component CSS** - scoped `@media` blocks inside component CSS with responsive breakpoints
+- [ ] **`cssQueriesConfig` builder** - validates query alias definitions (`@phone` -> `@media (width < 768px)`) with recursive DSL validation
   - [ ] Type Validation
   - [ ] Type Inference
   - [ ] Runtime Validation
   - [ ] Test
 
-- [ ] **Media query features**
-  - [ ] Width breakpoints with comparison operators (`>`, `<`, `>=`, `<=`) — `(width > 768px)`
-  - [ ] Height breakpoints with comparison operators (`>`, `<`, `>=`, `<=`) — `(height <= 600px)`
+- [ ] **Media Query DSL** - `@media (prefers-reduced-motion: reduce)`, `@media (width < 768px)`, `@media (768px <= width < 1024px)`
+  - [ ] Width/height comparison operators (`>`, `<`, `>=`, `<=`) with units
   - [ ] `prefers-color-scheme` (light / dark)
-  - [ ] `prefers-reduced-motion`
+  - [ ] `prefers-reduced-motion` (reduce / no-preference)
   - [ ] `orientation` (portrait / landscape)
+  - [ ] `resolution` / `device-pixel-ratio` queries
   - [ ] Compound conditions with `and` / `,` (or)
-  - [ ] `not` negation
-  - [ ] `only` keyword
+  - [ ] `not` / `only` keywords
+  - [ ] Media types (`all`, `screen`, `print`)
+  - [ ] Type Validation
+  - [ ] Type Inference
+  - [ ] Runtime Validation
+  - [ ] Parse
+  - [ ] Test
 
-- [ ] **Nesting**
-  - [ ] `@media` at top level of component CSS
-  - [ ] `@media` inside pseudo-class blocks (`:hover`)
-  - [ ] `@media` inside pseudo-element blocks (`::placeholder`)
-  - [ ] Nested `@media` inside `@media`
-  - [ ] Properties, pseudo-classes, and child selectors inside `@media` block
+- [ ] **Container Query DSL** - `@container (width > 400px)`, `@container sidebar (min-width: 600px)`
+  - [ ] Width/height comparison operators with units
+  - [ ] Named container scoping (`@container sidebar (...)`)
+  - [ ] Style queries (`@container style(--theme: dark)`)
+  - [ ] Compound conditions with `and` / `,`
+  - [ ] Type Validation
+  - [ ] Type Inference
+  - [ ] Runtime Validation
+  - [ ] Parse
+  - [ ] Test
 
-- [ ] **CSS variable interaction**
-  - [ ] `var()` references inside `@media` block properties
-  - [ ] `calc()` expressions inside `@media` block properties
+- [ ] **Variations**
+  - [ ] Minimal - common width breakpoints, `prefers-reduced-motion`
+  - [ ] Common - width/height, `prefers-color-scheme`, `orientation`, `resolution`, basic container
+  - [ ] Full - all media features, container style queries, complex compound conditions
+
+- [ ] **Component CSS integration** - query aliases resolved in component CSS as `{ "@phone": { ... } }` expanded to scoped `@media` / `@container` blocks
+  - [ ] Query alias (`@phone`) at top level of component CSS
+  - [ ] Query alias inside pseudo-class blocks
+  - [ ] Query alias inside pseudo-element blocks
+  - [ ] Properties, pseudo-classes, and child selectors inside query alias block
+  - [ ] Nested query aliases
+  - [ ] Unknown query alias is a type-level error
+  - [ ] Type Validation
+  - [ ] Type Inference
+  - [ ] Runtime Validation
+  - [ ] Test
 
 - [ ] **Rendering**
-  - [ ] `@media` blocks rendered as scoped CSS rules with correct syntax
-  - [ ] Multiple `@media` blocks rendered in order
-  - [ ] CID scoping preserved inside `@media` blocks
+  - [ ] Query alias resolves to full `@media` / `@container` rule in scoped CSS
+  - [ ] Multiple query aliases rendered in order
+  - [ ] CID scoping preserved inside expanded query blocks
 
 - [ ] **Edge Cases**
-  - [ ] Empty `@media` block (no properties)
-  - [ ] `@media` with unsupported media feature rejected
-  - [ ] Invalid media query syntax rejected
-  - [ ] `@media` with only a type (`@media screen`)
+  - [ ] Empty config `{}` accepted
+  - [ ] Query alias must start with `@`
+  - [ ] Unknown alias reference raises error
+  - [ ] Empty query alias block (no properties) in component CSS
+  - [ ] Invalid media/container DSL string raises error
+
+---
+
+## CSS Class Selectors
+
+- [ ] **`class` attribute supports space-separated class names** — `class: "foo bar"` declares multiple classes on an element
+  - [ ] Type Validation
+  - [ ] Type Inference
+  - [ ] Runtime Validation
+  - [ ] Test
+
+- [ ] **Class targeting in CSS blocks** — `css: { "&.foo": { ... }, "&.bar": { ... } }` targets individual declared classes
+  - [ ] Type Validation
+  - [ ] Type Inference
+  - [ ] Runtime Validation
+  - [ ] Test
+
+- [ ] **Selector rules**
+  - [ ] `&.className` only valid if `className` is part of the element's `class` attribute
+  - [ ] Unknown class in CSS selector is a type-level error
+  - [ ] Multiple classes on same element targetable individually
+  - [ ] Pseudo-classes applied via nesting inside `&.className` block
+  - [ ] Pseudo-elements applied via nesting inside `&.className` block
+
+- [ ] **Nesting**
+  - [ ] `&.className` inside `@media` blocks
+  - [ ] `&.className` inside pseudo-class blocks
+  - [ ] `&.className` inside pseudo-element blocks
+  - [ ] Child selectors inside `&.className` blocks (`> childName`)
+
+- [ ] **Rendering**
+  - [ ] `class` attribute rendered as space-separated string in HTML output
+  - [ ] `&.foo` selectors rendered as `.cid-hash.foo` in scoped CSS
+  - [ ] CID scoping preserved on class selectors
+
+- [ ] **Edge Cases**
+  - [ ] Element with no `class` attribute rejects `&.` selectors
+  - [ ] Empty `class` attribute `""`
+  - [ ] Duplicate class names ignored
+  - [ ] Class name with special characters
