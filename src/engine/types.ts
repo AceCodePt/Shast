@@ -11,7 +11,7 @@ import type {
   InferHTMLAttributesConfig,
 } from "@/html/attribute-config/types.ts";
 import type { BaseHTMLTagConfig } from "@/html/tag-config/types.ts";
-import type { MakeUndefinedOptional } from "@/types.ts";
+import type { MakeUndefinedOptional, UnionToIntersection } from "@/types.ts";
 
 export type BaseComponentInnerHTMLStructure =
   | string
@@ -169,7 +169,9 @@ type ValidateComponentCSSStructure<
             CSSAttributesConfig,
             CSSPseudoClassConfig,
             CSSPropertiesConfig,
-            Exclude<T["innerHTML"][K][number], string>,
+            UnionToIntersection<
+              Extract<T["innerHTML"][K][number], BaseComponentStructure>
+            >,
             IsInPseudoElement
           >
         : T["innerHTML"][K] extends Record<string, any>

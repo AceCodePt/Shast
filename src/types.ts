@@ -60,4 +60,8 @@ export type MakeUndefinedOptional<T> = Simplify<
   } & { [K in UndefinedKeys<T>]?: T[K] } // Apply the `?` modifier to keys that DO allow undefined
 >;
 
-export type Keyof<T extends Record<string, any>> = keyof T & string;
+export type UnionToIntersection<U> = (
+  U extends any ? (k: U) => void : never
+) extends (k: infer I extends U) => void
+  ? I
+  : never;
