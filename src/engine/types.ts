@@ -150,12 +150,15 @@ type ValidateComponentInnerHTMLStructure<
         : `This element cannot contain a string`
       : never;
 
-type SplitSpace<S extends string> =
-  Trim<S> extends `${infer Head} ${infer Tail}`
-    ? Trim<Head> | SplitSpace<Tail>
+type SplitSpace<S extends string> = string extends S
+  ? never
+  : S extends never
+    ? never
     : Trim<S> extends ""
       ? never
-      : Trim<S>;
+      : Trim<S> extends `${infer Head} ${infer Tail}`
+        ? Trim<Head> | SplitSpace<Tail>
+        : Trim<S>;
 
 type ValidateComponentCSSStructure<
   Keywords extends SupportedKeywordsConfig,
