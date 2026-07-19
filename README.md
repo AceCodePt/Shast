@@ -205,7 +205,14 @@ What that means concretely:
 - **Plausible future work:** *unconditional* cross-node style relations
   (e.g. a child declaring `flex: 1` under a parent whose own `css` block
   declares `display: flex`). Both facts are visible in the same definition
-  the types already walk. Tracked in `TASK.md`; not promised.
+  the types already walk. A broader catalog of these checks — the common CSS
+  "why isn't this working" mistakes (`z-index` without a stacking context,
+  inline elements ignoring `width`, flex/grid item props without a flex/grid
+  parent, `grid-area` names, `position` sticky/absolute/fixed ancestor
+  requirements) — is enumerated in `TASK.md` under **CSS Semantic Rules**,
+  ordered by type-system cost. The cheap tiers (same-node and one-level
+  parent→child rules) cover a large fraction of the most-Googled CSS bugs;
+  heavier tiers are gated behind the performance budget. Tracked, not promised.
 - **Out of scope, permanently:** *conditional* layout semantics. The moment
   `display` sits behind a media query, a pseudo-class, or resolves via
   inheritance from a parent unknown at definition time, "is `flex: 1`
