@@ -1,19 +1,47 @@
 # shast
 
-**shast** — the **s**emantic **H**TML **a**bstract **s**yntax **t**ree whose
-CSS can't go stale.
+**shast** - the **s**emantic **H**TML **a**bstract **s**yntax **t**ree. A
+**server-side rendering** framework built on a closed-world component
+format: HTML structure and CSS are typed against each other, checked twice
+(compile time *and* runtime), and nothing - human or AI - can reference a
+tag, attribute, child, or selector that your registry doesn't declare.
 
-> Not affiliated with (or node-compatible with) [hast](https://github.com/syntax-tree/hast)
-> from the unified ecosystem — the name is a nod, not an implementation.
+shast is not a client-side framework and doesn't compete with React or Vue
+for the browser. It competes with your *templating layer* - JSX-as-template,
+Pug, string builders - and replaces it with one whose output is validated on
+the server, before any HTML leaves it. There is no client runtime, no
+hydration story, and nothing to ship to the browser except the rendered
+`html` and `css`.
 
-The bug this library kills is not *writing* CSS — it's *refactoring* HTML.
-You rename a wrapper, move a child, delete a node… and somewhere a selector
-silently stops matching. Nothing fails. The dead CSS just stays there.
+> Not affiliated with (or node-compatible with)
+> [hast](https://github.com/syntax-tree/hast) from the unified ecosystem -
+> the name is a nod, not an implementation.
 
-Here, a component's CSS is typed *against its own structure*. Change the
-structure and every style rule that targeted the old structure becomes a
-**compile error at that exact spot** — and, as a second wall, a **runtime
-error** if the type layer was bypassed.
+## Two audiences, one mechanism
+
+**If you're generating UI with an AI model:** shast is a target format with
+walls. Components are JSON-shaped (which models emit far more reliably than
+JSX), and every emission is validated against a registry *you* define. A
+model cannot invent a tag, attribute, design token, or custom property -
+`tsc` rejects it with a pointed message (`'colr' is not supported`, `'<p>'
+is not a permitted child of <ul>`), and a runtime backstop catches anything
+that slips past the types (`as any`, generated code, no `tsc` in the loop).
+Because rendering is server-side, that backstop runs exactly where it
+matters: invalid generated components fail **on your server, before HTML is
+ever sent** - not in a user's browser. In an era where the bottleneck is
+constraining what models produce, the registry isn't configuration
+overhead - it's the guardrail itself.
+
+**If you're a human refactoring a codebase:** the bug this kills is not
+*writing* CSS - it's *refactoring* HTML. You rename a wrapper, move a child,
+delete a node… and somewhere a selector silently stops matching. Nothing
+fails. The dead CSS just stays there. Name-integrity tools (CSS Modules,
+vanilla-extract) verify that a class you reference *exists*; none of them
+know the shape of your tree. Here, a component's CSS is typed *against its
+own structure*: change the structure and every rule that targeted the old
+structure becomes a **compile error at that exact spot**.
+
+## 30 seconds of shast
 
 ```ts
 const { createComponent, renderComponent } = engine({
@@ -52,72 +80,183 @@ css: { "> title": { ... } }
 ```
 
 The stale style is not a visual bug you discover next month. It's a red
-squiggle right now.
+squiggle right now - and if the types were bypassed, a runtime error instead
+of silence.
+
+## Dynamic components and classes
+
+Components are plain functions, so parameters, conditional classes, and
+composition are ordinary TypeScript - and the class wall holds through all
+of it. A `&.class` selector is typed against the classes actually declared
+in the element's `class` attribute, including classes computed at runtime
+through template literals:
+
+```ts
+const card = (num: number) => {
+  const active = num > 1 ? "active" : "";
+  return createComponent({
+    tag: "li",
+    attributes: { class: `${active} card` },
+    innerHTML: {
+      someImage: {
+        tag: "img",
+        attributes: { alt: "", src: "" },
+      },
+      content: {
+        tag: "a",
+        attributes: { href: "" },
+        innerHTML: {
+          content: { tag: "div", innerHTML: {} },
+        },
+        css: {
+          ":link": {}, // pseudo-class, validated for <a>
+        },
+      },
+    },
+    css: {
+      width: "100px",
+      "&.active": {}, // valid: 'active' is a possible class above
+      "> content": {}, // valid: 'content' is a named child
+    },
+  });
+};
+```
+
+Remove `active` from the class expression - or typo the selector as
+`&.actve` - and the rule is a compile error, same as a renamed child. The
+guarantee doesn't loosen because the class is conditional: the type system
+sees every class the expression can produce, so styles for a state the
+element can never be in are caught, not shipped.
+
+### The one rule: the type must be known at compile time
+
+Class checking in shast operates on **types, not source text**. This is the
+opposite of Tailwind's model: Tailwind discovers class names by scanning
+your files as strings, so a dynamically *constructed* class name
+(`` `text-${color}-500` ``) silently escapes the scanner and breaks. shast
+doesn't care how the class string is built - concatenated, computed,
+returned from a helper - as long as TypeScript can compute its **literal
+type**. You can create the type or compute it; what matters is that it's
+known:
+
+```ts
+// ✅ known - checked
+class: "card"
+class: num > 1 ? "active card" : "card"        // "active card" | "card"
+class: `${active} card`                        // if active: "active" | ""
+class: variantClass(props.kind)                // if it returns "primary" | "ghost"
+
+// ❌ not known - disregarded by the wall
+class: userInput                               // typed as string
+class: classNames.join(" ")                    // string
+class: legacyHelper()                          // untyped / returns string
+```
+
+**For better or for worse.** The better: total freedom in *how* you build
+class strings, with no scanner heuristics to appease - the check follows
+the type system wherever it can see. The worse: the moment a class value
+widens to plain `string`, it carries no information, and validation over it
+is disregarded - the class wall simply does not cover that expression. The
+boundary is exactly TypeScript's boundary, nothing smarter and nothing
+dumber. If you want a dynamic-but-checked class, give it a type: a `const`
+map, an `as const` array, a helper with a literal-union return type - the
+usual TypeScript moves all work.
 
 ## What gets validated
 
-Everything is defined in **closed-world config registries** — tags, allowed
+Everything is defined in **closed-world config registries** - tags, allowed
 children, attributes (as DSL strings), CSS properties, syntax tokens,
-`@property` custom properties, pseudo-classes/elements — and every component
+`@property` custom properties, pseudo-classes/elements - and every component
 is checked against them **twice**:
 
-| Rule | Compile time | Runtime |
-|---|---|---|
-| Tag exists in the registry | ✓ | ✓ |
-| Child tag allowed by parent (`ul` → only `li`) | ✓ | ✓ |
-| Ancestral inheritance (`a > h1 > b` rejected because `a ∩ h1` forbids `b`) | ✓ | ✓ |
-| Attribute exists and value matches its DSL type | ✓ | ✓ |
-| CSS property value matches the syntax config | ✓ | see [Limitations](#limitations) |
-| `> child` selector targets a real named child (at any nesting depth) | ✓ | ✓ |
-| `&.class` selector references a class declared on the context element | ✓ | ✓ |
-| Custom property (`--x`) registered and value matches its `syntax` | ✓ | ✓ |
-| Pseudo-class/element declared for that tag | ✓ | see [Limitations](#limitations) |
+| Rule                                                                       | Compile time | Runtime                         |
+| -------------------------------------------------------------------------- | ------------ | ------------------------------- |
+| Tag exists in the registry                                                 | ✓            | ✓                               |
+| Child tag allowed by parent (`ul` → only `li`)                             | ✓            | ✓                               |
+| Ancestral inheritance (`a > h1 > b` rejected because `a ∩ h1` forbids `b`) | ✓            | ✓                               |
+| Attribute exists and value matches its DSL type                            | ✓            | ✓                               |
+| CSS property value matches the syntax config                               | ✓            | see [Limitations](#limitations) |
+| `> child` selector targets a real named child (at any nesting depth)       | ✓            | ✓                               |
+| `&.class` references a class declared on the context element - including classes computed via template literals (`` class: `${active} card` ``) | ✓            | ✓                               |
+| Custom property (`--x`) registered and value matches its `syntax`          | ✓            | ✓                               |
+| Pseudo-class/element declared for that tag                                 | ✓            | see [Limitations](#limitations) |
 
 Composition does not weaken any of this: components built in separate files
 and embedded into parents are **re-validated under the parent's context**, at
-both levels. Widened types fail closed — they can't be embedded at all. See
+both levels. Widened types fail closed - they can't be embedded at all. See
 [docs/structural-coupling.md](docs/structural-coupling.md) for the verified
 guarantees and their test methodology.
 
-## For AI agents and humans alike
-
-The same design serves both audiences, deliberately:
-
-- **Humans** get autocomplete driven by the registries (valid tags, valid
-  children, valid CSS values for *this* property on *this* element) and
-  refactoring that fails loudly instead of silently.
-- **AI agents** get anti-hallucination walls. A model cannot invent a tag,
-  attribute, design token, or custom property that isn't in the registry —
-  `tsc` rejects it with a pointed message (`'colr' is not supported`,
-  `'<p>' is not a permitted child of <ul>`), and the runtime backstop catches
-  anything that slips past the types (`as any`, generated code). The
-  component format is JSON-shaped, which models emit far more reliably than
-  JSX, and a config-derived schema can constrain generation outright.
-
 The wall is only as good as its error messages, so diagnostic quality is
-treated as an interface, not an accident — error strings carry the path and
+treated as an interface, not an accident - error strings carry the path and
 the expectation, and regressions in message clarity are considered bugs.
+
+## The line shast draws (and won't pretend it doesn't)
+
+shast checks what is **mechanically checkable from declared, unconditional
+facts** - the same principle behind the ancestral-inheritance check, which
+already threads parent context through the type system at arbitrary depth.
+
+What that means concretely:
+
+- **Checked:** structure, selector targets, child validity, attribute and
+  value vocabularies, named relationships between a component's CSS and its
+  own tree.
+- **Plausible future work:** *unconditional* cross-node style relations
+  (e.g. a child declaring `flex: 1` under a parent whose own `css` block
+  declares `display: flex`). Both facts are visible in the same definition
+  the types already walk. Tracked in `TASK.md`; not promised.
+- **Out of scope, permanently:** *conditional* layout semantics. The moment
+  `display` sits behind a media query, a pseudo-class, or resolves via
+  inheritance from a parent unknown at definition time, "is `flex: 1`
+  meaningful here?" stops having a yes/no answer. Erroring conservatively
+  would reject correct code and breed escape hatches; permitting
+  optimistically would quietly weaken the guarantee. shast chooses to not
+  check what it cannot check honestly.
+
+If you adopt shast, you will still ship visual regressions that live in
+cascade and layout semantics. The claim is narrower and therefore keepable:
+everything expressible as structure fails loudly, at the definition site,
+before your code runs.
 
 ## Own your registry
 
 The registries are meant to live **inside your codebase** and be tailored to
-it — the same philosophy as shadcn: you don't install a black box, you own the
-config and grow it as your project grows.
+it - the same philosophy as shadcn: you don't install a black box, you own
+the config and grow it as your project grows.
 
-- **Start from `common` (or `minimal`)**, not `full`. Add a tag, an attribute,
-  a syntax token *when you need it*, next to the code that needs it.
+- **Start from `common` (or `minimal`)**, not `full`. Add a tag, an
+  attribute, a syntax token *when you need it*, next to the code that needs
+  it.
 - **`full` is a reference, not a starting point.** It covers essentially the
-  entire HTML/CSS surface, and it's extremely unlikely your project wants the
-  entire web platform as its vocabulary. A registry that permits everything
-  protects against nothing.
-- **Smaller registries are strictly better** on every axis this library cares
-  about: tighter anti-hallucination walls for AI (a model can't reach for a
-  tag your design system doesn't use), sharper autocomplete for humans, and a
-  smaller type-checking constant (registry breadth — not component count — is
-  what drives editor latency).
+  entire HTML/CSS surface, and it's extremely unlikely your project wants
+  the entire web platform as its vocabulary. A registry that permits
+  everything protects against nothing.
+- **Smaller registries are strictly better** on every axis this library
+  cares about: tighter anti-hallucination walls for AI (a model can't reach
+  for a tag your design system doesn't use), sharper autocomplete for
+  humans, and a smaller type-checking constant (registry breadth - not
+  component count - is what drives editor latency).
 
-Your registry *is* your design system's vocabulary. If `<table>` isn't in it,
-nobody — human or model — ships a table.
+Your registry *is* your design system's vocabulary. If `<table>` isn't in
+it, nobody - human or model - ships a table. For humans that is a curation
+chore; for AI-generated code it is the entire point. Defining what a model
+is permitted to emit is the new code review, and the registry is where that
+definition lives.
+
+## Prior art and lineage
+
+The one-string, two-walls technique - a TypeScript-syntax definition string
+parsed identically at the type level and at runtime - is the approach proven
+by [ArkType](https://arktype.io). shast applies it to a deliberately smaller
+domain: HTML attribute values and CSS values are **scalars** (keyword
+unions, numbers, template literals), so shast's DSL intentionally supports
+**no arrays and no objects**. That restraint is what keeps the type-level
+parser small enough for one maintainer to own and fast enough to stay out of
+your editor's way.
+
+You already know the DSL if you know TypeScript: `"'ltr' | 'rtl' |
+undefined"` means exactly what it looks like.
 
 ## Performance (measured, not promised)
 
@@ -132,41 +271,53 @@ imperceptible. Details in
 
 ## Limitations
 
-Some limitations are **deliberate trade-offs** to keep the type system snappy;
-others are **known gaps** with the fix tracked in `TASK.md`. They are listed
-here rather than hidden in either category's fine print.
+Some limitations are **deliberate trade-offs** to keep the type system
+snappy; others are **known gaps** with the fix tracked in `TASK.md`. They
+are listed here rather than hidden in either category's fine print.
 
 ### Deliberate (kept for type-system performance)
 
-Attribute and CSS value types are written as DSL strings
-(`"'ltr' | 'rtl' | undefined"`, `` "`${number}px`" ``) that are parsed at the
-type level *and* validated at runtime. Two parsing edge cases are intentionally
-unsupported because handling them would slow every DSL string down for a
-vanishingly rare case:
+Two DSL parsing edge cases are intentionally unsupported because handling
+them would slow every DSL string down for a vanishingly rare case:
 
-- **Pipe inside quoted strings.** The `|` character is a **union separator**.
-  A literal pipe inside a single/double-quoted string (`"'|'"`) is not
-  supported: the type-level parser splits on `|` before checking quote
-  boundaries, and quote-aware splitting at the type level adds significant
-  complexity. Template literals are the exception: `` `${"a" | "b"}` ``
-  handles `|` inside `${...}` correctly, because backtick strings are parsed
-  by `DSLTemplateDelimiter` before the pipe split.
+- **Pipe inside quoted strings.** The `|` character is a **union
+  separator**. A literal pipe inside a single/double-quoted string (`"'|'"`)
+  is not supported: the type-level parser splits on `|` before checking
+  quote boundaries, and quote-aware splitting at the type level adds
+  significant complexity. Template literals are the exception:
+  `` `${"a" | "b"}` `` handles `|` inside `${...}` correctly, because
+  backtick strings are parsed by `DSLTemplateDelimiter` before the pipe
+  split.
 - **Nested template literals.** `` `\`${number | string}\`` `` (a
-  backtick-literal backtick containing an interpolation) is not supported —
-  tracking escape depth across quote contexts at the type level costs far more
-  than the edge case is worth.
+  backtick-literal backtick containing an interpolation) is not supported -
+  tracking escape depth across quote contexts at the type level costs far
+  more than the edge case is worth.
 
-### Known gaps (runtime wall only — the type wall covers these today)
+### Known gaps (runtime wall only - the type wall covers these today)
 
 - **CSS property *values* are not validated at runtime.** Selector structure
-  in `css` blocks *is* runtime-validated (`> child` keys against `innerHTML`,
-  `&.class` keys against the context element's `class` attribute, at any
-  nesting depth), but an invalid property value (`color: "magenta"` when the
-  syntax config says `'red' | 'blue'`) passes runtime validation if the type
-  layer is bypassed (`as any`, generated code).
-- **Pseudo-class/element usage** in css blocks and pseudo-element declarations
-  in the tag config are type-checked but not runtime-checked.
+  in `css` blocks *is* runtime-validated (`> child` keys against
+  `innerHTML`, `&.class` keys against the context element's `class`
+  attribute, at any nesting depth), but an invalid property value
+  (`color: "magenta"` when the syntax config says `'red' | 'blue'`) passes
+  runtime validation if the type layer is bypassed (`as any`, generated
+  code).
+- **Pseudo-class/element usage** in css blocks and pseudo-element
+  declarations in the tag config are type-checked but not runtime-checked.
 
 Until these close, the runtime backstop covers *structure, attributes, and
-selector shape* but not yet *style values* — worth knowing if you rely on the
-runtime wall alone (e.g. validating untyped AI output without running `tsc`).
+selector shape* but not yet *style values* - worth knowing if you rely on
+the runtime wall alone (e.g. validating untyped AI output without running
+`tsc`).
+
+## Status
+
+Early, honest version: one maintainer, 200+ commits, no releases yet. The
+type-level and runtime guarantees in the table above are tested (see
+[docs/structural-coupling.md](docs/structural-coupling.md)); the API surface
+may still move. If a closed-world, server-rendered approach to AI-generated
+UI resonates with you, issues and skepticism are equally welcome.
+
+## License
+
+MIT
