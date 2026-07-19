@@ -2059,407 +2059,381 @@ describe("createComponent (engine)", () => {
         assert.ok(css.includes("font: italic;"));
       });
 
-  describe("CSS Class Selectors", () => {
-    const CLASS_CSS_ATTRIBUTES = cssAttributeConfig(
-      SUPPORTED_KEYWORDS,
-      MOCK_CSS_SYNTAX,
-      {
-        color: "string",
-        display: "'block' | 'inline' | 'none'",
-      },
-    );
-    const CLASS_CSS_PROPERTIES = cssPropertiesConfig(
-      SUPPORTED_KEYWORDS,
-      MOCK_CSS_SYNTAX,
-      {},
-    );
+      describe("CSS Class Selectors", () => {
+        const CLASS_CSS_ATTRIBUTES = cssAttributeConfig(
+          SUPPORTED_KEYWORDS,
+          MOCK_CSS_SYNTAX,
+          {
+            color: "string",
+            display: "'block' | 'inline' | 'none'",
+          },
+        );
+        const CLASS_CSS_PROPERTIES = cssPropertiesConfig(
+          SUPPORTED_KEYWORDS,
+          MOCK_CSS_SYNTAX,
+          {},
+        );
 
-    const CLASS_TAG_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
-      button: {
-        attributes: {},
-        innerHTML: ["#text"],
-        cssPseudoClass: [":hover"],
-        cssPseudoElement: [],
-      },
-      span: {
-        attributes: {},
-        innerHTML: ["#text"],
-        cssPseudoClass: [],
-        cssPseudoElement: [],
-      },
-      div: {
-        attributes: {},
-        innerHTML: "*",
-        cssPseudoClass: [],
-        cssPseudoElement: [],
-      },
-    });
+        const CLASS_TAG_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
+          button: {
+            attributes: {},
+            innerHTML: ["#text"],
+            cssPseudoClass: [":hover"],
+            cssPseudoElement: [],
+          },
+          span: {
+            attributes: {},
+            innerHTML: ["#text"],
+            cssPseudoClass: [],
+            cssPseudoElement: [],
+          },
+          div: {
+            attributes: {},
+            innerHTML: "*",
+            cssPseudoClass: [],
+            cssPseudoElement: [],
+          },
+        });
 
-    const { createComponent: createClassComponent } = engine({
-      supportedKeywords: SUPPORTED_KEYWORDS,
-      htmlAttributesConfig: htmlAttributeConfig(SUPPORTED_KEYWORDS, {
-        id: "string | undefined",
-        class: "string | undefined",
-      }),
-      htmlTagConfig: CLASS_TAG_CONFIG,
-      cssSyntaxConfig: MOCK_CSS_SYNTAX,
-      cssAttributesConfig: CLASS_CSS_ATTRIBUTES,
-      cssPseudoClassConfig: EMPTY_PSEUDO_CLASSES,
-      cssPropertiesConfig: CLASS_CSS_PROPERTIES,
-    });
+        const { createComponent: createClassComponent } = engine({
+          supportedKeywords: SUPPORTED_KEYWORDS,
+          htmlAttributesConfig: htmlAttributeConfig(SUPPORTED_KEYWORDS, {
+            id: "string | undefined",
+            class: "string | undefined",
+          }),
+          htmlTagConfig: CLASS_TAG_CONFIG,
+          cssSyntaxConfig: MOCK_CSS_SYNTAX,
+          cssAttributesConfig: CLASS_CSS_ATTRIBUTES,
+          cssPseudoClassConfig: EMPTY_PSEUDO_CLASSES,
+          cssPropertiesConfig: CLASS_CSS_PROPERTIES,
+        });
 
-    test("accepts &.className when class is declared in attributes", () => {
-      const config = createClassComponent({
-        tag: "button",
-        attributes: { class: "active" },
-        innerHTML: "Click",
-        css: {
-          "&.active": { color: "red" },
-        },
-      });
-      assert.deepStrictEqual(config, {
-        tag: "button",
-        attributes: { class: "active" },
-        innerHTML: "Click",
-        css: {
-          "&.active": { color: "red" },
-        },
-      });
-    });
-
-    test("accepts multiple &.className selectors for multiple declared classes", () => {
-      const config = createClassComponent({
-        tag: "button",
-        attributes: { class: "primary large" },
-        innerHTML: "Click",
-        css: {
-          "&.primary": { color: "blue" },
-          "&.large": { color: "red" },
-        },
-      });
-      assert.deepStrictEqual(config, {
-        tag: "button",
-        attributes: { class: "primary large" },
-        innerHTML: "Click",
-        css: {
-          "&.primary": { color: "blue" },
-          "&.large": { color: "red" },
-        },
-      });
-    });
-
-    test("rejects &.className when class is not declared on the element", () => {
-      assert.throws(
-        () =>
-          createClassComponent({
+        test("accepts &.className when class is declared in attributes", () => {
+          const config = createClassComponent({
             tag: "button",
             attributes: { class: "active" },
             innerHTML: "Click",
             css: {
-              // @ts-expect-error
-              "&.inactive": { color: "red" },
-            },
-          }),
-        /CSS Error: Class selector '&.inactive' references class 'inactive' which is not declared in the element's 'class' attribute/,
-      );
-    });
-
-    test("rejects &.className when no class attribute is present", () => {
-      assert.throws(
-        () =>
-          createClassComponent({
-            tag: "button",
-            innerHTML: "Click",
-            css: {
-              // @ts-expect-error
               "&.active": { color: "red" },
             },
-          }),
-        /CSS Error: Class selector '&.active' references class 'active' which is not declared in the element's 'class' attribute/,
-      );
-    });
-
-    test("rejects &.className when class attribute is empty string", () => {
-      assert.throws(
-        () =>
-          createClassComponent({
+          });
+          assert.deepStrictEqual(config, {
             tag: "button",
-            attributes: { class: "" },
+            attributes: { class: "active" },
             innerHTML: "Click",
             css: {
-              // @ts-expect-error
               "&.active": { color: "red" },
             },
-          }),
-        /CSS Error:/,
-      );
-    });
+          });
+        });
 
-    test("accepts &.className with pseudo-class nesting", () => {
-      const CLASS_PSEUDO_TAG = htmlTagConfig(SUPPORTED_KEYWORDS, {
-        button: {
-          attributes: {},
-          innerHTML: ["#text"],
-          cssPseudoClass: [":hover"],
-          cssPseudoElement: [],
-        },
-      });
-      const { createComponent: createPseudoClassComponent } = engine({
-        supportedKeywords: SUPPORTED_KEYWORDS,
-        htmlAttributesConfig: htmlAttributeConfig(SUPPORTED_KEYWORDS, {
-          class: "string | undefined",
-        }),
-        htmlTagConfig: CLASS_PSEUDO_TAG,
-        cssSyntaxConfig: MOCK_CSS_SYNTAX,
-        cssAttributesConfig: CLASS_CSS_ATTRIBUTES,
-        cssPseudoClassConfig: [":active"],
-        cssPropertiesConfig: CLASS_CSS_PROPERTIES,
-      });
-      const config = createPseudoClassComponent({
-        tag: "button",
-        attributes: { class: "primary" },
-        innerHTML: "Click",
-        css: {
-          "&.primary": {
-            ":hover": { color: "red" },
-          },
-        },
-      });
-      assert.deepStrictEqual(config, {
-        tag: "button",
-        attributes: { class: "primary" },
-        innerHTML: "Click",
-        css: {
-          "&.primary": {
-            ":hover": { color: "red" },
-          },
-        },
-      });
-    });
-
-    test("accepts &.className with child selector nesting", () => {
-      const config = createClassComponent({
-        tag: "div",
-        attributes: { class: "card" },
-        innerHTML: { title: { tag: "span", innerHTML: "Hi" } },
-        css: {
-          "&.card": {
-            "> title": { color: "red" },
-          },
-        },
-      });
-      assert.deepStrictEqual(config, {
-        tag: "div",
-        attributes: { class: "card" },
-        innerHTML: { title: { tag: "span", innerHTML: "Hi" } },
-        css: {
-          "&.card": {
-            "> title": { color: "red" },
-          },
-        },
-      });
-    });
-
-    test("rejects &.className nested inside a pseudo-class block when class not declared", () => {
-      assert.throws(
-        () =>
-          createClassComponent({
+        test("accepts multiple &.className selectors for multiple declared classes", () => {
+          const config = createClassComponent({
             tag: "button",
-            attributes: { class: "x" },
+            attributes: { class: "primary large" },
             innerHTML: "Click",
             css: {
-              ":hover": {
-                // @ts-expect-error
-                "&.y": { color: "red" },
+              "&.primary": { color: "blue" },
+              "&.large": { color: "red" },
+            },
+          });
+          assert.deepStrictEqual(config, {
+            tag: "button",
+            attributes: { class: "primary large" },
+            innerHTML: "Click",
+            css: {
+              "&.primary": { color: "blue" },
+              "&.large": { color: "red" },
+            },
+          });
+        });
+
+        test("rejects &.className when class is not declared on the element", () => {
+          assert.throws(
+            () =>
+              createClassComponent({
+                tag: "button",
+                attributes: { class: "active" },
+                innerHTML: "Click",
+                css: {
+                  // @ts-expect-error
+                  "&.inactive": { color: "red" },
+                },
+              }),
+            /CSS Error: Class selector '&.inactive' references class 'inactive' which is not declared in the element's 'class' attribute/,
+          );
+        });
+
+        test("rejects &.className when no class attribute is present", () => {
+          assert.throws(
+            () =>
+              createClassComponent({
+                tag: "button",
+                innerHTML: "Click",
+                css: {
+                  // @ts-expect-error
+                  "&.active": { color: "red" },
+                },
+              }),
+            /CSS Error: Class selector '&.active' references class 'active' which is not declared in the element's 'class' attribute/,
+          );
+        });
+
+        test("rejects &.className when class attribute is empty string", () => {
+          assert.throws(
+            () =>
+              createClassComponent({
+                tag: "button",
+                attributes: { class: "" },
+                innerHTML: "Click",
+                css: {
+                  // @ts-expect-error
+                  "&.active": { color: "red" },
+                },
+              }),
+            /CSS Error:/,
+          );
+        });
+
+        test("accepts &.className with pseudo-class nesting", () => {
+          const CLASS_PSEUDO_TAG = htmlTagConfig(SUPPORTED_KEYWORDS, {
+            button: {
+              attributes: {},
+              innerHTML: ["#text"],
+              cssPseudoClass: [":hover"],
+              cssPseudoElement: [],
+            },
+          });
+          const { createComponent: createPseudoClassComponent } = engine({
+            supportedKeywords: SUPPORTED_KEYWORDS,
+            htmlAttributesConfig: htmlAttributeConfig(SUPPORTED_KEYWORDS, {
+              class: "string | undefined",
+            }),
+            htmlTagConfig: CLASS_PSEUDO_TAG,
+            cssSyntaxConfig: MOCK_CSS_SYNTAX,
+            cssAttributesConfig: CLASS_CSS_ATTRIBUTES,
+            cssPseudoClassConfig: [":active"],
+            cssPropertiesConfig: CLASS_CSS_PROPERTIES,
+          });
+          const config = createPseudoClassComponent({
+            tag: "button",
+            attributes: { class: "primary" },
+            innerHTML: "Click",
+            css: {
+              "&.primary": {
+                ":hover": { color: "red" },
               },
             },
+          });
+          assert.deepStrictEqual(config, {
+            tag: "button",
+            attributes: { class: "primary" },
+            innerHTML: "Click",
+            css: {
+              "&.primary": {
+                ":hover": { color: "red" },
+              },
+            },
+          });
+        });
+
+        test("accepts &.className with child selector nesting", () => {
+          const config = createClassComponent({
+            tag: "div",
+            attributes: { class: "card" },
+            innerHTML: { title: { tag: "span", innerHTML: "Hi" } },
+            css: {
+              "&.card": {
+                "> title": { color: "red" },
+              },
+            },
+          });
+          assert.deepStrictEqual(config, {
+            tag: "div",
+            attributes: { class: "card" },
+            innerHTML: { title: { tag: "span", innerHTML: "Hi" } },
+            css: {
+              "&.card": {
+                "> title": { color: "red" },
+              },
+            },
+          });
+        });
+
+        test("rejects &.className nested inside a pseudo-class block when class not declared", () => {
+          assert.throws(
+            () =>
+              createClassComponent({
+                tag: "button",
+                attributes: { class: "x" },
+                innerHTML: "Click",
+                css: {
+                  ":hover": {
+                    // @ts-expect-error
+                    "&.y": { color: "red" },
+                  },
+                },
+              }),
+            /CSS Error: Class selector '&.y' references class 'y' which is not declared in the element's 'class' attribute/,
+          );
+        });
+
+        test("default CSS config with class attribute renders class in HTML", () => {
+          const comp = createComponent({
+            tag: "div",
+            attributes: { class: "foo bar" },
+            css: {
+              "&.foo": { color: "inherit" },
+            },
+          });
+          const { html } = renderBound(comp);
+          assert.ok(html.includes('class="foo bar"'));
+        });
+      });
+
+      describe("Child Selector CSS Validation", () => {
+        const CHILD_CSS_ATTRIBUTES = cssAttributeConfig(
+          SUPPORTED_KEYWORDS,
+          MOCK_CSS_SYNTAX,
+          {
+            color: "string",
+            display: "'block' | 'inline' | 'none'",
+          },
+        );
+        const CHILD_CSS_PROPERTIES = cssPropertiesConfig(
+          SUPPORTED_KEYWORDS,
+          MOCK_CSS_SYNTAX,
+          {},
+        );
+
+        const CHILD_TAG_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
+          div: {
+            attributes: {},
+            innerHTML: "*",
+            cssPseudoClass: [":hover"],
+            cssPseudoElement: [],
+          },
+          span: {
+            attributes: {},
+            innerHTML: ["#text"],
+            cssPseudoClass: [],
+            cssPseudoElement: [],
+          },
+        });
+
+        const { createComponent: createChildComponent } = engine({
+          supportedKeywords: SUPPORTED_KEYWORDS,
+          htmlAttributesConfig: htmlAttributeConfig(SUPPORTED_KEYWORDS, {
+            id: "string | undefined",
+            class: "string | undefined",
           }),
-        /CSS Error: Class selector '&.y' references class 'y' which is not declared in the element's 'class' attribute/,
-      );
-    });
+          htmlTagConfig: CHILD_TAG_CONFIG,
+          cssSyntaxConfig: MOCK_CSS_SYNTAX,
+          cssAttributesConfig: CHILD_CSS_ATTRIBUTES,
+          cssPseudoClassConfig: [":hover"],
+          cssPropertiesConfig: CHILD_CSS_PROPERTIES,
+        });
 
-    test("default CSS config with class attribute renders class in HTML", () => {
-      const comp = createComponent({
-        tag: "div",
-        attributes: { class: "foo bar" },
-        css: {
-          "&.foo": { color: "inherit" },
-        },
-      });
-      const { html } = renderBound(comp);
-      assert.ok(html.includes('class="foo bar"'));
-    });
-  });
-
-  describe("Child Selector CSS Validation", () => {
-    const CHILD_CSS_ATTRIBUTES = cssAttributeConfig(
-      SUPPORTED_KEYWORDS,
-      MOCK_CSS_SYNTAX,
-      {
-        color: "string",
-        display: "'block' | 'inline' | 'none'",
-      },
-    );
-    const CHILD_CSS_PROPERTIES = cssPropertiesConfig(
-      SUPPORTED_KEYWORDS,
-      MOCK_CSS_SYNTAX,
-      {},
-    );
-
-    const CHILD_TAG_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
-      div: {
-        attributes: {},
-        innerHTML: "*",
-        cssPseudoClass: [":hover"],
-        cssPseudoElement: [],
-      },
-      span: {
-        attributes: {},
-        innerHTML: ["#text"],
-        cssPseudoClass: [],
-        cssPseudoElement: [],
-      },
-    });
-
-    const { createComponent: createChildComponent } = engine({
-      supportedKeywords: SUPPORTED_KEYWORDS,
-      htmlAttributesConfig: htmlAttributeConfig(SUPPORTED_KEYWORDS, {
-        id: "string | undefined",
-        class: "string | undefined",
-      }),
-      htmlTagConfig: CHILD_TAG_CONFIG,
-      cssSyntaxConfig: MOCK_CSS_SYNTAX,
-      cssAttributesConfig: CHILD_CSS_ATTRIBUTES,
-      cssPseudoClassConfig: [":hover"],
-      cssPropertiesConfig: CHILD_CSS_PROPERTIES,
-    });
-
-    test("accepts a valid > childName selector", () => {
-      const config = createChildComponent({
-        tag: "div",
-        innerHTML: { title: { tag: "span", innerHTML: "Hello" } },
-        css: {
-          "> title": { color: "red" },
-        },
-      });
-      assert.deepStrictEqual(config, {
-        tag: "div",
-        innerHTML: { title: { tag: "span", innerHTML: "Hello" } },
-        css: {
-          "> title": { color: "red" },
-        },
-      });
-    });
-
-    test("rejects > childName that does not match any innerHTML key", () => {
-      assert.throws(
-        () =>
-          createChildComponent({
+        test("accepts a valid > childName selector", () => {
+          const config = createChildComponent({
             tag: "div",
             innerHTML: { title: { tag: "span", innerHTML: "Hello" } },
             css: {
-              // @ts-expect-error
-              "> headnig": { color: "red" },
-            },
-          }),
-        /CSS Error: Child selector '> headnig' references child 'headnig' which is not declared in the element's innerHTML/,
-      );
-    });
-
-    test("rejects > childName when innerHTML is a string", () => {
-      assert.throws(
-        () =>
-          createChildComponent({
-            tag: "span",
-            innerHTML: "Hello",
-            css: {
-              // @ts-expect-error
               "> title": { color: "red" },
             },
-          }),
-        /CSS Error: Child selector '> title' references child 'title' which is not declared in the element's innerHTML/,
-      );
-    });
-
-    test("rejects > childName when innerHTML is not present", () => {
-      assert.throws(
-        () =>
-          createChildComponent({
-            tag: "span",
+          });
+          assert.deepStrictEqual(config, {
+            tag: "div",
+            innerHTML: { title: { tag: "span", innerHTML: "Hello" } },
             css: {
-              // @ts-expect-error
               "> title": { color: "red" },
             },
-          }),
-        /CSS Error: Child selector '> title' references child 'title' which is not declared in the element's innerHTML/,
-      );
-    });
+          });
+        });
 
-    test("accepts > childName inside a pseudo-class block", () => {
-      const config = createChildComponent({
-        tag: "div",
-        innerHTML: { label: { tag: "span", innerHTML: "Hi" } },
-        css: {
-          ":hover": { "> label": { color: "red" } },
-        },
-      });
-      assert.deepStrictEqual(config, {
-        tag: "div",
-        innerHTML: { label: { tag: "span", innerHTML: "Hi" } },
-        css: {
-          ":hover": { "> label": { color: "red" } },
-        },
-      });
-    });
+        test("rejects > childName that does not match any innerHTML key", () => {
+          assert.throws(
+            () =>
+              createChildComponent({
+                tag: "div",
+                innerHTML: { title: { tag: "span", innerHTML: "Hello" } },
+                css: {
+                  // @ts-expect-error
+                  "> headnig": { color: "red" },
+                },
+              }),
+            /CSS Error: Child selector '> headnig' references child 'headnig' which is not declared in the element's innerHTML/,
+          );
+        });
 
-    test("rejects > childName inside a pseudo-class block when child does not exist", () => {
-      assert.throws(
-        () =>
-          createChildComponent({
+        test("rejects > childName when innerHTML is a string", () => {
+          assert.throws(
+            () =>
+              createChildComponent({
+                tag: "span",
+                innerHTML: "Hello",
+                css: {
+                  // @ts-expect-error
+                  "> title": { color: "red" },
+                },
+              }),
+            /CSS Error: Child selector '> title' references child 'title' which is not declared in the element's innerHTML/,
+          );
+        });
+
+        test("rejects > childName when innerHTML is not present", () => {
+          assert.throws(
+            () =>
+              createChildComponent({
+                tag: "span",
+                css: {
+                  // @ts-expect-error
+                  "> title": { color: "red" },
+                },
+              }),
+            /CSS Error: Child selector '> title' references child 'title' which is not declared in the element's innerHTML/,
+          );
+        });
+
+        test("accepts > childName inside a pseudo-class block", () => {
+          const config = createChildComponent({
             tag: "div",
             innerHTML: { label: { tag: "span", innerHTML: "Hi" } },
             css: {
-              ":hover": {
-                // @ts-expect-error
-                "> headnig": { color: "red" },
-              },
+              ":hover": { "> label": { color: "red" } },
             },
-          }),
-        /CSS Error: Child selector '> headnig' references child 'headnig' which is not declared in the element's innerHTML/,
-      );
-    });
-
-    test("accepts &.className inside > childName when the class is declared on the child", () => {
-      // Regression: the type level validates &. against the *child's* class
-      // attribute inside a `> child` block; the runtime must do the same
-      // instead of checking the root's classes at every depth.
-      const config = createChildComponent({
-        tag: "div",
-        attributes: { class: "card" },
-        innerHTML: {
-          child: {
+          });
+          assert.deepStrictEqual(config, {
             tag: "div",
-            attributes: { class: "inner" },
-            innerHTML: "x",
-          },
-        },
-        css: {
-          "> child": {
-            "&.inner": { color: "red" },
-          },
-        },
-      });
-      assert.strictEqual(
-        (config.css["> child"] as Record<string, unknown>)["&.inner"] !==
-          undefined,
-        true,
-      );
-    });
+            innerHTML: { label: { tag: "span", innerHTML: "Hi" } },
+            css: {
+              ":hover": { "> label": { color: "red" } },
+            },
+          });
+        });
 
-    test("rejects &.className inside > childName when the class is only on the root", () => {
-      assert.throws(
-        () =>
-          createChildComponent({
+        test("rejects > childName inside a pseudo-class block when child does not exist", () => {
+          assert.throws(
+            () =>
+              createChildComponent({
+                tag: "div",
+                innerHTML: { label: { tag: "span", innerHTML: "Hi" } },
+                css: {
+                  ":hover": {
+                    // @ts-expect-error
+                    "> headnig": { color: "red" },
+                  },
+                },
+              }),
+            /CSS Error: Child selector '> headnig' references child 'headnig' which is not declared in the element's innerHTML/,
+          );
+        });
+
+        test("accepts &.className inside > childName when the class is declared on the child", () => {
+          // Regression: the type level validates &. against the *child's* class
+          // attribute inside a `> child` block; the runtime must do the same
+          // instead of checking the root's classes at every depth.
+          const config = createChildComponent({
             tag: "div",
             attributes: { class: "card" },
             innerHTML: {
@@ -2471,72 +2445,98 @@ describe("createComponent (engine)", () => {
             },
             css: {
               "> child": {
-                // @ts-expect-error root's class, not the child's
-                "&.card": { color: "red" },
+                "&.inner": { color: "red" },
               },
             },
-          }),
-        /CSS Error: Class selector '&.card' references class 'card' which is not declared in the element's 'class' attribute/,
-      );
-    });
+          });
+          assert.strictEqual(
+            (config.css["> child"] as Record<string, unknown>)["&.inner"] !==
+              undefined,
+            true,
+          );
+        });
 
-    test("accepts valid nested > childName > deeperChild", () => {
-      const config = createChildComponent({
-        tag: "div",
-        innerHTML: {
-          card: {
-            tag: "div",
-            innerHTML: {
-              title: { tag: "span", innerHTML: "Hello" },
-            },
-          },
-        },
-        css: {
-          "> card": {
-            "> title": { color: "red" },
-          },
-        },
-      });
-      assert.deepStrictEqual(config, {
-        tag: "div",
-        innerHTML: {
-          card: {
-            tag: "div",
-            innerHTML: {
-              title: { tag: "span", innerHTML: "Hello" },
-            },
-          },
-        },
-        css: {
-          "> card": {
-            "> title": { color: "red" },
-          },
-        },
-      });
-    });
+        test("rejects &.className inside > childName when the class is only on the root", () => {
+          assert.throws(
+            () =>
+              createChildComponent({
+                tag: "div",
+                attributes: { class: "card" },
+                innerHTML: {
+                  child: {
+                    tag: "div",
+                    attributes: { class: "inner" },
+                    innerHTML: "x",
+                  },
+                },
+                css: {
+                  "> child": {
+                    // @ts-expect-error root's class, not the child's
+                    "&.card": { color: "red" },
+                  },
+                },
+              }),
+            /CSS Error: Class selector '&.card' references class 'card' which is not declared in the element's 'class' attribute/,
+          );
+        });
 
-    test("rejects nested > childName when deeper child does not exist in child's innerHTML", () => {
-      assert.throws(
-        () =>
-          createChildComponent({
+        test("accepts valid nested > childName > deeperChild", () => {
+          const config = createChildComponent({
             tag: "div",
             innerHTML: {
               card: {
-                tag: "span",
-                innerHTML: "text",
+                tag: "div",
+                innerHTML: {
+                  title: { tag: "span", innerHTML: "Hello" },
+                },
               },
             },
             css: {
               "> card": {
-                // @ts-expect-error
                 "> title": { color: "red" },
               },
             },
-          }),
-        /CSS Error: Child selector '> title' references child 'title' which is not declared in the element's innerHTML/,
-      );
-    });
-  });
+          });
+          assert.deepStrictEqual(config, {
+            tag: "div",
+            innerHTML: {
+              card: {
+                tag: "div",
+                innerHTML: {
+                  title: { tag: "span", innerHTML: "Hello" },
+                },
+              },
+            },
+            css: {
+              "> card": {
+                "> title": { color: "red" },
+              },
+            },
+          });
+        });
+
+        test("rejects nested > childName when deeper child does not exist in child's innerHTML", () => {
+          assert.throws(
+            () =>
+              createChildComponent({
+                tag: "div",
+                innerHTML: {
+                  card: {
+                    tag: "span",
+                    innerHTML: "text",
+                  },
+                },
+                css: {
+                  "> card": {
+                    // @ts-expect-error
+                    "> title": { color: "red" },
+                  },
+                },
+              }),
+            /CSS Error: Child selector '> title' references child 'title' which is not declared in the element's innerHTML/,
+          );
+        });
+      });
 
       test("triple-nested array -> object -> array -> object with CSS chain", () => {
         const comp = createComponent({
@@ -2576,6 +2576,138 @@ describe("createComponent (engine)", () => {
         assert.ok(css.includes("color: transparent;"));
         assert.ok(html.includes("<span cid-c>deepest</span>"));
       });
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Production mode — validation is skipped, but rendering still works.
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // Production mode — validation is skipped, but rendering still works.
+  // -----------------------------------------------------------------------
+  describe("production mode", () => {
+    const PROD_CSS_ATTRIBUTES = cssAttributeConfig(
+      SUPPORTED_KEYWORDS,
+      MOCK_CSS_SYNTAX,
+      {
+        width: "string",
+        color: "string",
+        display: "string",
+      },
+    );
+    const PROD_CSS_PROPERTIES = cssPropertiesConfig(
+      SUPPORTED_KEYWORDS,
+      MOCK_CSS_SYNTAX,
+      {},
+    );
+
+    const PROD_TAG_CONFIG = htmlTagConfig(SUPPORTED_KEYWORDS, {
+      div: {
+        attributes: {},
+        innerHTML: "*",
+        cssPseudoClass: [],
+        cssPseudoElement: [],
+      },
+      span: {
+        attributes: {},
+        innerHTML: ["#text"],
+        cssPseudoClass: [],
+        cssPseudoElement: [],
+      },
+    });
+
+    const {
+      createComponent: createProdComponent,
+      renderComponent: renderProd,
+    } = engine({
+      supportedKeywords: SUPPORTED_KEYWORDS,
+      htmlAttributesConfig: htmlAttributeConfig(SUPPORTED_KEYWORDS, {
+        id: "string | undefined",
+        class: "string | undefined",
+      }),
+      htmlTagConfig: PROD_TAG_CONFIG,
+      cssSyntaxConfig: MOCK_CSS_SYNTAX,
+      cssAttributesConfig: PROD_CSS_ATTRIBUTES,
+      cssPseudoClassConfig: EMPTY_PSEUDO_CLASSES,
+      cssPropertiesConfig: PROD_CSS_PROPERTIES,
+      skipValidation: true,
+    });
+
+    test("skips validation — invalid data passes through", () => {
+      const comp = createProdComponent({ tag: "unknown" } as any);
+      assert.deepStrictEqual(comp, { tag: "unknown" });
+    });
+
+    test("skips attribute validation — unknown attributes pass through", () => {
+      const comp = createProdComponent({
+        tag: "div",
+        attributes: { href: "https://example.com" },
+      } as any);
+      assert.deepStrictEqual(comp, {
+        tag: "div",
+        attributes: { href: "https://example.com" },
+      });
+    });
+
+    test("skips CSS child selector check — invalid child selector passes through", () => {
+      const comp = createProdComponent({
+        tag: "div",
+        innerHTML: { title: { tag: "span", innerHTML: "Hello" } },
+        css: { "> headnig": { color: "red" } },
+      } as any);
+      assert.deepStrictEqual(comp, {
+        tag: "div",
+        innerHTML: { title: { tag: "span", innerHTML: "Hello" } },
+        css: { "> headnig": { color: "red" } },
+      });
+    });
+
+    test("valid components still render correctly", () => {
+      const comp = createProdComponent({
+        tag: "div",
+        innerHTML: { title: { tag: "span", innerHTML: "hello" } },
+        css: { width: "100%", "> title": { color: "inherit" } },
+      });
+      const { html, css } = renderProd(comp);
+      assert.match(html, /^<div cid-[a-z0-9]+>/);
+      assert.ok(html.includes("<span cid-title"));
+      assert.ok(html.includes("hello"));
+      assert.ok(css.includes("width: 100%;"));
+    });
+
+    test("deeply nested valid tree renders correctly in production mode", () => {
+      const comp = createProdComponent({
+        tag: "div",
+        innerHTML: {
+          level1: {
+            tag: "div",
+            innerHTML: {
+              level2: [
+                {
+                  tag: "div",
+                  innerHTML: {
+                    level3: [{ tag: "span", innerHTML: "deep" }],
+                  },
+                },
+              ],
+            },
+          },
+        },
+        css: {
+          "> level1": {
+            "> level2": {
+              "> level3": { color: "transparent" },
+            },
+          },
+        },
+      });
+      const { html, css } = renderProd(comp);
+      assert.ok(html.includes("cid-level1"));
+      assert.ok(html.includes("cid-level2"));
+      assert.ok(html.includes("cid-level3"));
+      assert.ok(css.includes("[cid-level1]"));
+      assert.ok(css.includes("[cid-level2]"));
+      assert.ok(css.includes("[cid-level3]"));
     });
   });
 });

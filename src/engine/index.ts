@@ -130,14 +130,6 @@ export function validateComponentNode(
       contextClasses: string[],
     ): void => {
       for (const key of Object.keys(block)) {
-        if (key.startsWith("&.")) {
-          const className = key.slice(2);
-          if (!contextClasses.includes(className)) {
-            throw new Error(
-              `CSS Error: Class selector '${key}' references class '${className}' which is not declared in the element's 'class' attribute`,
-            );
-          }
-        }
         if (key.startsWith("> ")) {
           const childName = key.slice(2);
           if (
@@ -151,27 +143,52 @@ export function validateComponentNode(
           }
         }
         const value = block[key];
-        if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+        if (
+          value !== null &&
+          typeof value === "object" &&
+          !Array.isArray(value)
+        ) {
           let nextContext = contextInnerHTML;
           let nextClasses = contextClasses;
           if (key.startsWith("> ")) {
             const childName = key.slice(2);
-            if (contextInnerHTML && typeof contextInnerHTML === "object" && childName in contextInnerHTML) {
-              const rawChild = (contextInnerHTML as Record<string, unknown>)[childName];
+            if (
+              contextInnerHTML &&
+              typeof contextInnerHTML === "object" &&
+              childName in contextInnerHTML
+            ) {
+              const rawChild = (contextInnerHTML as Record<string, unknown>)[
+                childName
+              ];
               if (Array.isArray(rawChild)) {
                 const merged: Record<string, unknown> = {};
                 const mergedClasses = new Set<string>();
                 for (const item of rawChild) {
-                  if (item && typeof item === "object" && !Array.isArray(item)) {
+                  if (
+                    item &&
+                    typeof item === "object" &&
+                    !Array.isArray(item)
+                  ) {
                     for (const cls of classesOf(item)) {
                       mergedClasses.add(cls);
                     }
-                    const childInner = (item as Record<string, unknown>)["innerHTML"];
-                    if (childInner && typeof childInner === "object" && !Array.isArray(childInner)) {
-                      for (const [k, v] of Object.entries(childInner as Record<string, unknown>)) {
+                    const childInner = (item as Record<string, unknown>)[
+                      "innerHTML"
+                    ];
+                    if (
+                      childInner &&
+                      typeof childInner === "object" &&
+                      !Array.isArray(childInner)
+                    ) {
+                      for (const [k, v] of Object.entries(
+                        childInner as Record<string, unknown>,
+                      )) {
                         if (Array.isArray(v)) {
                           const existing = merged[k];
-                          merged[k] = existing && Array.isArray(existing) ? [...existing, ...v] : [...v];
+                          merged[k] =
+                            existing && Array.isArray(existing)
+                              ? [...existing, ...v]
+                              : [...v];
                         } else {
                           merged[k] = v;
                         }
@@ -179,12 +196,22 @@ export function validateComponentNode(
                     }
                   }
                 }
-                nextContext = Object.keys(merged).length > 0 ? merged as typeof innerHTML : undefined;
+                nextContext =
+                  Object.keys(merged).length > 0
+                    ? (merged as typeof innerHTML)
+                    : undefined;
                 nextClasses = [...mergedClasses];
-              } else if (rawChild && typeof rawChild === "object" && !Array.isArray(rawChild)) {
-                nextContext = "innerHTML" in (rawChild as Record<string, unknown>)
-                  ? (rawChild as Record<string, unknown>)["innerHTML"] as typeof innerHTML
-                  : undefined;
+              } else if (
+                rawChild &&
+                typeof rawChild === "object" &&
+                !Array.isArray(rawChild)
+              ) {
+                nextContext =
+                  "innerHTML" in (rawChild as Record<string, unknown>)
+                    ? ((rawChild as Record<string, unknown>)[
+                        "innerHTML"
+                      ] as typeof innerHTML)
+                    : undefined;
                 nextClasses = classesOf(rawChild);
               } else {
                 nextContext = undefined;
@@ -192,7 +219,11 @@ export function validateComponentNode(
               }
             }
           }
-          validateCSS(value as Record<string, unknown>, nextContext, nextClasses);
+          validateCSS(
+            value as Record<string, unknown>,
+            nextContext,
+            nextClasses,
+          );
         }
       }
     };
@@ -313,6 +344,7 @@ export default function engine<
     CSSSyntaxConfig,
     CSSPropertiesConfig
   >;
+  skipValidation?: boolean;
 }) {
   const createComponent = <const T extends BaseComponentStructure>(
     componentStructure: ValidateComponentStructure<
@@ -330,13 +362,15 @@ export default function engine<
       keyof HTMLTagConfig | "#text"
     >,
   ) => {
-    validateComponentNode(
-      componentStructure,
-      config.supportedKeywords,
-      config.htmlAttributesConfig,
-      config.htmlTagConfig,
-      null,
-    );
+    if (!config.skipValidation) {
+      validateComponentNode(
+        componentStructure,
+        config.supportedKeywords,
+        config.htmlAttributesConfig,
+        config.htmlTagConfig,
+        null,
+      );
+    }
     return componentStructure as T;
   };
 
