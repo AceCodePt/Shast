@@ -83,6 +83,14 @@ The stale style is not a visual bug you discover next month. It's a red
 squiggle right now - and if the types were bypassed, a runtime error instead
 of silence.
 
+If you trust your pipeline and want to skip the per-component runtime
+validation in production, pass `skipValidation: true` as a second argument to `engine()`:
+```ts
+const { createComponent } = engine(config, { skipValidation: true });
+```
+`createComponent` becomes a pass-through — no tag, attribute, or CSS checks.
+Useful when `tsc`/CI has already caught everything and you're CPU-bound.
+
 ## Dynamic components and classes
 
 Components are plain functions, so parameters, conditional classes, and

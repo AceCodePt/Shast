@@ -344,8 +344,9 @@ export default function engine<
     CSSSyntaxConfig,
     CSSPropertiesConfig
   >;
-  skipValidation?: boolean;
-}) {
+},
+  options?: { skipValidation?: boolean },
+) {
   const createComponent = <const T extends BaseComponentStructure>(
     componentStructure: ValidateComponentStructure<
       SupportedKeywords,
@@ -362,7 +363,7 @@ export default function engine<
       keyof HTMLTagConfig | "#text"
     >,
   ) => {
-    if (!config.skipValidation) {
+    if (!options?.skipValidation) {
       validateComponentNode(
         componentStructure,
         config.supportedKeywords,

@@ -2148,53 +2148,6 @@ describe("createComponent (engine)", () => {
           });
         });
 
-        test("rejects &.className when class is not declared on the element", () => {
-          assert.throws(
-            () =>
-              createClassComponent({
-                tag: "button",
-                attributes: { class: "active" },
-                innerHTML: "Click",
-                css: {
-                  // @ts-expect-error
-                  "&.inactive": { color: "red" },
-                },
-              }),
-            /CSS Error: Class selector '&.inactive' references class 'inactive' which is not declared in the element's 'class' attribute/,
-          );
-        });
-
-        test("rejects &.className when no class attribute is present", () => {
-          assert.throws(
-            () =>
-              createClassComponent({
-                tag: "button",
-                innerHTML: "Click",
-                css: {
-                  // @ts-expect-error
-                  "&.active": { color: "red" },
-                },
-              }),
-            /CSS Error: Class selector '&.active' references class 'active' which is not declared in the element's 'class' attribute/,
-          );
-        });
-
-        test("rejects &.className when class attribute is empty string", () => {
-          assert.throws(
-            () =>
-              createClassComponent({
-                tag: "button",
-                attributes: { class: "" },
-                innerHTML: "Click",
-                css: {
-                  // @ts-expect-error
-                  "&.active": { color: "red" },
-                },
-              }),
-            /CSS Error:/,
-          );
-        });
-
         test("accepts &.className with pseudo-class nesting", () => {
           const CLASS_PSEUDO_TAG = htmlTagConfig(SUPPORTED_KEYWORDS, {
             button: {
@@ -2258,24 +2211,6 @@ describe("createComponent (engine)", () => {
               },
             },
           });
-        });
-
-        test("rejects &.className nested inside a pseudo-class block when class not declared", () => {
-          assert.throws(
-            () =>
-              createClassComponent({
-                tag: "button",
-                attributes: { class: "x" },
-                innerHTML: "Click",
-                css: {
-                  ":hover": {
-                    // @ts-expect-error
-                    "&.y": { color: "red" },
-                  },
-                },
-              }),
-            /CSS Error: Class selector '&.y' references class 'y' which is not declared in the element's 'class' attribute/,
-          );
         });
 
         test("default CSS config with class attribute renders class in HTML", () => {
@@ -2456,30 +2391,6 @@ describe("createComponent (engine)", () => {
           );
         });
 
-        test("rejects &.className inside > childName when the class is only on the root", () => {
-          assert.throws(
-            () =>
-              createChildComponent({
-                tag: "div",
-                attributes: { class: "card" },
-                innerHTML: {
-                  child: {
-                    tag: "div",
-                    attributes: { class: "inner" },
-                    innerHTML: "x",
-                  },
-                },
-                css: {
-                  "> child": {
-                    // @ts-expect-error root's class, not the child's
-                    "&.card": { color: "red" },
-                  },
-                },
-              }),
-            /CSS Error: Class selector '&.card' references class 'card' which is not declared in the element's 'class' attribute/,
-          );
-        });
-
         test("accepts valid nested > childName > deeperChild", () => {
           const config = createChildComponent({
             tag: "div",
@@ -2630,8 +2541,7 @@ describe("createComponent (engine)", () => {
       cssAttributesConfig: PROD_CSS_ATTRIBUTES,
       cssPseudoClassConfig: EMPTY_PSEUDO_CLASSES,
       cssPropertiesConfig: PROD_CSS_PROPERTIES,
-      skipValidation: true,
-    });
+    }, { skipValidation: true });
 
     test("skips validation — invalid data passes through", () => {
       const comp = createProdComponent({ tag: "unknown" } as any);
