@@ -361,6 +361,8 @@
 
 - [x] **CSS string output**
   - [x] Styled components receive a `cid-<hash>` attribute; children receive a semantic `cid-<name>` attribute only when targeted by a `> childName` direct child selector
+  - [x] Scope hash is derived from the component's `css` block (its style contract), not from instance data (attribute values, text, child data)
+  - [x] Instances with an identical `css` block share one scope; the rule is emitted once, not once per instance / data variation
   - [x] Inline `css` block properties collected as scoped CSS rules
   - [x] Child CSS selectors (`> childName`) applied to corresponding children
   - [x] Pseudo-class blocks included in scoped styles
@@ -647,38 +649,46 @@
 
 ## CSS Class Selectors
 
-- [ ] **`class` attribute supports space-separated class names** — `class: "foo bar"` declares multiple classes on an element
-  - [ ] Type Validation
-  - [ ] Type Inference
-  - [ ] Runtime Validation
-  - [ ] Test
+> **Class checking is type-level only, by design.** `&.className` is validated
+> against the classes the `class` attribute can produce *at the type level*.
+> The runtime does **not** reject a `&.className` whose class is absent from the
+> rendered `class` string: the server render is only the *initial* state, while
+> classes are dynamic (toggled by client JS, or conditional template literals
+> such as `` `${active} card` ``), so the runtime sees a single point of the
+> type's union and cannot reject soundly — doing so false-positives on
+> legitimate dynamic classes. Contrast `> childName`, whose structure is fixed
+> at render and therefore *is* runtime-validated.
 
-- [ ] **Class targeting in CSS blocks** — `css: { "&.foo": { ... }, "&.bar": { ... } }` targets individual declared classes
-  - [ ] Type Validation
-  - [ ] Type Inference
-  - [ ] Runtime Validation
-  - [ ] Test
+- [x] **`class` attribute supports space-separated class names** — `class: "foo bar"` declares multiple classes on an element
+  - [x] Type Validation
+  - [x] Type Inference
+  - [x] Test
 
-- [ ] **Selector rules**
-  - [ ] `&.className` only valid if `className` is part of the element's `class` attribute
-  - [ ] Unknown class in CSS selector is a type-level error
-  - [ ] Multiple classes on same element targetable individually
-  - [ ] Pseudo-classes applied via nesting inside `&.className` block
+- [x] **Class targeting in CSS blocks** — `css: { "&.foo": { ... }, "&.bar": { ... } }` targets individual declared classes
+  - [x] Type Validation
+  - [x] Type Inference
+  - [x] Test
+
+- [x] **Selector rules**
+  - [x] `&.className` only valid if `className` is part of the element's `class` attribute (type level)
+  - [x] Unknown class in CSS selector is a type-level error
+  - [x] Multiple classes on same element targetable individually
+  - [x] Pseudo-classes applied via nesting inside `&.className` block
   - [ ] Pseudo-elements applied via nesting inside `&.className` block
 
 - [ ] **Nesting**
   - [ ] `&.className` inside `@media` blocks
-  - [ ] `&.className` inside pseudo-class blocks
+  - [x] `&.className` inside pseudo-class blocks
   - [ ] `&.className` inside pseudo-element blocks
-  - [ ] Child selectors inside `&.className` blocks (`> childName`)
+  - [x] Child selectors inside `&.className` blocks (`> childName`)
 
-- [ ] **Rendering**
-  - [ ] `class` attribute rendered as space-separated string in HTML output
-  - [ ] `&.foo` selectors rendered as `.cid-hash.foo` in scoped CSS
-  - [ ] CID scoping preserved on class selectors
+- [x] **Rendering**
+  - [x] `class` attribute rendered as space-separated string in HTML output
+  - [x] `&.foo` selectors rendered nested as `&.foo` under the element's `[cid-<hash>]` scope
+  - [x] CID scoping preserved on class selectors
 
 - [ ] **Edge Cases**
-  - [ ] Element with no `class` attribute rejects `&.` selectors
-  - [ ] Empty `class` attribute `""`
+  - [x] Element with no `class` attribute rejects `&.` selectors (type level; runtime accepts — dynamic state)
+  - [x] Empty `class` attribute `""` (type level rejects `&.`; runtime accepts)
   - [ ] Duplicate class names ignored
   - [ ] Class name with special characters
