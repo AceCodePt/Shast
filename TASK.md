@@ -361,8 +361,8 @@
 
 - [x] **CSS string output**
   - [x] Styled components receive a `cid-<hash>` attribute; children receive a semantic `cid-<name>` attribute only when targeted by a `> childName` direct child selector
-  - [x] Scope hash is derived from the component's `css` block (its style contract), not from instance data (attribute values, text, child data)
-  - [x] Instances with an identical `css` block share one scope; the rule is emitted once, not once per instance / data variation
+  - [x] Scope hash is derived from the component's `css` block, not from instance data
+  - [x] Instances with an identical `css` block share one scope and are emitted once
   - [x] Inline `css` block properties collected as scoped CSS rules
   - [x] Child CSS selectors (`> childName`) applied to corresponding children
   - [x] Pseudo-class blocks included in scoped styles
@@ -660,11 +660,16 @@
   - [x] Test
 
 - [x] **Selector rules**
-  - [x] `&.className` only valid if `className` is part of the element's `class` attribute (type level)
+  - [x] `&.className` only valid if `className` is part of the element's `class` attribute
   - [x] Unknown class in CSS selector is a type-level error
   - [x] Multiple classes on same element targetable individually
   - [x] Pseudo-classes applied via nesting inside `&.className` block
-  - [ ] Pseudo-elements applied via nesting inside `&.className` block
+  - [x] Pseudo-elements applied via nesting inside `&.className` block
+
+- [ ] **Type-level class-name validation** — `ValidateClassName` rejects an invalid CSS class identifier at compile time, applied to the `class` attribute (`SplitSpace`) and the `&.${K}` selector keys in `ValidateComponentCSSStructure`
+  - [ ] Type Validation
+  - [ ] Type Inference
+  - [ ] Test
 
 - [ ] **Nesting**
   - [ ] `&.className` inside `@media` blocks
@@ -678,7 +683,49 @@
   - [x] CID scoping preserved on class selectors
 
 - [ ] **Edge Cases**
-  - [x] Element with no `class` attribute rejects `&.` selectors (type level; runtime accepts — dynamic state)
-  - [x] Empty `class` attribute `""` (type level rejects `&.`; runtime accepts)
+  - [x] Element with no `class` attribute rejects `&.` selectors
+  - [x] Empty `class` attribute `""`
   - [ ] Duplicate class names ignored
-  - [ ] Class name with special characters
+  - [x] Class name with special characters
+
+---
+
+## CSS Semantic Rules (structure → style validity)
+
+- [ ] **Structure → style validity checks** - extends validation from "is this token legal" to "does this declaration do anything in its structural context", threaded like innerHTML ancestral inheritance. Ordered by type-system cost (Tier A cheapest)
+  - [ ] Type Validation
+  - [ ] Type Inference
+  - [ ] Runtime Validation
+  - [ ] Test
+
+- [ ] **Tier A — same-node rules** (intra-block conditional, no threading)
+  - [ ] `z-index` requires a stacking context (`position` ≠ static, or opacity/transform/filter)
+  - [ ] Inline elements reject `width` / `height` / `margin-top` / `margin-bottom`
+  - [ ] Box-model overflow (percentage `width` + padding/border + `box-sizing: content-box`)
+  - [ ] `vertical-align` valid only on inline / inline-block / table-cell
+  - [ ] Non-animatable `transition` / `animation` property
+  - [ ] `text-align` context (block containers)
+  - [ ] Float container collapse (only floated children, no clearfix / BFC)
+
+- [ ] **Tier B — one-level parent → child threading**
+  - [ ] Flex/grid item props require flex/grid parent (`flex` / `order` / `align-self` / `grid-column` / `grid-row`)
+  - [ ] `grid-area` name validated against parent's `grid-template-areas`
+  - [ ] Container-only props require own flex/grid display (`gap` / `justify-content` / `align-items`)
+
+- [ ] **Tier C — ancestor-chain boolean threading**
+  - [ ] `position: absolute` needs a positioned ancestor
+  - [ ] `position: sticky` needs a threshold + no scroll-clipping ancestor
+  - [ ] `position: fixed` containing block changed by ancestor `transform` / `filter` / `will-change`
+  - [ ] `overflow` clipping an absolutely-positioned descendant
+  - [ ] `height: 100%` chain to a definite-height ancestor
+
+- [ ] **Tier D — union-carrying** (gate behind perf budget)
+  - [ ] Conditional display invalidates child layout props (error only when meaningful in zero states)
+  - [ ] Multi-state dead-property detection
+
+- [ ] **Out of scope** (not statically decidable)
+  - [ ] `inherit` value / contrast (extrinsic render context)
+  - [ ] Actual content overflow / fit (layout-computed)
+  - [ ] Flex `min-width: auto` overflow (needs intrinsic content size)
+  - [ ] Specificity / `!important` conflicts across components (extrinsic cascade)
+  - [ ] `100vw` scrollbar, missing assets, responsive design intent (runtime / intent)
