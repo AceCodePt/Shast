@@ -31,7 +31,16 @@ function hashNode(node: unknown): string {
 const PREFIX = "cid-";
 
 function hashAttribute(node: BaseComponentStructure): string {
-  return `${PREFIX}${hashNode(node)}`;
+  // The scope is a property of the component's *style contract* — its `css`
+  // block — not of instance data (attribute values, text, child data). The
+  // rendered rules are a pure function of `css` (child selectors emit
+  // `[cid-<name>]` by name, not by child hash), so two components with an
+  // identical `css` block produce identical rules and must share one scope.
+  // Per-instance differences (e.g. which classes are actually present) are
+  // resolved by the real `class` attribute at match time, not by minting a
+  // separate scope. Hashing the whole node would emit a duplicate block per
+  // instance and per data variation.
+  return `${PREFIX}${hashNode(node.css)}`;
 }
 
 function semanticAttribute(name: string): string {
@@ -208,7 +217,11 @@ function markTargetedChildren(
         const rawChild = innerHTML[childName];
         if (Array.isArray(rawChild)) {
           for (const item of rawChild) {
-            if (item !== null && typeof item === "object" && !Array.isArray(item)) {
+            if (
+              item !== null &&
+              typeof item === "object" &&
+              !Array.isArray(item)
+            ) {
               targeted.add(item as BaseComponentStructure);
             }
           }
@@ -406,8 +419,12 @@ export function renderComponent(
   node: BaseComponentStructure,
 ): { html: string; css: string } {
   const targeted = collectTargetedChildren(node);
+  // Identical `css` blocks hash to the same scope and render to the same rule
+  // string; dedupe so a component styled once is emitted once, regardless of
+  // how many instances (or data variations) appear in the tree.
+  const rules = [...new Set(collectCSS(node))];
   return {
     html: renderHTMLNode(tagConfig, node, undefined, targeted),
-    css: collectCSS(node).join("\n\n"),
+    css: rules.join("\n\n"),
   };
 }

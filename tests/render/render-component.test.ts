@@ -335,6 +335,37 @@ describe("renderComponent", () => {
       const { html, css } = render({ tag: "div", css: { width: "1px" } });
       assert.ok(css.startsWith(`[${hashScope(html, "div")}]`));
     });
+
+    test("instances with identical css but different data share one scope", () => {
+      const card = (n: number): BaseComponentStructure => ({
+        tag: "div",
+        attributes: { class: n > 1 ? "active card" : "card" },
+        innerHTML: { label: { tag: "span", innerHTML: String(n) } },
+        css: { width: "1px" },
+      });
+      const one = render(card(1));
+      const two = render(card(2));
+      // Same css → same scope, even though class/text data differ.
+      assert.strictEqual(
+        hashScope(one.html, "div"),
+        hashScope(two.html, "div"),
+      );
+    });
+
+    test("a component styled once is emitted once across many instances", () => {
+      const card = (n: number): BaseComponentStructure => ({
+        tag: "div",
+        attributes: { class: n > 1 ? "active card" : "card" },
+        innerHTML: { label: { tag: "span", innerHTML: String(n) } },
+        css: { width: "1px" },
+      });
+      const { css } = render({
+        tag: "div",
+        innerHTML: { items: [card(1), card(2), card(3)] },
+      });
+      // The shared rule appears exactly once, not once per instance.
+      assert.strictEqual(css.split("width: 1px;").length - 1, 1);
+    });
   });
 
   describe("Determinism & edge cases", () => {
