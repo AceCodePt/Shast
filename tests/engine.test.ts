@@ -1051,6 +1051,25 @@ describe("createComponent (engine)", () => {
       });
     });
 
+    test("accepts a pseudo-element inside a class selector block", () => {
+      const config = createPEComponent({
+        tag: "field",
+        attributes: { class: "active" },
+        innerHTML: "x",
+        css: {
+          "&.active": { "::placeholder": { color: "gray" } },
+        },
+      });
+      assert.deepStrictEqual(config, {
+        tag: "field",
+        attributes: { class: "active" },
+        innerHTML: "x",
+        css: {
+          "&.active": { "::placeholder": { color: "gray" } },
+        },
+      });
+    });
+
     test("accepts a pseudo-element inside a pseudo-class block", () => {
       const config = createPEComponent({
         tag: "field",
