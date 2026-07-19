@@ -649,16 +649,6 @@
 
 ## CSS Class Selectors
 
-> **Class checking is type-level only, by design.** `&.className` is validated
-> against the classes the `class` attribute can produce *at the type level*.
-> The runtime does **not** reject a `&.className` whose class is absent from the
-> rendered `class` string: the server render is only the *initial* state, while
-> classes are dynamic (toggled by client JS, or conditional template literals
-> such as `` `${active} card` ``), so the runtime sees a single point of the
-> type's union and cannot reject soundly — doing so false-positives on
-> legitimate dynamic classes. Contrast `> childName`, whose structure is fixed
-> at render and therefore *is* runtime-validated.
-
 - [x] **`class` attribute supports space-separated class names** — `class: "foo bar"` declares multiple classes on an element
   - [x] Type Validation
   - [x] Type Inference
